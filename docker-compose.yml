@@ -1,6 +1,22 @@
 version: "3.9"
 services:
-  web:
+  dora:
+    container_name: dora
     build: .
     ports:
       - "8080:8080"
+    env_file: ./local.env
+    depends_on:
+      - mongodb
+  mongodb:
+    container_name: mongodb
+    image: mongo:latest
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=user
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb:/data/db
+volumes:
+  mongodb:
