@@ -29,4 +29,7 @@ mongo-stop:
 	docker stop mongo-test
 	docker rm mongo-test
 
+mongo-sh:
+	mongosh --host 127.0.0.1 --port 27017 -u user -p password
+
 integration-test: mongo-run unit-test mongo-stop

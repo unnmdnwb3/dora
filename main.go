@@ -31,11 +31,12 @@ func main() {
     router.GET("/api/v1/projects", handler.ReadAllProjects)
 
 	router.POST("/api/integrations", handler.CreateIntegration)
-    router.GET("/api/integrations", handler.ReadIntegration)
+	router.GET("/api/integrations", handler.ReadAllIntegrations)
+    router.GET("/api/integrations/:id", handler.ReadIntegration)
 	router.PUT("/api/integrations", handler.UpdateIntegration)
-	router.DELETE("/api/integrations", handler.DeleteIntegration)
+	router.DELETE("/api/integrations/:id", handler.DeleteIntegration)
 
-    log.Println("The server is running and listening on localhost")
+    log.Println("\nThe server is running and listening on localhost")
     err = http.ListenAndServe(":8080", router)
     if err != nil {
         log.Fatalln("The server encountered a fatal error: ", err)
