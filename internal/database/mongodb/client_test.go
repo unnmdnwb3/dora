@@ -8,13 +8,8 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/unnmdnwb3/dora/internal/database/mongodb"
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
-
-var ctx context.Context
-var client *mongo.Client
-
 
 func TestClient(t *testing.T) {
 	RegisterFailHandler(Fail)
@@ -42,6 +37,7 @@ var _ = Describe("MongoDB", func() {
 	})
 
 	It("can create a new MongoDB client with connection", func() {
+		ctx := context.Background()
 		client, err := mongodb.NewClient(&ctx)
 		defer client.Disconnect(ctx)
 		

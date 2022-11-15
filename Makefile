@@ -10,11 +10,11 @@ compose:
 	docker compose build
 	docker compose up
 
-test:
-	go test -v ./...
-
-env:
+copy-env:
 	cp default.env local.env
+
+unit-test:
+	go test -v ./...
 
 mongo-run:
 	docker run \
@@ -28,3 +28,5 @@ mongo-run:
 mongo-stop:
 	docker stop mongo-test
 	docker rm mongo-test
+
+integration-test: mongo-run unit-test mongo-stop
