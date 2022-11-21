@@ -8,15 +8,19 @@ import (
 	"github.com/unnmdnwb3/dora/internal/models"
 )
 
-func CreateIntegration(c *gin.Context) {
+func CreateApplication(c *gin.Context) {
 	ctx := c.Request.Context()
-	var integration models.Integration
+	var integration models.Application
 	err := c.ShouldBind(&integration)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
 
-	integrationDAO, err := daos.NewIntegration(&ctx)
+	integrationDAO, err := daos.NewApplication(&ctx)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+	}
+
 	response, err := integrationDAO.Create(&integration)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
@@ -25,9 +29,13 @@ func CreateIntegration(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func ReadAllIntegrations(c *gin.Context) {
+func GetApplications(c *gin.Context) {
 	ctx := c.Request.Context()
-	integrationDAO, err := daos.NewIntegration(&ctx)
+	integrationDAO, err := daos.NewApplication(&ctx)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+	}
+
 	response, err := integrationDAO.ReadAll()
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
@@ -36,15 +44,15 @@ func ReadAllIntegrations(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func ReadIntegration(c *gin.Context) {
+func GetApplication(c *gin.Context) {
 	ctx := c.Request.Context()
-	var integration models.Integration
+	var integration models.Application
 	err := c.BindUri(&integration)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
 
-	integrationDAO, err := daos.NewIntegration(&ctx)
+	integrationDAO, err := daos.NewApplication(&ctx)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
@@ -58,15 +66,19 @@ func ReadIntegration(c *gin.Context) {
 }
 
 // TODO get id from uri instead of form
-func UpdateIntegration(c *gin.Context) {
+func UpdateApplication(c *gin.Context) {
 	ctx := c.Request.Context()
-	var integration models.Integration
+	var integration models.Application
 	err := c.ShouldBind(&integration)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
 
-	integrationDAO, err := daos.NewIntegration(&ctx)
+	integrationDAO, err := daos.NewApplication(&ctx)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+	}
+	
 	response, err := integrationDAO.Update(&integration)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
@@ -75,15 +87,15 @@ func UpdateIntegration(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func DeleteIntegration(c *gin.Context) {
+func DeleteApplication(c *gin.Context) {
 	ctx := c.Request.Context()
-	var integration models.Integration
+	var integration models.Application
 	err := c.BindUri(&integration)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
 
-	integrationDAO, err := daos.NewIntegration(&ctx)
+	integrationDAO, err := daos.NewApplication(&ctx)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
