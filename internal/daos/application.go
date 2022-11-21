@@ -11,27 +11,27 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type Integration struct {
+type Application struct {
 	ctx    *context.Context
 	client *mongo.Client
 	coll   *mongo.Collection
 }
 
-func NewIntegration(ctx *context.Context) (Integration, error) {
+func NewApplication(ctx *context.Context) (Application, error) {
 	client, err := mongodb.NewClient(ctx)
 	if err != nil {
-		return Integration{}, err
+		return Application{}, err
 	}
 	coll := client.Database(mongodb.Database).Collection("integrations")
 
-	return Integration{
+	return Application{
 		ctx:    ctx,
 		client: client,
 		coll:   coll,
 	}, nil
 }
 
-func (i *Integration) Create(integration *models.Integration) (*models.Integration, error) {
+func (i *Application) Create(integration *models.Application) (*models.Application, error) {
 	insertResult, err := i.coll.InsertOne(*i.ctx, integration)
 	if err != nil {
 		return nil, err
@@ -43,7 +43,7 @@ func (i *Integration) Create(integration *models.Integration) (*models.Integrati
 		return nil, err
 	}
 
-	var result models.Integration
+	var result models.Application
 	err = integrationResult.Decode(&result)
 	if err != nil {
 		return nil, err
@@ -52,7 +52,7 @@ func (i *Integration) Create(integration *models.Integration) (*models.Integrati
 	return &result, nil
 }
 
-func (i *Integration) Read(id string) (*models.Integration, error) {
+func (i *Application) Read(id string) (*models.Application, error) {
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -64,7 +64,7 @@ func (i *Integration) Read(id string) (*models.Integration, error) {
 		return nil, readResult.Err()
 	}
 
-	var result models.Integration
+	var result models.Application
 	err = readResult.Decode(&result)
 	if err != nil {
 		return nil, err
@@ -73,16 +73,16 @@ func (i *Integration) Read(id string) (*models.Integration, error) {
 	return &result, nil
 }
 
-func (i *Integration) ReadAll() (*[]models.Integration, error) {
+func (i *Application) ReadAll() (*[]models.Application, error) {
 	cursor, err := i.coll.Find(*i.ctx, bson.M{})
 	if err != nil {
 		return nil, err
 	}
 
-	result := make([]models.Integration, cursor.RemainingBatchLength())
+	result := make([]models.Application, cursor.RemainingBatchLength())
 	pos := 0
 	for cursor.Next(*i.ctx) {
-		var cursorResult models.Integration
+		var cursorResult models.Application
 		err := cursor.Decode(&cursorResult)
 		if err != nil {
 			return nil, err
@@ -99,7 +99,7 @@ func (i *Integration) ReadAll() (*[]models.Integration, error) {
 	return &result, nil
 }
 
-func (i *Integration) Update(integration *models.Integration) (*models.Integration, error) {
+func (i *Application) Update(integration *models.Application) (*models.Application, error) {
 	objectId, err := primitive.ObjectIDFromHex(integration.Id)
 	if err != nil {
 		return nil, err
@@ -128,7 +128,7 @@ func (i *Integration) Update(integration *models.Integration) (*models.Integrati
 		return nil, findResult.Err()
 	}
 
-	var result models.Integration
+	var result models.Application
 	err = findResult.Decode(&result)
 	if err != nil {
 		return nil, err
@@ -137,7 +137,7 @@ func (i *Integration) Update(integration *models.Integration) (*models.Integrati
 	return &result, nil
 }
 
-func (i *Integration) Delete(id string) (*models.Integration, error) {
+func (i *Application) Delete(id string) (*models.Application, error) {
 	objectId, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -149,7 +149,7 @@ func (i *Integration) Delete(id string) (*models.Integration, error) {
 		return nil, deleteResult.Err()
 	}
 
-	var result models.Integration
+	var result models.Application
 	err = deleteResult.Decode(&result)
 	if err != nil {
 		return nil, err
