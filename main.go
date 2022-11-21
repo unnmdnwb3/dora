@@ -23,22 +23,25 @@ func main() {
     if err != nil {
 		log.Fatalln(err)
 	}
+
 	fmt.Println("Successfully connected to database.")
 	client.Disconnect(ctx)
 
     router := gin.Default()
 
-    router.GET("/api/v1/projects", handler.ReadAllProjects)
+	// repositories
+    router.GET("/api/v1/repositories", handler.GetRepositories)
 
-	router.POST("/api/integrations", handler.CreateIntegration)
-	router.GET("/api/integrations", handler.ReadAllIntegrations)
-    router.GET("/api/integrations/:id", handler.ReadIntegration)
-	router.PUT("/api/integrations", handler.UpdateIntegration)
-	router.DELETE("/api/integrations/:id", handler.DeleteIntegration)
+	// applications
+	router.POST("/api/applications", handler.CreateApplication)
+	router.GET("/api/applications", handler.GetApplications)
+    router.GET("/api/applications/:id", handler.GetApplication)
+	router.PUT("/api/applications", handler.UpdateApplication)
+	router.DELETE("/api/applications/:id", handler.DeleteApplication)
 
-    log.Println("\nThe server is running and listening on localhost")
+    log.Println("\nThe server is running and listening on localhost! ")
     err = http.ListenAndServe(":8080", router)
     if err != nil {
-        log.Fatalln("The server encountered a fatal error: ", err)
+        log.Fatalln("The server encountered a fatal error: 🚀", err)
     }
 }

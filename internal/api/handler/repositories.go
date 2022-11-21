@@ -5,19 +5,19 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/unnmdnwb3/dora/internal/integrations/gitlab"
+	"github.com/unnmdnwb3/dora/internal/applications/gitlab"
 )
 
-func ReadAllProjects(c *gin.Context) {
+func GetRepositories(c *gin.Context) {
 	client, err := gitlab.NewClient()
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
 
-	projects, err := client.GetProjects()
+	repositories, err := client.GetRepositories()
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
 	
-	c.IndentedJSON(http.StatusOK, projects)
+	c.IndentedJSON(http.StatusOK, repositories)
 }
