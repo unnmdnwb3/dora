@@ -2,9 +2,8 @@ package gitlab
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -19,13 +18,13 @@ func NewClient() (*Client, error) {
 	uriID := "GITLAB_URI"
 	uri := os.Getenv(uriID)
 	if uri == "" {
-		return nil, errors.New(fmt.Sprintf("Could not find env:  %s", uriID))
+		return nil, fmt.Errorf("could not find env:  %s", uriID)
 	}
 
 	authID := "GITLAB_BEARER"
 	auth := os.Getenv(authID)
 	if auth == "" {
-		return nil, errors.New(fmt.Sprintf("Could not find env:  %s", authID))
+		return nil, fmt.Errorf("could not find env:  %s", authID)
 	}
 
 	return &Client{
@@ -34,14 +33,15 @@ func NewClient() (*Client, error) {
 	}, nil
 }
 
-type Project struct {
+type Repository struct {
+	Id string `json:"id"`
 	CreatedAt string `json:"created_at"`
 	DefaultBranch string `json:"default_branch"`
 	NamespacedName string `json:"path_with_namespace"`
 	Url string `json:"web_url"`
 }
 
-func (c *Client) GetProjects() (*[]Project, error) {
+func (c *Client) GetRepositories() (*[]Repository, error) {
 	client := &http.Client{}
 
 	uri := fmt.Sprintf("%s/projects", c.Uri)
@@ -64,16 +64,16 @@ func (c *Client) GetProjects() (*[]Project, error) {
     }
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
         log.Fatalln(err)
     }
 
-	projects := []Project{}
-	err = json.Unmarshal(body, &projects)
+	repositories := []Repository{}
+	err = json.Unmarshal(body, &repositories)
 	if err != nil {
         log.Fatalln(err)
     }
 
-	return &projects, nil
+	return &repositories, nil
 }
