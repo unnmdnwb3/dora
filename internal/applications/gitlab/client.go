@@ -87,6 +87,7 @@ func (c *Client) GetOrganisations() (*[]models.Organisation, error) {
 
 	bearer := fmt.Sprintf("Bearer %s", c.Auth)
 	req.Header.Add("Authorization", bearer)
+
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatalln(err)

@@ -19,11 +19,35 @@ func TestGitlabClient(t *testing.T) {
 }
 
 var _ = Describe("gitlab.Client", func() {
-	var organisations []models.Organisation
-	_ = test.FromTestData("./../../../test/data/gitlab/organisations.json", &organisations)
+	var repositories []models.Repository
+	_ = test.FromTestData("./../../../test/data/gitlab/repositories.json", &repositories)
 
 	var _ = When("GetRepositories", func() {
 		It("get all repositories", func() {
+			mock := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+				json, _ := json.Marshal(repositories)
+				w.Write(json)
+
+			}))
+			defer mock.Close()
+
+			client := Client{
+				Auth: "token",
+				URI:  mock.URL,
+			}
+
+			repositories, err := client.GetRepositories()
+			Expect(err).To(BeNil())
+			Expect(len(*repositories)).To(Equal(1))
+		})
+	})
+
+	var organisations []models.Organisation
+	_ = test.FromTestData("./../../../test/data/gitlab/organisations.json", &organisations)
+
+	var _ = When("GetOrganisations", func() {
+		It("get all organisations", func() {
 			mock := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				json, _ := json.Marshal(organisations)
@@ -37,9 +61,9 @@ var _ = Describe("gitlab.Client", func() {
 				URI:  mock.URL,
 			}
 
-			projects, err := client.GetRepositories()
+			organisations, err := client.GetOrganisations()
 			Expect(err).To(BeNil())
-			Expect(len(*projects)).To(Equal(2))
+			Expect(len(*organisations)).To(Equal(2))
 		})
 	})
 })
