@@ -8,6 +8,7 @@ import (
 	"github.com/unnmdnwb3/dora/internal/applications/gitlab"
 )
 
+// GetRepositories gets all repositories
 func GetRepositories(c *gin.Context) {
 	client, err := gitlab.NewClient()
 	if err != nil {
@@ -18,6 +19,6 @@ func GetRepositories(c *gin.Context) {
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-	
+
 	c.IndentedJSON(http.StatusOK, repositories)
 }

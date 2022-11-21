@@ -6,6 +6,7 @@ import (
 	"os"
 )
 
+// FromTestData is a helper funtion which returns any fixture as structs
 func FromTestData(path string, v any) error {
 	jsonFile, err := os.Open(path)
 	if err != nil {
@@ -18,6 +19,6 @@ func FromTestData(path string, v any) error {
 		return err
 	}
 
-    err = json.Unmarshal(bytes, &v)
+	err = json.Unmarshal(bytes, &v)
 	return err
 }

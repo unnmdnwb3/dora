@@ -8,6 +8,7 @@ import (
 	"github.com/unnmdnwb3/dora/internal/models"
 )
 
+// CreateApplication creates a new application
 func CreateApplication(c *gin.Context) {
 	ctx := c.Request.Context()
 	var integration models.Application
@@ -29,6 +30,7 @@ func CreateApplication(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// GetApplications gets all applications
 func GetApplications(c *gin.Context) {
 	ctx := c.Request.Context()
 	integrationDAO, err := daos.NewApplication(&ctx)
@@ -40,10 +42,11 @@ func GetApplications(c *gin.Context) {
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
-	
+
 	c.JSON(http.StatusOK, response)
 }
 
+// GetApplication gets a single application
 func GetApplication(c *gin.Context) {
 	ctx := c.Request.Context()
 	var integration models.Application
@@ -57,16 +60,17 @@ func GetApplication(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
 
-	response, err := integrationDAO.Read(integration.Id)
+	response, err := integrationDAO.Read(integration.ID)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
-	
+
 	c.JSON(http.StatusOK, response)
 }
 
-// TODO get id from uri instead of form
+// UpdateApplication updates an application
 func UpdateApplication(c *gin.Context) {
+	// TODO get id from uri instead of form
 	ctx := c.Request.Context()
 	var integration models.Application
 	err := c.ShouldBind(&integration)
@@ -78,15 +82,16 @@ func UpdateApplication(c *gin.Context) {
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
-	
+
 	response, err := integrationDAO.Update(&integration)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
-	
+
 	c.JSON(http.StatusOK, response)
 }
 
+// DeleteApplication deletes an application
 func DeleteApplication(c *gin.Context) {
 	ctx := c.Request.Context()
 	var integration models.Application
@@ -100,10 +105,10 @@ func DeleteApplication(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
 
-	response, err := integrationDAO.Delete(integration.Id)
+	response, err := integrationDAO.Delete(integration.ID)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
-	
+
 	c.JSON(http.StatusOK, response)
 }

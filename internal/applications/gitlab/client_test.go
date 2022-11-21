@@ -23,20 +23,20 @@ var _ = Describe("gitlab.Client", func() {
 	_ = test.FromTestData("./../../../test/data/gitlab/organisations.json", &organisations)
 
 	var _ = When("GetRepositories", func() {
-        It("get all repositories", func() {
+		It("get all repositories", func() {
 			mock := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 				json, _ := json.Marshal(organisations)
 				w.Write(json)
-				
+
 			}))
 			defer mock.Close()
-		
+
 			client := Client{
 				Auth: "token",
-				Uri: mock.URL,
+				URI:  mock.URL,
 			}
-		
+
 			projects, err := client.GetRepositories()
 			Expect(err).To(BeNil())
 			Expect(len(*projects)).To(Equal(2))

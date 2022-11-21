@@ -10,8 +10,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+// Database is fixed
 const Database = "dora"
 
+// NewClient creates a new mongodb client
 func NewClient(ctx *context.Context) (*mongo.Client, error) {
 	conn, err := ConnectionString()
 	if err != nil {
@@ -26,13 +28,14 @@ func NewClient(ctx *context.Context) (*mongo.Client, error) {
 	return client, nil
 }
 
+// ConnectionString creates the URI needed to connect to a mongodb instance
 func ConnectionString() (string, error) {
 	// necessary
 	uri := os.Getenv("MONGODB_URI")
 	if uri == "" {
 		return "", errors.New("could not find env: MONGODB_URI")
 	}
-	
+
 	// optional
 	auth := ""
 	user := os.Getenv("MONGODB_USER")

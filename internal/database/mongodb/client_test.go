@@ -22,7 +22,7 @@ var _ = BeforeSuite(func() {
 	os.Setenv("MONGODB_USER", "user")
 	os.Setenv("MONGODB_PASSWORD", "password")
 })
-  
+
 var _ = AfterSuite(func() {
 	os.Remove("MONGODB_URI")
 	os.Remove("MONGODB_PORT")
@@ -43,7 +43,7 @@ var _ = Describe("mongodb.Client", func() {
 			ctx := context.Background()
 			client, err := mongodb.NewClient(&ctx)
 			defer client.Disconnect(ctx)
-			
+
 			Expect(err).To(BeNil())
 			Expect(client.Ping(ctx, readpref.Primary())).To(BeNil())
 		})
