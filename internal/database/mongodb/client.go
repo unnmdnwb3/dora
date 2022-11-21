@@ -20,7 +20,7 @@ func NewClient(ctx *context.Context) (*mongo.Client, error) {
 
 	client, err := mongo.Connect(*ctx, options.Client().ApplyURI(conn))
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("Could not establish connection to database: %s", err.Error()))
+		return nil, fmt.Errorf("could not establish connection to database: %s", err.Error())
 	}
 
 	return client, nil
@@ -30,7 +30,7 @@ func ConnectionString() (string, error) {
 	// necessary
 	uri := os.Getenv("MONGODB_URI")
 	if uri == "" {
-		return "", errors.New("Could not find env: MONGODB_URI")
+		return "", errors.New("could not find env: MONGODB_URI")
 	}
 	
 	// optional

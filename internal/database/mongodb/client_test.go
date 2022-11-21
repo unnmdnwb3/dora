@@ -13,7 +13,7 @@ import (
 
 func TestClient(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "MongoDB Client Suite")
+	RunSpecs(t, "mongodb.Client Suite")
 }
 
 var _ = BeforeSuite(func() {
@@ -30,18 +30,22 @@ var _ = AfterSuite(func() {
 	os.Remove("MONGODB_PASSWORD")
 })
 
-var _ = Describe("MongoDB", func() {
-	It("can build the correct connection string", func() {
-		expectedConn := "mongodb://user:password@127.0.0.1:27017"
-		Expect(mongodb.ConnectionString()).To(Equal(expectedConn))
+var _ = Describe("mongodb.Client", func() {
+	var _ = When("CpnnectionString", func() {
+		It("can build the correct connection string", func() {
+			expectedConn := "mongodb://user:password@127.0.0.1:27017"
+			Expect(mongodb.ConnectionString()).To(Equal(expectedConn))
+		})
 	})
 
-	It("can create a new MongoDB client with connection", func() {
-		ctx := context.Background()
-		client, err := mongodb.NewClient(&ctx)
-		defer client.Disconnect(ctx)
-		
-		Expect(err).To(BeNil())
-		Expect(client.Ping(ctx, readpref.Primary())).To(BeNil())
+	var _ = When("NewClient", func() {
+		It("can create a new MongoDB client with connection", func() {
+			ctx := context.Background()
+			client, err := mongodb.NewClient(&ctx)
+			defer client.Disconnect(ctx)
+			
+			Expect(err).To(BeNil())
+			Expect(client.Ping(ctx, readpref.Primary())).To(BeNil())
+		})
 	})
 })
