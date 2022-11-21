@@ -107,3 +107,43 @@ func (c *Client) GetOrganisations() (*[]models.Organisation, error) {
 
 	return &organisations, nil
 }
+
+// GetDeployRuns gets all deployment runs of a project
+func (c *Client) GetDeployRuns(projectID string, referenceBranch string) (*[]models.DeployRun, error) {
+	client := &http.Client{}
+
+	uri := fmt.Sprintf("%s/projects/%s/pipelines", c.URI, projectID)
+	req, err := http.NewRequest(http.MethodGet, uri, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	bearer := fmt.Sprintf("Bearer %s", c.Auth)
+	req.Header.Add("Authorization", bearer)
+
+	q := req.URL.Query()
+	q.Add("ref", referenceBranch)
+	q.Add("sort", "asc")
+	q.Add("source", "push")
+	q.Add("status", "success")
+	req.URL.RawQuery = q.Encode()
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	deployRuns := []models.DeployRun{}
+	err = json.Unmarshal(body, &deployRuns)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	return &deployRuns, nil
+}

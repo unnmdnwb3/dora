@@ -1,0 +1,26 @@
+[
+    {
+        "id": 114883218,
+        "iid": 323,
+        "project_id": 15392086,
+        "sha": "2a6dccf7443c2fd9d4b88a6f6dc61e5b11ee53fb",
+        "ref": "main",
+        "status": "success",
+        "source": "push",
+        "created_at": "2020-02-04T14:29:50.092Z",
+        "updated_at": "2020-02-04T14:35:51.459Z",
+        "web_url": "https://gitlab.com/foobar/foobar/-/pipelines/114883218"
+    },
+    {
+        "id": 114884002,
+        "iid": 324,
+        "project_id": 15392086,
+        "sha": "6eb5041e34e0b752c2e7cbb5007dd3ff68887160",
+        "ref": "main",
+        "status": "success",
+        "source": "push",
+        "created_at": "2020-02-04T14:31:51.235Z",
+        "updated_at": "2020-02-04T14:38:18.252Z",
+        "web_url": "https://gitlab.com/foobar/foobar/-/pipelines/114884002"
+    }
+]

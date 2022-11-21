@@ -66,4 +66,30 @@ var _ = Describe("gitlab.Client", func() {
 			Expect(len(*organisations)).To(Equal(2))
 		})
 	})
+
+	var deployRuns []models.DeployRun
+	_ = test.FromTestData("./../../../test/data/gitlab/deploy_runs.json", &deployRuns)
+
+	var _ = When("GetDeployRuns", func() {
+		It("get all deploy runs", func() {
+			mock := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+				json, _ := json.Marshal(organisations)
+				w.Write(json)
+
+			}))
+			defer mock.Close()
+
+			client := Client{
+				Auth: "token",
+				URI:  mock.URL,
+			}
+
+			projectID := "15392086"
+			ref := "main"
+			deployRuns, err := client.GetDeployRuns(projectID, ref)
+			Expect(err).To(BeNil())
+			Expect(len(*deployRuns)).To(Equal(2))
+		})
+	})
 })
