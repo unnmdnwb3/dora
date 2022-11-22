@@ -26,14 +26,14 @@ func NewApplication(ctx *context.Context) (Application, error) {
 }
 
 // Create persists a new application
-func (i *Application) Create(integration *models.Application) (*models.Application, error) {
-	insertResult, err := i.coll.InsertOne(*i.ctx, integration)
+func (a *Application) Create(integration *models.Application) (*models.Application, error) {
+	insertResult, err := a.coll.InsertOne(*a.ctx, integration)
 	if err != nil {
 		return nil, err
 	}
 
 	filter := bson.M{"_id": insertResult.InsertedID}
-	integrationResult := i.coll.FindOne(*i.ctx, filter)
+	integrationResult := a.coll.FindOne(*a.ctx, filter)
 	if integrationResult.Err() != nil {
 		return nil, err
 	}
@@ -48,14 +48,14 @@ func (i *Application) Create(integration *models.Application) (*models.Applicati
 }
 
 // Read retrieves an application
-func (i *Application) Read(id string) (*models.Application, error) {
+func (a *Application) Read(id string) (*models.Application, error) {
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
 	}
 
 	filter := bson.M{"_id": objectID}
-	readResult := i.coll.FindOne(*i.ctx, filter)
+	readResult := a.coll.FindOne(*a.ctx, filter)
 	if readResult.Err() != nil {
 		return nil, readResult.Err()
 	}
@@ -70,15 +70,15 @@ func (i *Application) Read(id string) (*models.Application, error) {
 }
 
 // ReadAll retrieves all applications
-func (i *Application) ReadAll() (*[]models.Application, error) {
-	cursor, err := i.coll.Find(*i.ctx, bson.M{})
+func (a *Application) ReadAll() (*[]models.Application, error) {
+	cursor, err := i.coll.Find(*a.ctx, bson.M{})
 	if err != nil {
 		return nil, err
 	}
 
 	result := make([]models.Application, cursor.RemainingBatchLength())
 	pos := 0
-	for cursor.Next(*i.ctx) {
+	for cursor.Next(*a.ctx) {
 		var cursorResult models.Application
 		err := cursor.Decode(&cursorResult)
 		if err != nil {
@@ -97,7 +97,7 @@ func (i *Application) ReadAll() (*[]models.Application, error) {
 }
 
 // Update persists changes to an alreay existing application
-func (i *Application) Update(integration *models.Application) (*models.Application, error) {
+func (a *Application) Update(integration *models.Application) (*models.Application, error) {
 	objectID, err := primitive.ObjectIDFromHex(integration.ID)
 	if err != nil {
 		return nil, err
@@ -121,7 +121,7 @@ func (i *Application) Update(integration *models.Application) (*models.Applicati
 		Upsert:         &upsert,
 	}
 
-	findResult := i.coll.FindOneAndUpdate(*i.ctx, filter, update, &opt)
+	findResult := a.coll.FindOneAndUpdate(*a.ctx, filter, update, &opt)
 	if findResult.Err() != nil {
 		return nil, findResult.Err()
 	}
@@ -136,14 +136,14 @@ func (i *Application) Update(integration *models.Application) (*models.Applicati
 }
 
 // Delete deletes an existing application
-func (i *Application) Delete(id string) (*models.Application, error) {
+func (a *Application) Delete(id string) (*models.Application, error) {
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
 	}
 
 	filter := bson.M{"_id": objectID}
-	deleteResult := i.coll.FindOneAndDelete(*i.ctx, filter)
+	deleteResult := a.coll.FindOneAndDelete(*a.ctx, filter)
 	if deleteResult.Err() != nil {
 		return nil, deleteResult.Err()
 	}

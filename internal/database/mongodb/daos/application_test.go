@@ -7,8 +7,8 @@ import (
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/unnmdnwb3/dora/internal/daos"
 	"github.com/unnmdnwb3/dora/internal/database/mongodb"
+	"github.com/unnmdnwb3/dora/internal/database/mongodb/daos"
 	"github.com/unnmdnwb3/dora/internal/models"
 )
 
