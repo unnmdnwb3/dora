@@ -4,12 +4,12 @@ import "time"
 
 // DeployRun describes a deployment run
 type DeployRun struct {
-	ID        int       `json:"id"`
-	ProjectID int       `json:"project_id"`
-	Ref       string    `json:"ref"`
-	Status    string    `json:"status"`
-	Source    string    `json:"source"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	URI       string    `json:"web_url"`
+	ID        string    `json:"id" bson:"_id,omitempty"`
+	ProjectID string    `json:"project_id" bson:"project_id"`
+	Ref       string    `json:"ref" bson:"ref"`
+	Status    string    `json:"status" bson:"status"`
+	Source    string    `json:"source" bson:"source"`
+	CreatedAt time.Time `json:"created_at" bson:"created_at"`
+	UpdatedAt time.Time `json:"updated_at" bson:"updated_at"`
+	URI       string    `json:"web_url" bson:"uri"`
 }
