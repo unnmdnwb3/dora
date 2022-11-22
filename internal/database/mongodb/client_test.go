@@ -31,21 +31,23 @@ var _ = AfterSuite(func() {
 })
 
 var _ = Describe("mongodb.Client", func() {
-	var _ = When("CpnnectionString", func() {
+	var _ = When("ConnectionString", func() {
 		It("can build the correct connection string", func() {
 			expectedConn := "mongodb://user:password@127.0.0.1:27017"
 			Expect(mongodb.ConnectionString()).To(Equal(expectedConn))
 		})
 	})
 
-	var _ = When("NewClient", func() {
-		It("can create a new MongoDB client with connection", func() {
+	var _ = When("Init", func() {
+		It("creates a new MongoDB client with connection to a database", func() {
 			ctx := context.Background()
-			client, err := mongodb.NewClient(&ctx)
-			defer client.Disconnect(ctx)
+			err := mongodb.Init(&ctx)
+			defer mongodb.Client.Disconnect(ctx)
 
 			Expect(err).To(BeNil())
-			Expect(client.Ping(ctx, readpref.Primary())).To(BeNil())
+			Expect(mongodb.Client).To(Not(BeNil()))
+			Expect(mongodb.DB).To(Not(BeNil()))
+			Expect(mongodb.Client.Ping(ctx, readpref.Primary())).To(BeNil())
 		})
 	})
 })

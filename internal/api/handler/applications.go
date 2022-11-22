@@ -11,6 +11,7 @@ import (
 // CreateApplication creates a new application
 func CreateApplication(c *gin.Context) {
 	ctx := c.Request.Context()
+
 	var application models.Application
 	err := c.ShouldBind(&application)
 	if err != nil {
@@ -33,6 +34,7 @@ func CreateApplication(c *gin.Context) {
 // GetApplications gets all applications
 func GetApplications(c *gin.Context) {
 	ctx := c.Request.Context()
+
 	applicationDAO, err := daos.NewApplication(&ctx)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
@@ -49,6 +51,7 @@ func GetApplications(c *gin.Context) {
 // GetApplication gets a single application
 func GetApplication(c *gin.Context) {
 	ctx := c.Request.Context()
+
 	var application models.Application
 	err := c.BindUri(&application)
 	if err != nil {
@@ -72,6 +75,7 @@ func GetApplication(c *gin.Context) {
 func UpdateApplication(c *gin.Context) {
 	// TODO get id from uri instead of form
 	ctx := c.Request.Context()
+
 	var application models.Application
 	err := c.ShouldBind(&application)
 	if err != nil {
@@ -94,6 +98,7 @@ func UpdateApplication(c *gin.Context) {
 // DeleteApplication deletes an application
 func DeleteApplication(c *gin.Context) {
 	ctx := c.Request.Context()
+
 	var application models.Application
 	err := c.BindUri(&application)
 	if err != nil {

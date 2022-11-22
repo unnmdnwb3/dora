@@ -8,6 +8,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/unnmdnwb3/dora/internal/daos"
+	"github.com/unnmdnwb3/dora/internal/database/mongodb"
 	"github.com/unnmdnwb3/dora/internal/models"
 )
 
@@ -16,11 +17,16 @@ func TestApplications(t *testing.T) {
 	RunSpecs(t, "daos.Application Suite")
 }
 
+var ctx = context.Background()
+
 var _ = BeforeSuite(func() {
 	os.Setenv("MONGODB_URI", "127.0.0.1")
 	os.Setenv("MONGODB_PORT", "27017")
 	os.Setenv("MONGODB_USER", "user")
 	os.Setenv("MONGODB_PASSWORD", "password")
+
+	ctx := context.Background()
+	mongodb.Init(&ctx)
 })
 
 var _ = AfterSuite(func() {
@@ -28,10 +34,11 @@ var _ = AfterSuite(func() {
 	os.Remove("MONGODB_PORT")
 	os.Remove("MONGODB_USER")
 	os.Remove("MONGODB_PASSWORD")
+
+	mongodb.Client.Disconnect(ctx)
 })
 
 var _ = Describe("daos.Application", func() {
-	ctx := context.Background()
 
 	var _ = When("Create", func() {
 		It("creates an application", func() {
@@ -45,10 +52,10 @@ var _ = Describe("daos.Application", func() {
 			}
 
 			createResponse, err := applicationDao.Create(&createRequest)
-			Expect(err).To((BeNil()))
-			Expect(createResponse.Auth).To((Equal(createRequest.Auth)))
-			Expect(createResponse.Type).To((Equal(createRequest.Type)))
-			Expect(createResponse.URI).To((Equal(createRequest.URI)))
+			Expect(err).To(BeNil())
+			Expect(createResponse.Auth).To(Equal(createRequest.Auth))
+			Expect(createResponse.Type).To(Equal(createRequest.Type))
+			Expect(createResponse.URI).To(Equal(createRequest.URI))
 		})
 	})
 
@@ -67,11 +74,11 @@ var _ = Describe("daos.Application", func() {
 			Expect(err).To((BeNil()))
 
 			readResponse, err := applicationDao.Read(createResponse.ID)
-			Expect(err).To((BeNil()))
-			Expect(readResponse.ID).To((Equal(createResponse.ID)))
-			Expect(readResponse.Auth).To((Equal(createResponse.Auth)))
-			Expect(readResponse.Type).To((Equal(createResponse.Type)))
-			Expect(readResponse.URI).To((Equal(createResponse.URI)))
+			Expect(err).To(BeNil())
+			Expect(readResponse.ID).To(Equal(createResponse.ID))
+			Expect(readResponse.Auth).To(Equal(createResponse.Auth))
+			Expect(readResponse.Type).To(Equal(createResponse.Type))
+			Expect(readResponse.URI).To(Equal(createResponse.URI))
 		})
 	})
 

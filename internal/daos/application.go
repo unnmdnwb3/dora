@@ -13,23 +13,15 @@ import (
 
 // Application is the data access object for any application
 type Application struct {
-	ctx    *context.Context
-	client *mongo.Client
-	coll   *mongo.Collection
+	ctx  *context.Context
+	coll *mongo.Collection
 }
 
 // NewApplication creates a new data access object for any application
 func NewApplication(ctx *context.Context) (Application, error) {
-	client, err := mongodb.NewClient(ctx)
-	if err != nil {
-		return Application{}, err
-	}
-	coll := client.Database(mongodb.Database).Collection("integrations")
-
 	return Application{
-		ctx:    ctx,
-		client: client,
-		coll:   coll,
+		ctx:  ctx,
+		coll: mongodb.DB.Collection("applications"),
 	}, nil
 }
 

@@ -5,28 +5,28 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// Database is fixed
-const Database = "dora"
+var (
+	// Client provides all functionality for MongoDB
+	// and gets instatiated in the main function
+	Client *mongo.Client
 
-// NewClient creates a new mongodb client
-func NewClient(ctx *context.Context) (*mongo.Client, error) {
-	conn, err := ConnectionString()
-	if err != nil {
-		return nil, err
-	}
+	// DB points to the standard database
+	DB *mongo.Database
+)
 
-	client, err := mongo.Connect(*ctx, options.Client().ApplyURI(conn))
-	if err != nil {
-		return nil, fmt.Errorf("could not establish connection to database: %s", err.Error())
-	}
+const (
+	// Timeout holds the general TimeOut
+	Timeout = 5 * time.Second
 
-	return client, nil
-}
+	// StandardDatabase defines the standard database MongoDB needs to connect to
+	StandardDatabase = "dora"
+)
 
 // ConnectionString creates the URI needed to connect to a mongodb instance
 func ConnectionString() (string, error) {
@@ -49,4 +49,21 @@ func ConnectionString() (string, error) {
 	}
 
 	return fmt.Sprintf("mongodb://%s%s%s", auth, uri, port), nil
+}
+
+// Init creates a new mongodb client and pointer to the database
+func Init(ctx *context.Context) error {
+	conn, err := ConnectionString()
+	if err != nil {
+		return err
+	}
+
+	Client, err = mongo.Connect(*ctx, options.Client().ApplyURI(conn))
+	if err != nil {
+		return fmt.Errorf("could not establish connection to database: %s", err.Error())
+	}
+
+	DB = Client.Database(StandardDatabase)
+
+	return nil
 }

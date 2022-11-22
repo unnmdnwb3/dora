@@ -13,7 +13,7 @@ import (
 	"github.com/unnmdnwb3/dora/internal/models"
 )
 
-func TestGitlabClient(t *testing.T) {
+func TestClient(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "gitlab.Client Suite")
 }

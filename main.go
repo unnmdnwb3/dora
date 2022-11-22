@@ -14,34 +14,36 @@ import (
 
 func main() {
 	ctx := context.Background()
-    client, err := mongodb.NewClient(&ctx)
-    if err != nil {
+
+	// connect to database
+	err := mongodb.Init(&ctx)
+	if err != nil {
 		log.Fatalln(err)
 	}
 
-    err = client.Ping(context.TODO(), readpref.Primary())
-    if err != nil {
+	err = mongodb.Client.Ping(context.TODO(), readpref.Primary())
+	if err != nil {
 		log.Fatalln(err)
 	}
 
 	fmt.Println("Successfully connected to database.")
-	client.Disconnect(ctx)
+	defer mongodb.Client.Disconnect(ctx)
 
-    router := gin.Default()
+	router := gin.Default()
 
-	// repositories
-    router.GET("/api/v1/repositories", handler.GetRepositories)
+	// routes for repositories
+	router.GET("/api/v1/repositories", handler.GetRepositories)
 
-	// applications
+	// routes for applications
 	router.POST("/api/applications", handler.CreateApplication)
 	router.GET("/api/applications", handler.GetApplications)
-    router.GET("/api/applications/:id", handler.GetApplication)
+	router.GET("/api/applications/:id", handler.GetApplication)
 	router.PUT("/api/applications", handler.UpdateApplication)
 	router.DELETE("/api/applications/:id", handler.DeleteApplication)
 
-    log.Println("\nThe server is running and listening on localhost! ")
-    err = http.ListenAndServe(":8080", router)
-    if err != nil {
-        log.Fatalln("The server encountered a fatal error: 🚀", err)
-    }
+	log.Println("\nThe server is running and listening on localhost! ")
+	err = http.ListenAndServe(":8080", router)
+	if err != nil {
+		log.Fatalln("The server encountered a fatal error: 🚀", err)
+	}
 }
