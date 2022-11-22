@@ -17,9 +17,8 @@ func TestApplications(t *testing.T) {
 	RunSpecs(t, "daos.Application Suite")
 }
 
-var ctx = context.Background()
-
-var _ = BeforeSuite(func() {
+var _ = BeforeEach(func() {
+	// TODO remove config from code
 	os.Setenv("MONGODB_URI", "127.0.0.1")
 	os.Setenv("MONGODB_PORT", "27017")
 	os.Setenv("MONGODB_USER", "user")
@@ -29,20 +28,23 @@ var _ = BeforeSuite(func() {
 	mongodb.Init(&ctx)
 })
 
-var _ = AfterSuite(func() {
+var _ = AfterEach(func() {
+	// TODO remove config from code
 	os.Remove("MONGODB_URI")
 	os.Remove("MONGODB_PORT")
 	os.Remove("MONGODB_USER")
 	os.Remove("MONGODB_PASSWORD")
 
-	mongodb.Client.Disconnect(ctx)
+	ctx := context.Background()
+	defer mongodb.Client.Disconnect(ctx)
 })
 
 var _ = Describe("daos.Application", func() {
+	ctx := context.Background()
 
 	var _ = When("Create", func() {
 		It("creates an application", func() {
-			applicationDao, err := daos.NewApplication(&ctx)
+			DAO, err := daos.NewApplication(&ctx)
 			Expect(err).To((BeNil()))
 
 			createRequest := models.Application{
@@ -51,7 +53,7 @@ var _ = Describe("daos.Application", func() {
 				URI:  "https://gitlab.com",
 			}
 
-			createResponse, err := applicationDao.Create(&createRequest)
+			createResponse, err := DAO.Create(&createRequest)
 			Expect(err).To(BeNil())
 			Expect(createResponse.Auth).To(Equal(createRequest.Auth))
 			Expect(createResponse.Type).To(Equal(createRequest.Type))
@@ -61,7 +63,7 @@ var _ = Describe("daos.Application", func() {
 
 	var _ = When("Read", func() {
 		It("reads an application", func() {
-			applicationDao, err := daos.NewApplication(&ctx)
+			DAO, err := daos.NewApplication(&ctx)
 			Expect(err).To((BeNil()))
 
 			createRequest := models.Application{
@@ -70,10 +72,10 @@ var _ = Describe("daos.Application", func() {
 				URI:  "https://gitlab.com",
 			}
 
-			createResponse, err := applicationDao.Create(&createRequest)
+			createResponse, err := DAO.Create(&createRequest)
 			Expect(err).To((BeNil()))
 
-			readResponse, err := applicationDao.Read(createResponse.ID)
+			readResponse, err := DAO.Read(createResponse.ID)
 			Expect(err).To(BeNil())
 			Expect(readResponse.ID).To(Equal(createResponse.ID))
 			Expect(readResponse.Auth).To(Equal(createResponse.Auth))
@@ -84,10 +86,26 @@ var _ = Describe("daos.Application", func() {
 
 	var _ = When("ReadAll", func() {
 		It("reads all applications", func() {
-			applicationDao, err := daos.NewApplication(&ctx)
+			DAO, err := daos.NewApplication(&ctx)
 			Expect(err).To((BeNil()))
 
-			readAllResponse, err := applicationDao.ReadAll()
+			firstCreateRequest := models.Application{
+				Auth: "bearertoken",
+				Type: "gitlab",
+				URI:  "https://gitlab.com",
+			}
+			secondCreateRequest := models.Application{
+				Auth: "bearertoken",
+				Type: "github",
+				URI:  "https://github.com",
+			}
+
+			_, err = DAO.Create(&firstCreateRequest)
+			Expect(err).To(BeNil())
+			_, err = DAO.Create(&secondCreateRequest)
+			Expect(err).To(BeNil())
+
+			readAllResponse, err := DAO.ReadAll()
 			Expect(err).To((BeNil()))
 			Expect(len(*readAllResponse)).To(BeNumerically(">", 0))
 		})
@@ -95,7 +113,7 @@ var _ = Describe("daos.Application", func() {
 
 	var _ = When("Update", func() {
 		It("updates an application", func() {
-			applicationDao, err := daos.NewApplication(&ctx)
+			DAO, err := daos.NewApplication(&ctx)
 			Expect(err).To((BeNil()))
 
 			createRequest := models.Application{
@@ -104,7 +122,7 @@ var _ = Describe("daos.Application", func() {
 				URI:  "https://gitlab.com",
 			}
 
-			createResponse, err := applicationDao.Create(&createRequest)
+			createResponse, err := DAO.Create(&createRequest)
 			Expect(err).To((BeNil()))
 
 			authUpdate := "newbearertoken"
@@ -115,7 +133,7 @@ var _ = Describe("daos.Application", func() {
 				URI:  createResponse.URI,
 			}
 
-			updateResponse, err := applicationDao.Update(&updateRequest)
+			updateResponse, err := DAO.Update(&updateRequest)
 			Expect(err).To(BeNil())
 			Expect(updateResponse.Auth).To(Equal(updateRequest.Auth))
 			Expect(updateResponse.Type).To(Equal(updateRequest.Type))
@@ -125,7 +143,7 @@ var _ = Describe("daos.Application", func() {
 
 	var _ = When("Delete", func() {
 		It("deletes an application", func() {
-			applicationDao, err := daos.NewApplication(&ctx)
+			DAO, err := daos.NewApplication(&ctx)
 			Expect(err).To((BeNil()))
 
 			createRequest := models.Application{
@@ -134,17 +152,16 @@ var _ = Describe("daos.Application", func() {
 				URI:  "https://gitlab.com",
 			}
 
-			createResponse, err := applicationDao.Create(&createRequest)
+			createResponse, err := DAO.Create(&createRequest)
 			Expect(err).To((BeNil()))
 
 			deleteRequest := createResponse.ID
-			deleteResponse, err := applicationDao.Delete(deleteRequest)
+			deleteResponse, err := DAO.Delete(deleteRequest)
 			Expect(err).To(BeNil())
 			Expect(deleteResponse.ID).To(Equal(deleteRequest))
 			Expect(deleteResponse.Auth).To(Equal(createResponse.Auth))
 			Expect(deleteResponse.Type).To(Equal(createResponse.Type))
 			Expect(deleteResponse.URI).To(Equal(createResponse.URI))
-			Expect(err).To(BeNil())
 		})
 	})
 })

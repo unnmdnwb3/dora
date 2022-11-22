@@ -26,20 +26,20 @@ func NewApplication(ctx *context.Context) (Application, error) {
 }
 
 // Create persists a new application
-func (a *Application) Create(integration *models.Application) (*models.Application, error) {
-	insertResult, err := a.coll.InsertOne(*a.ctx, integration)
+func (a *Application) Create(application *models.Application) (*models.Application, error) {
+	insertResult, err := a.coll.InsertOne(*a.ctx, application)
 	if err != nil {
 		return nil, err
 	}
 
 	filter := bson.M{"_id": insertResult.InsertedID}
-	integrationResult := a.coll.FindOne(*a.ctx, filter)
-	if integrationResult.Err() != nil {
+	applicationResult := a.coll.FindOne(*a.ctx, filter)
+	if applicationResult.Err() != nil {
 		return nil, err
 	}
 
 	var result models.Application
-	err = integrationResult.Decode(&result)
+	err = applicationResult.Decode(&result)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +71,7 @@ func (a *Application) Read(id string) (*models.Application, error) {
 
 // ReadAll retrieves all applications
 func (a *Application) ReadAll() (*[]models.Application, error) {
-	cursor, err := i.coll.Find(*a.ctx, bson.M{})
+	cursor, err := a.coll.Find(*a.ctx, bson.M{})
 	if err != nil {
 		return nil, err
 	}
@@ -97,8 +97,8 @@ func (a *Application) ReadAll() (*[]models.Application, error) {
 }
 
 // Update persists changes to an alreay existing application
-func (a *Application) Update(integration *models.Application) (*models.Application, error) {
-	objectID, err := primitive.ObjectIDFromHex(integration.ID)
+func (a *Application) Update(application *models.Application) (*models.Application, error) {
+	objectID, err := primitive.ObjectIDFromHex(application.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -108,9 +108,9 @@ func (a *Application) Update(integration *models.Application) (*models.Applicati
 	}
 	update := bson.M{
 		"$set": bson.M{
-			"auth": integration.Auth,
-			"type": integration.Type,
-			"uri":  integration.URI,
+			"auth": application.Auth,
+			"type": application.Type,
+			"uri":  application.URI,
 		},
 	}
 
