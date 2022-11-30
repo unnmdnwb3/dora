@@ -81,8 +81,8 @@ func (d DeployRun) Read(id string) (*models.DeployRun, error) {
 }
 
 // ReadAll retrieves all deploy runs
-func (d DeployRun) ReadAll() (*[]models.DeployRun, error) {
-	cursor, err := d.coll.Find(*d.ctx, bson.M{})
+func (d DeployRun) ReadAll(filter bson.M) (*[]models.DeployRun, error) {
+	cursor, err := d.coll.Find(*d.ctx, filter)
 	if err != nil {
 		return nil, err
 	}
