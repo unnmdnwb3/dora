@@ -13,8 +13,8 @@ compose:
 copy-env:
 	cp default.env local.env
 
-unit-tests:
-	go test -v ./...
+ginkgo:
+	ginkgo -r -v
 
 mongo-run:
 	docker run \
@@ -32,4 +32,4 @@ mongo-stop:
 mongo-sh:
 	mongosh --host 127.0.0.1 --port 27017 -u user -p password
 
-tests: mongo-run unit-tests mongo-stop
+tests: mongo-run ginkgo mongo-stop
