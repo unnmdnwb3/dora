@@ -2,8 +2,8 @@ package models
 
 import "time"
 
-// DeployRun describes a deployment run
-type DeployRun struct {
+// WorkflowRun describes a single run of a CICD workflow
+type WorkflowRun struct {
 	ID        string    `json:"id" bson:"_id,omitempty"`
 	ProjectID string    `json:"project_id" bson:"project_id"`
 	Ref       string    `json:"ref" bson:"ref"`

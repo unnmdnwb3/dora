@@ -37,6 +37,39 @@ func NewClient() (*Client, error) {
 	}, nil
 }
 
+// GetOrganisations gets all organisations readable with the bearer token provided
+func (c *Client) GetOrganisations() (*[]models.Organisation, error) {
+	client := &http.Client{}
+
+	uri := fmt.Sprintf("%s/groups", c.URI)
+	req, err := http.NewRequest(http.MethodGet, uri, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	bearer := fmt.Sprintf("Bearer %s", c.Auth)
+	req.Header.Add("Authorization", bearer)
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	organisations := []models.Organisation{}
+	err = json.Unmarshal(body, &organisations)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	return &organisations, nil
+}
+
 // GetRepositories gets all repositories readable with the bearer token provided
 func (c *Client) GetRepositories() (*[]models.Repository, error) {
 	client := &http.Client{}
@@ -75,41 +108,8 @@ func (c *Client) GetRepositories() (*[]models.Repository, error) {
 	return &repositories, nil
 }
 
-// GetOrganisations gets all organisations readable with the bearer token provided
-func (c *Client) GetOrganisations() (*[]models.Organisation, error) {
-	client := &http.Client{}
-
-	uri := fmt.Sprintf("%s/groups", c.URI)
-	req, err := http.NewRequest(http.MethodGet, uri, nil)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	bearer := fmt.Sprintf("Bearer %s", c.Auth)
-	req.Header.Add("Authorization", bearer)
-
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	organisations := []models.Organisation{}
-	err = json.Unmarshal(body, &organisations)
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	return &organisations, nil
-}
-
-// GetDeployRuns gets all deployment runs of a project
-func (c *Client) GetDeployRuns(projectID string, referenceBranch string) (*[]models.DeployRun, error) {
+// WorkflowRuns gets all deployment runs of a project
+func (c *Client) WorkflowRuns(projectID string, referenceBranch string) (*[]models.WorkflowRun, error) {
 	client := &http.Client{}
 
 	uri := fmt.Sprintf("%s/projects/%s/pipelines", c.URI, projectID)
@@ -139,11 +139,11 @@ func (c *Client) GetDeployRuns(projectID string, referenceBranch string) (*[]mod
 		log.Fatalln(err)
 	}
 
-	deployRuns := []models.DeployRun{}
-	err = json.Unmarshal(body, &deployRuns)
+	workflowRuns := []models.WorkflowRun{}
+	err = json.Unmarshal(body, &workflowRuns)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	return &deployRuns, nil
+	return &workflowRuns, nil
 }

@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/unnmdnwb3/dora/internal/applications/gitlab"
+	"github.com/unnmdnwb3/dora/internal/connectors/gitlab"
 )
 
 // GetRepositories gets all repositories
