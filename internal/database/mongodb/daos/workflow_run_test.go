@@ -15,7 +15,7 @@ var _ = Describe("daos.WorkflowRun", func() {
 	ctx := context.Background()
 
 	var _ = When("Create", func() {
-		It("creates a deploy run", func() {
+		It("creates a workflow run", func() {
 			DAO, err := daos.NewWorkflowRun(&ctx)
 			Expect(err).To((BeNil()))
 
@@ -38,7 +38,7 @@ var _ = Describe("daos.WorkflowRun", func() {
 	})
 
 	var _ = When("CreateMany", func() {
-		It("creates many deploy runs", func() {
+		It("creates many workflow runs", func() {
 			DAO, err := daos.NewWorkflowRun(&ctx)
 			Expect(err).To((BeNil()))
 
@@ -78,7 +78,7 @@ var _ = Describe("daos.WorkflowRun", func() {
 	})
 
 	var _ = When("Read", func() {
-		It("reads a deploy run", func() {
+		It("reads a workflow run", func() {
 			DAO, err := daos.NewWorkflowRun(&ctx)
 			Expect(err).To((BeNil()))
 
@@ -106,7 +106,7 @@ var _ = Describe("daos.WorkflowRun", func() {
 	})
 
 	var _ = When("ReadAll", func() {
-		It("reads all applications", func() {
+		It("reads all workflow runs", func() {
 			DAO, err := daos.NewWorkflowRun(&ctx)
 			Expect(err).To((BeNil()))
 
@@ -151,7 +151,7 @@ var _ = Describe("daos.WorkflowRun", func() {
 	})
 
 	var _ = When("Update", func() {
-		It("updates a deploy run", func() {
+		It("updates a workflow run", func() {
 			DAO, err := daos.NewWorkflowRun(&ctx)
 			Expect(err).To((BeNil()))
 
@@ -190,7 +190,7 @@ var _ = Describe("daos.WorkflowRun", func() {
 	})
 
 	var _ = When("Delete", func() {
-		It("deletes a deploy run", func() {
+		It("deletes a workflow run", func() {
 			DAO, err := daos.NewWorkflowRun(&ctx)
 			Expect(err).To((BeNil()))
 
