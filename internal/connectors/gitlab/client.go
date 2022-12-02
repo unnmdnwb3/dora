@@ -37,6 +37,39 @@ func NewClient() (*Client, error) {
 	}, nil
 }
 
+// GetOrganisations gets all organisations readable with the bearer token provided
+func (c *Client) GetOrganisations() (*[]models.Organisation, error) {
+	client := &http.Client{}
+
+	uri := fmt.Sprintf("%s/groups", c.URI)
+	req, err := http.NewRequest(http.MethodGet, uri, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	bearer := fmt.Sprintf("Bearer %s", c.Auth)
+	req.Header.Add("Authorization", bearer)
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	organisations := []models.Organisation{}
+	err = json.Unmarshal(body, &organisations)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	return &organisations, nil
+}
+
 // GetRepositories gets all repositories readable with the bearer token provided
 func (c *Client) GetRepositories() (*[]models.Repository, error) {
 	client := &http.Client{}
@@ -75,11 +108,11 @@ func (c *Client) GetRepositories() (*[]models.Repository, error) {
 	return &repositories, nil
 }
 
-// GetOrganisations gets all organisations readable with the bearer token provided
-func (c *Client) GetOrganisations() (*[]models.Organisation, error) {
+// GetPullRequests gets all pull requests of a repository
+func (c *Client) GetPullRequests(projectID string, targetBranch string) (*[]models.PullRequest, error) {
 	client := &http.Client{}
 
-	uri := fmt.Sprintf("%s/groups", c.URI)
+	uri := fmt.Sprintf("%s/projects/%s/merge_requests", c.URI, projectID)
 	req, err := http.NewRequest(http.MethodGet, uri, nil)
 	if err != nil {
 		log.Fatalln(err)
@@ -87,6 +120,12 @@ func (c *Client) GetOrganisations() (*[]models.Organisation, error) {
 
 	bearer := fmt.Sprintf("Bearer %s", c.Auth)
 	req.Header.Add("Authorization", bearer)
+
+	// TODO add "since" parameter
+	q := req.URL.Query()
+	q.Add("state", "merged")
+	q.Add("target_branch", targetBranch)
+	req.URL.RawQuery = q.Encode()
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -99,17 +138,56 @@ func (c *Client) GetOrganisations() (*[]models.Organisation, error) {
 		log.Fatalln(err)
 	}
 
-	organisations := []models.Organisation{}
-	err = json.Unmarshal(body, &organisations)
+	pullRequests := []models.PullRequest{}
+	err = json.Unmarshal(body, &pullRequests)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	return &organisations, nil
+	return &pullRequests, nil
 }
 
-// GetDeployRuns gets all deployment runs of a project
-func (c *Client) GetDeployRuns(projectID string, referenceBranch string) (*[]models.DeployRun, error) {
+// GetCommits gets all commits of a repository
+func (c *Client) GetCommits(projectID string, referenceBranch string) (*[]models.Commit, error) {
+	client := &http.Client{}
+
+	uri := fmt.Sprintf("%s/projects/%s/repository/commits", c.URI, projectID)
+	req, err := http.NewRequest(http.MethodGet, uri, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	bearer := fmt.Sprintf("Bearer %s", c.Auth)
+	req.Header.Add("Authorization", bearer)
+
+	// TODO add "since" parameter
+	q := req.URL.Query()
+	q.Add("order", "default") // asc
+	q.Add("ref_name", referenceBranch)
+	req.URL.RawQuery = q.Encode()
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	commits := []models.Commit{}
+	err = json.Unmarshal(body, &commits)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	return &commits, nil
+}
+
+// GetWorkflowRuns gets all workflow runs of a project
+func (c *Client) GetWorkflowRuns(projectID string, referenceBranch string) (*[]models.WorkflowRun, error) {
 	client := &http.Client{}
 
 	uri := fmt.Sprintf("%s/projects/%s/pipelines", c.URI, projectID)
@@ -139,11 +217,11 @@ func (c *Client) GetDeployRuns(projectID string, referenceBranch string) (*[]mod
 		log.Fatalln(err)
 	}
 
-	deployRuns := []models.DeployRun{}
-	err = json.Unmarshal(body, &deployRuns)
+	workflowRuns := []models.WorkflowRun{}
+	err = json.Unmarshal(body, &workflowRuns)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	return &deployRuns, nil
+	return &workflowRuns, nil
 }

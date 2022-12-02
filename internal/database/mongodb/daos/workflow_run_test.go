@@ -11,17 +11,17 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-var _ = Describe("daos.DeployRun", func() {
+var _ = Describe("daos.WorkflowRun", func() {
 	ctx := context.Background()
 
 	var _ = When("Create", func() {
 		It("creates a deploy run", func() {
-			DAO, err := daos.NewDeployRun(&ctx)
+			DAO, err := daos.NewWorkflowRun(&ctx)
 			Expect(err).To((BeNil()))
 
 			createdAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:29:50.092Z")
 			updatedAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:35:51.459Z")
-			createRequest := models.DeployRun{
+			createRequest := models.WorkflowRun{
 				ProjectID: "15392086",
 				Ref:       "main",
 				Status:    "success",
@@ -39,12 +39,12 @@ var _ = Describe("daos.DeployRun", func() {
 
 	var _ = When("CreateMany", func() {
 		It("creates many deploy runs", func() {
-			DAO, err := daos.NewDeployRun(&ctx)
+			DAO, err := daos.NewWorkflowRun(&ctx)
 			Expect(err).To((BeNil()))
 
 			firstCreatedAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:29:50.092Z")
 			firstUpdatedAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:35:51.459Z")
-			firstCreateRequest := models.DeployRun{
+			firstCreateRequest := models.WorkflowRun{
 				ProjectID: "15392086",
 				Ref:       "main",
 				Status:    "success",
@@ -56,7 +56,7 @@ var _ = Describe("daos.DeployRun", func() {
 
 			secondCreatedAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:31:51.235Z")
 			secondUpdatedAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:38:18.252Z")
-			secondCreateRequest := models.DeployRun{
+			secondCreateRequest := models.WorkflowRun{
 				ProjectID: "15392086",
 				Ref:       "main",
 				Status:    "success",
@@ -66,7 +66,7 @@ var _ = Describe("daos.DeployRun", func() {
 				URI:       "https://gitlab.com/foobar/foobar/-/pipelines/114884002",
 			}
 
-			createRequest := []models.DeployRun{
+			createRequest := []models.WorkflowRun{
 				firstCreateRequest,
 				secondCreateRequest,
 			}
@@ -79,12 +79,12 @@ var _ = Describe("daos.DeployRun", func() {
 
 	var _ = When("Read", func() {
 		It("reads a deploy run", func() {
-			DAO, err := daos.NewDeployRun(&ctx)
+			DAO, err := daos.NewWorkflowRun(&ctx)
 			Expect(err).To((BeNil()))
 
 			createdAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:29:50.092Z")
 			updatedAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:35:51.459Z")
-			createRequest := models.DeployRun{
+			createRequest := models.WorkflowRun{
 				ProjectID: "15392086",
 				Ref:       "main",
 				Status:    "success",
@@ -98,21 +98,21 @@ var _ = Describe("daos.DeployRun", func() {
 			Expect(err).To(BeNil())
 			Expect(ID).To(Not(BeEmpty()))
 
-			deployRun, err := DAO.Read(ID)
+			workflowRun, err := DAO.Read(ID)
 			Expect(err).To(BeNil())
-			Expect(deployRun.ID).To(Equal(ID))
-			Expect(deployRun.ProjectID).To(Equal(createRequest.ProjectID))
+			Expect(workflowRun.ID).To(Equal(ID))
+			Expect(workflowRun.ProjectID).To(Equal(createRequest.ProjectID))
 		})
 	})
 
 	var _ = When("ReadAll", func() {
 		It("reads all applications", func() {
-			DAO, err := daos.NewDeployRun(&ctx)
+			DAO, err := daos.NewWorkflowRun(&ctx)
 			Expect(err).To((BeNil()))
 
 			firstCreatedAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:29:50.092Z")
 			firstUpdatedAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:35:51.459Z")
-			firstCreateRequest := models.DeployRun{
+			firstCreateRequest := models.WorkflowRun{
 				ProjectID: "15392086",
 				Ref:       "main",
 				Status:    "success",
@@ -124,7 +124,7 @@ var _ = Describe("daos.DeployRun", func() {
 
 			secondCreatedAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:31:51.235Z")
 			secondUpdatedAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:38:18.252Z")
-			secondCreateRequest := models.DeployRun{
+			secondCreateRequest := models.WorkflowRun{
 				ProjectID: "15392086",
 				Ref:       "main",
 				Status:    "success",
@@ -134,7 +134,7 @@ var _ = Describe("daos.DeployRun", func() {
 				URI:       "https://gitlab.com/foobar/foobar/-/pipelines/114884002",
 			}
 
-			createRequest := []models.DeployRun{
+			createRequest := []models.WorkflowRun{
 				firstCreateRequest,
 				secondCreateRequest,
 			}
@@ -152,12 +152,12 @@ var _ = Describe("daos.DeployRun", func() {
 
 	var _ = When("Update", func() {
 		It("updates a deploy run", func() {
-			DAO, err := daos.NewDeployRun(&ctx)
+			DAO, err := daos.NewWorkflowRun(&ctx)
 			Expect(err).To((BeNil()))
 
 			createdAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:29:50.092Z")
 			updatedAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:35:51.459Z")
-			createRequest := models.DeployRun{
+			createRequest := models.WorkflowRun{
 				Ref:       "master",
 				Status:    "success",
 				Source:    "push",
@@ -172,7 +172,7 @@ var _ = Describe("daos.DeployRun", func() {
 			refUpdate := "main"
 			createdAt, _ = time.Parse(time.RFC3339, "2020-02-04T14:29:50.092Z")
 			updatedAt, _ = time.Parse(time.RFC3339, "2020-02-04T14:35:51.459Z")
-			updateRequest := models.DeployRun{
+			updateRequest := models.WorkflowRun{
 				ID:        ID,
 				ProjectID: createRequest.ProjectID,
 				Ref:       refUpdate,
@@ -191,12 +191,12 @@ var _ = Describe("daos.DeployRun", func() {
 
 	var _ = When("Delete", func() {
 		It("deletes a deploy run", func() {
-			DAO, err := daos.NewDeployRun(&ctx)
+			DAO, err := daos.NewWorkflowRun(&ctx)
 			Expect(err).To((BeNil()))
 
 			createdAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:29:50.092Z")
 			updatedAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:35:51.459Z")
-			createRequest := models.DeployRun{
+			createRequest := models.WorkflowRun{
 				ProjectID: "15392086",
 				Ref:       "master",
 				Status:    "success",

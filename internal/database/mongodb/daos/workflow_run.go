@@ -11,23 +11,23 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// DeployRun is the data access object for any deploy run
-type DeployRun struct {
+// WorkflowRun is the data access object for any deploy run
+type WorkflowRun struct {
 	ctx  *context.Context
 	coll *mongo.Collection
 }
 
-// NewDeployRun creates a new data access object for any deploy run
-func NewDeployRun(ctx *context.Context) (*DeployRun, error) {
-	return &DeployRun{
+// NewWorkflowRun creates a new data access object for any deploy run
+func NewWorkflowRun(ctx *context.Context) (*WorkflowRun, error) {
+	return &WorkflowRun{
 		ctx:  ctx,
 		coll: mongodb.DB.Collection("deploy_runs"),
 	}, nil
 }
 
 // Create persists a new deploy run
-func (d DeployRun) Create(deployRun *models.DeployRun) (string, error) {
-	insertResult, err := d.coll.InsertOne(*d.ctx, deployRun)
+func (d WorkflowRun) Create(workflowRun *models.WorkflowRun) (string, error) {
+	insertResult, err := d.coll.InsertOne(*d.ctx, workflowRun)
 	if err != nil {
 		return "", err
 	}
@@ -37,11 +37,11 @@ func (d DeployRun) Create(deployRun *models.DeployRun) (string, error) {
 }
 
 // CreateMany persists many new deploy runs
-func (d DeployRun) CreateMany(deployRuns []models.DeployRun) (*[]string, error) {
+func (d WorkflowRun) CreateMany(workflowRuns []models.WorkflowRun) (*[]string, error) {
 	// convert structs to interface
-	documents := make([]interface{}, len(deployRuns))
-	for i, deployRun := range deployRuns {
-		documents[i] = deployRun
+	documents := make([]interface{}, len(workflowRuns))
+	for i, workflowRun := range workflowRuns {
+		documents[i] = workflowRun
 	}
 
 	insertManyResult, err := d.coll.InsertMany(*d.ctx, documents)
@@ -59,7 +59,7 @@ func (d DeployRun) CreateMany(deployRuns []models.DeployRun) (*[]string, error) 
 }
 
 // Read retrieves an deploy run
-func (d DeployRun) Read(id string) (*models.DeployRun, error) {
+func (d WorkflowRun) Read(id string) (*models.WorkflowRun, error) {
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -71,7 +71,7 @@ func (d DeployRun) Read(id string) (*models.DeployRun, error) {
 		return nil, readResult.Err()
 	}
 
-	var result models.DeployRun
+	var result models.WorkflowRun
 	err = readResult.Decode(&result)
 	if err != nil {
 		return nil, err
@@ -81,16 +81,16 @@ func (d DeployRun) Read(id string) (*models.DeployRun, error) {
 }
 
 // ReadAll retrieves all deploy runs
-func (d DeployRun) ReadAll(filter bson.M) (*[]models.DeployRun, error) {
+func (d WorkflowRun) ReadAll(filter bson.M) (*[]models.WorkflowRun, error) {
 	cursor, err := d.coll.Find(*d.ctx, filter)
 	if err != nil {
 		return nil, err
 	}
 
-	result := make([]models.DeployRun, cursor.RemainingBatchLength())
+	result := make([]models.WorkflowRun, cursor.RemainingBatchLength())
 	pos := 0
 	for cursor.Next(*d.ctx) {
-		var cursorResult models.DeployRun
+		var cursorResult models.WorkflowRun
 		err := cursor.Decode(&cursorResult)
 		if err != nil {
 			return nil, err
@@ -108,8 +108,8 @@ func (d DeployRun) ReadAll(filter bson.M) (*[]models.DeployRun, error) {
 }
 
 // Update persists changes to an alreay existing deploy run
-func (d DeployRun) Update(deployRun *models.DeployRun) (*models.DeployRun, error) {
-	objectID, err := primitive.ObjectIDFromHex(deployRun.ID)
+func (d WorkflowRun) Update(workflowRun *models.WorkflowRun) (*models.WorkflowRun, error) {
+	objectID, err := primitive.ObjectIDFromHex(workflowRun.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -119,13 +119,13 @@ func (d DeployRun) Update(deployRun *models.DeployRun) (*models.DeployRun, error
 	}
 	update := bson.M{
 		"$set": bson.M{
-			"project_id": deployRun.Ref,
-			"ref":        deployRun.Ref,
-			"status":     deployRun.Status,
-			"source":     deployRun.Source,
-			"created_at": deployRun.CreatedAt,
-			"updated_at": deployRun.UpdatedAt,
-			"uri":        deployRun.URI,
+			"project_id": workflowRun.Ref,
+			"ref":        workflowRun.Ref,
+			"status":     workflowRun.Status,
+			"source":     workflowRun.Source,
+			"created_at": workflowRun.CreatedAt,
+			"updated_at": workflowRun.UpdatedAt,
+			"uri":        workflowRun.URI,
 		},
 	}
 
@@ -141,7 +141,7 @@ func (d DeployRun) Update(deployRun *models.DeployRun) (*models.DeployRun, error
 		return nil, findResult.Err()
 	}
 
-	var result models.DeployRun
+	var result models.WorkflowRun
 	err = findResult.Decode(&result)
 	if err != nil {
 		return nil, err
@@ -151,7 +151,7 @@ func (d DeployRun) Update(deployRun *models.DeployRun) (*models.DeployRun, error
 }
 
 // Delete deletes an existing deploy run
-func (d DeployRun) Delete(id string) (*models.DeployRun, error) {
+func (d WorkflowRun) Delete(id string) (*models.WorkflowRun, error) {
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return nil, err
@@ -163,7 +163,7 @@ func (d DeployRun) Delete(id string) (*models.DeployRun, error) {
 		return nil, deleteResult.Err()
 	}
 
-	var result models.DeployRun
+	var result models.WorkflowRun
 	err = deleteResult.Decode(&result)
 	if err != nil {
 		return nil, err
