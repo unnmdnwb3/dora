@@ -108,8 +108,86 @@ func (c *Client) GetRepositories() (*[]models.Repository, error) {
 	return &repositories, nil
 }
 
-// WorkflowRuns gets all deployment runs of a project
-func (c *Client) WorkflowRuns(projectID string, referenceBranch string) (*[]models.WorkflowRun, error) {
+// GetPullRequests gets all pull requests of a repository
+func (c *Client) GetPullRequests(projectID string, targetBranch string) (*[]models.PullRequest, error) {
+	client := &http.Client{}
+
+	uri := fmt.Sprintf("%s/projects/%s/merge_requests", c.URI, projectID)
+	req, err := http.NewRequest(http.MethodGet, uri, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	bearer := fmt.Sprintf("Bearer %s", c.Auth)
+	req.Header.Add("Authorization", bearer)
+
+	// TODO add "since" parameter
+	q := req.URL.Query()
+	q.Add("state", "merged")
+	q.Add("target_branch", targetBranch)
+	req.URL.RawQuery = q.Encode()
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	pullRequests := []models.PullRequest{}
+	err = json.Unmarshal(body, &pullRequests)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	return &pullRequests, nil
+}
+
+// GetCommits gets all commits of a repository
+func (c *Client) GetCommits(projectID string, referenceBranch string) (*[]models.Commit, error) {
+	client := &http.Client{}
+
+	uri := fmt.Sprintf("%s/projects/%s/repository/commits", c.URI, projectID)
+	req, err := http.NewRequest(http.MethodGet, uri, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	bearer := fmt.Sprintf("Bearer %s", c.Auth)
+	req.Header.Add("Authorization", bearer)
+
+	// TODO add "since" parameter
+	q := req.URL.Query()
+	q.Add("order", "default") // asc
+	q.Add("ref_name", referenceBranch)
+	req.URL.RawQuery = q.Encode()
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	commits := []models.Commit{}
+	err = json.Unmarshal(body, &commits)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	return &commits, nil
+}
+
+// GetWorkflowRuns gets all workflow runs of a project
+func (c *Client) GetWorkflowRuns(projectID string, referenceBranch string) (*[]models.WorkflowRun, error) {
 	client := &http.Client{}
 
 	uri := fmt.Sprintf("%s/projects/%s/pipelines", c.URI, projectID)
