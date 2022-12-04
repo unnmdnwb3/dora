@@ -13,14 +13,6 @@ jobs:
       - run: go version
       - name: Install dependencies
         run: go get .
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
       - name: Build
         run: go build -v ./...
       - name: Start MongoDB
@@ -30,4 +22,6 @@ jobs:
           mongodb-password: password
           mongodb-db: dora
       - name: Test
-        run: ginkgo -r -v
+        run: |
+          go install github.com/onsi/ginkgo/ginkgo 
+          ginkgo -r -v
