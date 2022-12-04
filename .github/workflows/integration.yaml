@@ -1,5 +1,5 @@
 name: Integration
-on: [push]
+on: [pull_request]
 
 jobs:
   build:
@@ -21,9 +21,7 @@ jobs:
           mongodb-username: user
           mongodb-password: password
           mongodb-db: dora
-      - name: Test
-        run: |
-          go get github.com/onsi/ginkgo/ginkgo
-          go install github.com/onsi/ginkgo/v2/ginkgo
-          go get github.com/onsi/gomega/...
-          ginkgo -r -v
+      - name: Install Ginkgo
+        run: go install github.com/onsi/ginkgo/v2/ginkgo@latest
+      - name: Tests
+        run: ginkgo -r -v --randomizeAllSpecs --randomizeSuites

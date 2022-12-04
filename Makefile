@@ -14,7 +14,7 @@ copy-env:
 	cp default.env local.env
 
 ginkgo:
-	ginkgo -r -v
+	ginkgo -r -v --randomizeAllSpecs --randomizeSuites
 
 mongo-run:
 	docker run \
