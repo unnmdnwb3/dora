@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -13,25 +12,46 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var (
-	// Client provides the driver functionality for MongoDB.
-	// It gets initialized in the main function as a singleton.
+// DefaultDatabase defines the default database name
+const DefaultDatabase = "dora"
+
+// Service provides the functionality to use
+type Service struct {
 	Client *mongo.Client
+	DB     *mongo.Database
+}
 
-	// DB provides the connectivity to a MongoDB instance.
-	// It gets initialized in the main function as a singleton.
-	DB *mongo.Database
-)
+// NewService creates a new service providing a Mongos.db connection
+func NewService() *Service {
+	return &Service{}
+}
 
-const (
-	// Timeout defines the timeout for database.
-	Timeout = 5 * time.Second
+// Connect establishes a connection to a MongoDB instance
+func (s *Service) Connect(ctx context.Context, databaseName string) error {
+	conn, err := ConnectionString()
+	if err != nil {
+		return err
+	}
 
-	// DefaultDatabase defines the default database name.
-	DefaultDatabase = "dora"
-)
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(conn))
+	if err != nil {
+		return fmt.Errorf("could not establish connection to database: %s", err.Error())
+	}
+	db := client.Database(databaseName)
 
-// ConnectionString creates the connection string with the full URI for a MongoDB instance.
+	s.Client = client
+	s.DB = db
+
+	return nil
+}
+
+// Disconnect removes a connection to a MongoDB instance
+func (s *Service) Disconnect(ctx context.Context) error {
+	err := s.Client.Disconnect(ctx)
+	return err
+}
+
+// ConnectionString creates the connection string with the full URI for a Mongos.db instance.
 func ConnectionString() (string, error) {
 	// necessary
 	uri := os.Getenv("MONGODB_URI")
@@ -54,26 +74,9 @@ func ConnectionString() (string, error) {
 	return fmt.Sprintf("mongodb://%s%s%s", auth, uri, port), nil
 }
 
-// Init a Client and DB connection to MongoDB as singletons.
-func Init(ctx *context.Context) error {
-	conn, err := ConnectionString()
-	if err != nil {
-		return err
-	}
-
-	Client, err = mongo.Connect(*ctx, options.Client().ApplyURI(conn))
-	if err != nil {
-		return fmt.Errorf("could not establish connection to database: %s", err.Error())
-	}
-
-	DB = Client.Database(DefaultDatabase)
-
-	return nil
-}
-
 // InsertOne inserts a document into a collection.
-func InsertOne(ctx context.Context, collection string, v any) error {
-	coll := DB.Collection(collection)
+func (s *Service) InsertOne(ctx context.Context, collection string, v any) error {
+	coll := s.DB.Collection(collection)
 	insertOneResult, err := coll.InsertOne(ctx, v)
 	if err != nil {
 		return err
@@ -90,8 +93,8 @@ func InsertOne(ctx context.Context, collection string, v any) error {
 }
 
 // Find finds many documents in a collection.
-func Find(ctx context.Context, collection string, filter bson.M, vs any) error {
-	coll := DB.Collection(collection)
+func (s *Service) Find(ctx context.Context, collection string, filter bson.M, vs any) error {
+	coll := s.DB.Collection(collection)
 
 	cursor, err := coll.Find(ctx, filter)
 	if err != nil {
@@ -103,8 +106,8 @@ func Find(ctx context.Context, collection string, filter bson.M, vs any) error {
 }
 
 // FindOne finds a documents in a collection.
-func FindOne(ctx context.Context, collection string, filter bson.M, v any) error {
-	coll := DB.Collection(collection)
+func (s *Service) FindOne(ctx context.Context, collection string, filter bson.M, v any) error {
+	coll := s.DB.Collection(collection)
 
 	findOneResult := coll.FindOne(ctx, filter)
 	if findOneResult.Err() != nil {
@@ -116,21 +119,21 @@ func FindOne(ctx context.Context, collection string, filter bson.M, v any) error
 }
 
 // FindOneByID finds a documents with a specific ID in a collection.
-func FindOneByID(ctx context.Context, collection string, ID string, v any) error {
+func (s *Service) FindOneByID(ctx context.Context, collection string, ID string, v any) error {
 	objectID, err := primitive.ObjectIDFromHex(ID)
 	if err != nil {
 		return err
 	}
 
 	filter := bson.M{"_id": objectID}
-	err = FindOne(ctx, collection, filter, v)
+	err = s.FindOne(ctx, collection, filter, v)
 
 	return err
 }
 
 // UpdateOne updates a document in a collection.
-func UpdateOne(ctx context.Context, collection string, ID string, v any) error {
-	coll := DB.Collection(collection)
+func (s *Service) UpdateOne(ctx context.Context, collection string, ID string, v any) error {
+	coll := s.DB.Collection(collection)
 
 	objectID, err := primitive.ObjectIDFromHex(ID)
 	if err != nil {
@@ -152,8 +155,8 @@ func UpdateOne(ctx context.Context, collection string, ID string, v any) error {
 }
 
 // DeleteOne deletes a document in a collection.
-func DeleteOne(ctx context.Context, collection string, ID string) error {
-	coll := DB.Collection(collection)
+func (s *Service) DeleteOne(ctx context.Context, collection string, ID string) error {
+	coll := s.DB.Collection(collection)
 
 	objectID, err := primitive.ObjectIDFromHex(ID)
 	if err != nil {

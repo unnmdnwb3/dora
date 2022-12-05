@@ -16,18 +16,19 @@ func main() {
 	ctx := context.Background()
 
 	// connect to database
-	err := mongodb.Init(&ctx)
+	service := mongodb.NewService()
+	err := service.Connect(ctx)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	err = mongodb.Client.Ping(context.TODO(), readpref.Primary())
+	err = service.Client.Ping(context.TODO(), readpref.Primary())
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	fmt.Println("Successfully connected to database.")
-	defer mongodb.Client.Disconnect(ctx)
+	defer service.Disconnect(ctx)
 
 	router := gin.Default()
 
