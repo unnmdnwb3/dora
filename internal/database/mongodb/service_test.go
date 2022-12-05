@@ -21,7 +21,6 @@ func TestService(t *testing.T) {
 
 var _ = Describe("mongodb.Service", func() {
 	ctx := context.Background()
-
 	var service *mongodb.Service
 
 	var _ = BeforeEach(func() {
@@ -56,120 +55,129 @@ var _ = Describe("mongodb.Service", func() {
 
 	var _ = When("InsertOne", func() {
 		It("creates a new document in a collection", func() {
-			application := models.Application{
-				Auth: "bearertoken",
-				Type: "gitlab",
-				URI:  "https://gitlab.com",
+			integration := models.Integration{
+				Type:        "sc",
+				Provider:    "gitlab",
+				BearerToken: "bearertoken",
+				URI:         "https://gitlab.com",
 			}
-			err := service.InsertOne(ctx, "application", &application)
+			err := service.InsertOne(ctx, "integration", &integration)
 			Expect(err).To(BeNil())
-			Expect(application.ID).To(Not(BeNil()))
+			Expect(integration.ID).To(Not(BeEmpty()))
 		})
 	})
 
 	var _ = When("Find", func() {
 		It("finds many documents in a collection", func() {
-			application1 := models.Application{
-				Auth: "bearertoken",
-				Type: "gitlab",
-				URI:  "https://gitlab.onprem1.com",
+			integration1 := models.Integration{
+				Type:        "sc",
+				Provider:    "gitlab",
+				BearerToken: "bearertoken",
+				URI:         "https://gitlab.onprem.com",
 			}
-			application2 := models.Application{
-				Auth: "bearertoken",
-				Type: "gitlab",
-				URI:  "https://gitlab.onprem2.com",
+			integration2 := models.Integration{
+				Type:        "sc",
+				Provider:    "gitlab",
+				BearerToken: "bearertoken",
+				URI:         "https://gitlab.com",
 			}
-			application3 := models.Application{
-				Auth: "bearertoken",
-				Type: "gitlab",
-				URI:  "https://gitlab.onprem.com",
+			integration3 := models.Integration{
+				Type:        "sc",
+				Provider:    "gihub",
+				BearerToken: "bearertoken",
+				URI:         "https://github.com",
 			}
-			service.InsertOne(ctx, "application", &application1)
-			service.InsertOne(ctx, "application", &application2)
-			service.InsertOne(ctx, "application", &application3)
-			Expect(application1.ID).To(Not(BeNil()))
-			Expect(application2.ID).To(Not(BeNil()))
-			Expect(application3.ID).To(Not(BeNil()))
+			service.InsertOne(ctx, "integration", &integration1)
+			service.InsertOne(ctx, "integration", &integration2)
+			service.InsertOne(ctx, "integration", &integration3)
+			Expect(integration1.ID).To(Not(BeNil()))
+			Expect(integration2.ID).To(Not(BeNil()))
+			Expect(integration3.ID).To(Not(BeNil()))
 
-			var findApplications []models.Application
-			filter := bson.M{"type": "gitlab"}
-			err := service.Find(ctx, "application", filter, &findApplications)
+			var findIntegrations []models.Integration
+			filter := bson.M{"type": "sc"}
+			err := service.Find(ctx, "integration", filter, &findIntegrations)
 			Expect(err).To(BeNil())
-			Expect(findApplications).To(HaveLen(3))
+			Expect(findIntegrations).To(HaveLen(3))
 		})
 	})
 
 	var _ = When("FindOne", func() {
 		It("finds a specific document in a collection", func() {
-			application := models.Application{
-				Auth: "bearertoken",
-				Type: "gitlab",
-				URI:  "https://gitlab.com",
+			integration := models.Integration{
+				Type:        "sc",
+				Provider:    "gitlab",
+				BearerToken: "bearertoken",
+				URI:         "https://gitlab.com",
 			}
-			service.InsertOne(ctx, "application", &application)
-			Expect(application.ID).To(Not(BeNil()))
+			service.InsertOne(ctx, "integration", &integration)
+			Expect(integration.ID).To(Not(BeNil()))
 
-			var findApplication models.Application
+			var findIntegration models.Integration
 			filter := bson.M{"uri": "https://gitlab.com"}
-			err := service.FindOne(ctx, "application", filter, &findApplication)
+			err := service.FindOne(ctx, "integration", filter, &findIntegration)
 			Expect(err).To(BeNil())
-			Expect(findApplication.ID).To(Equal(application.ID))
+			Expect(findIntegration.ID).To(Equal(integration.ID))
 		})
 	})
 
 	var _ = When("FindOneByID", func() {
 		It("finds a specific document with ID in a collection", func() {
-			application := models.Application{
-				Auth: "bearertoken",
-				Type: "gitlab",
-				URI:  "https://gitlab.com",
+			integration := models.Integration{
+				Type:        "sc",
+				Provider:    "gitlab",
+				BearerToken: "bearertoken",
+				URI:         "https://gitlab.com",
 			}
-			service.InsertOne(ctx, "application", &application)
-			Expect(application.ID).To(Not(BeNil()))
+			service.InsertOne(ctx, "integration", &integration)
+			Expect(integration.ID).To(Not(BeNil()))
 
-			var findApplication models.Application
-			err := service.FindOneByID(ctx, "application", application.ID, &findApplication)
+			var findIntegration models.Integration
+			err := service.FindOneByID(ctx, "integration", integration.ID, &findIntegration)
 			Expect(err).To(BeNil())
-			Expect(findApplication.ID).To(Equal(application.ID))
+			Expect(findIntegration.ID).To(Equal(integration.ID))
 		})
 	})
 
 	var _ = When("UpdateOne", func() {
 		It("updates a document with ID in a collection", func() {
-			application := models.Application{
-				Auth: "bearertoken",
-				Type: "gitlab",
-				URI:  "https://gitlab.com",
+			integration := models.Integration{
+				Type:        "sc",
+				Provider:    "gitlab",
+				BearerToken: "bearertoken",
+				URI:         "https://gitlab.com",
 			}
-			service.InsertOne(ctx, "application", &application)
-			Expect(application.ID).To(Not(BeNil()))
+			service.InsertOne(ctx, "integration", &integration)
+			Expect(integration.ID).To(Not(BeNil()))
 
-			updateApplication := models.Application{
-				Auth: "newbearertoken",
-				Type: "gitlab",
-				URI:  "https://gitlab.com",
+			updateIntegration := models.Integration{
+				Type:        "sc",
+				Provider:    "gitlab",
+				BearerToken: "newbearertoken",
+				URI:         "https://gitlab.com",
 			}
-			err := service.UpdateOne(ctx, "application", application.ID, &updateApplication)
+			err := service.UpdateOne(ctx, "integration", integration.ID, &updateIntegration)
 			Expect(err).To(BeNil())
-			Expect(updateApplication.Auth).To(Equal("newbearertoken"))
+			Expect(updateIntegration.BearerToken).To(Equal("newbearertoken"))
 		})
 	})
 
 	var _ = When("DeleteOne", func() {
 		It("deletes a document with ID in a collection", func() {
-			application := models.Application{
-				Auth: "bearertoken",
-				Type: "gitlab",
-				URI:  "https://gitlab.com",
+			integration := models.Integration{
+				Type:        "sc",
+				Provider:    "gitlab",
+				BearerToken: "bearertoken",
+				URI:         "https://gitlab.com",
 			}
-			service.InsertOne(ctx, "application", &application)
-			Expect(application.ID).To(Not(BeNil()))
+			service.InsertOne(ctx, "integration", &integration)
+			Expect(integration.ID).To(Not(BeNil()))
 
-			err := service.DeleteOne(ctx, "application", application.ID)
+			err := service.DeleteOne(ctx, "integration", integration.ID)
 			Expect(err).To(BeNil())
 
-			var findApplication models.Application
-			err = service.FindOneByID(ctx, "application", application.ID, &findApplication)
+			var findIntegration models.Integration
+			err = service.FindOneByID(ctx, "integration", integration.ID, &findIntegration)
 			Expect(err).To(Not(BeNil()))
 		})
 	})

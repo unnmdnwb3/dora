@@ -14,7 +14,6 @@ import (
 func main() {
 	ctx := context.Background()
 
-	// connect to database
 	service := mongodb.NewService()
 	err := service.Connect(ctx, mongodb.DefaultDatabase)
 	if err != nil {
@@ -31,9 +30,9 @@ func main() {
 
 	router := api.SetupRouter()
 
-	log.Println("\nThe server is running and listening on localhost! ")
+	log.Println("\nThe server is running and listening on localhost! 🚀")
 	err = http.ListenAndServe(":8080", router)
 	if err != nil {
-		log.Fatalln("The server encountered a fatal error: 🚀", err)
+		log.Fatalln("The server encountered a fatal error:", err)
 	}
 }

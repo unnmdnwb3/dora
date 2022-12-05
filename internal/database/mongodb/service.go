@@ -142,6 +142,7 @@ func (s *Service) UpdateOne(ctx context.Context, collection string, ID string, v
 
 	filter := bson.M{"_id": objectID}
 	update := bson.M{"$set": v}
+
 	updateOneResult, err := coll.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return err
