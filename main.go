@@ -6,8 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
-	"github.com/unnmdnwb3/dora/internal/api/handler"
+	"github.com/unnmdnwb3/dora/internal/api"
 	"github.com/unnmdnwb3/dora/internal/database/mongodb"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
@@ -17,7 +16,7 @@ func main() {
 
 	// connect to database
 	service := mongodb.NewService()
-	err := service.Connect(ctx)
+	err := service.Connect(ctx, mongodb.DefaultDatabase)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -30,17 +29,7 @@ func main() {
 	fmt.Println("Successfully connected to database.")
 	defer service.Disconnect(ctx)
 
-	router := gin.Default()
-
-	// routes for repositories
-	router.GET("/api/v1/repositories", handler.GetRepositories)
-
-	// routes for applications
-	router.POST("/api/applications", handler.CreateApplication)
-	router.GET("/api/applications", handler.GetApplications)
-	router.GET("/api/applications/:id", handler.GetApplication)
-	router.PUT("/api/applications", handler.UpdateApplication)
-	router.DELETE("/api/applications/:id", handler.DeleteApplication)
+	router := api.SetupRouter()
 
 	log.Println("\nThe server is running and listening on localhost! ")
 	err = http.ListenAndServe(":8080", router)
