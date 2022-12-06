@@ -1,20 +1,9 @@
-build:
-	docker build -t dora .
-
-run:
-	docker run --env-file=local.env -it --rm -p 8080:8080 dora
-
-rebuild: build run
-
 compose:
 	docker compose build
 	docker compose up
 
-copy-env:
-	cp default.env local.env
-
-ginkgo:
-	ginkgo -r -v --randomize-all --randomize-suites
+copy-empty-env:
+	cp .env.empty .env
 
 mongo-run:
 	docker run \
@@ -31,5 +20,8 @@ mongo-stop:
 
 mongo-sh:
 	mongosh --host 127.0.0.1 --port 27017 -u user -p password
+
+ginkgo:
+	ginkgo -r -v --randomize-all --randomize-suites
 
 tests: mongo-run ginkgo mongo-stop
