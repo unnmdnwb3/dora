@@ -9,11 +9,11 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-// default integrationCollection
-const integrationCollection = "integrations"
+// default pipelineRunCollection
+const pipelineRunCollection = "pipeline_runs"
 
-// CreateIntegration creates a new Integration.
-func CreateIntegration(ctx context.Context, integration *models.Integration) error {
+// CreatePipelineRun creates a new PipelineRun.
+func CreatePipelineRun(ctx context.Context, pipelineRun *models.PipelineRun) error {
 	service := mongodb.NewService()
 	database := os.Getenv("MONGODB_DATABASE")
 	err := service.Connect(ctx, database)
@@ -22,12 +22,12 @@ func CreateIntegration(ctx context.Context, integration *models.Integration) err
 	}
 	defer service.Disconnect(ctx)
 
-	err = service.InsertOne(ctx, integrationCollection, integration)
+	err = service.InsertOne(ctx, pipelineRunCollection, pipelineRun)
 	return err
 }
 
-// GetIntegration retrieves an Integration.
-func GetIntegration(ctx context.Context, ID string, integration *models.Integration) error {
+// GetPipelineRun retrieves an PipelineRun.
+func GetPipelineRun(ctx context.Context, ID string, pipelineRun *models.PipelineRun) error {
 	service := mongodb.NewService()
 	database := os.Getenv("MONGODB_DATABASE")
 	err := service.Connect(ctx, database)
@@ -36,12 +36,12 @@ func GetIntegration(ctx context.Context, ID string, integration *models.Integrat
 	}
 	defer service.Disconnect(ctx)
 
-	err = service.FindOneByID(ctx, integrationCollection, ID, integration)
+	err = service.FindOneByID(ctx, pipelineRunCollection, ID, pipelineRun)
 	return err
 }
 
-// ListIntegrations retrieves many Integrations.
-func ListIntegrations(ctx context.Context, integrations *[]models.Integration) error {
+// ListPipelineRuns retrieves many PipelineRuns.
+func ListPipelineRuns(ctx context.Context, pipelineRuns *[]models.PipelineRun) error {
 	service := mongodb.NewService()
 	database := os.Getenv("MONGODB_DATABASE")
 	err := service.Connect(ctx, database)
@@ -50,13 +50,13 @@ func ListIntegrations(ctx context.Context, integrations *[]models.Integration) e
 	}
 	defer service.Disconnect(ctx)
 
-	err = service.Find(ctx, integrationCollection, bson.M{}, integrations)
+	err = service.Find(ctx, pipelineRunCollection, bson.M{}, pipelineRuns)
 	return err
 }
 
-// ListIntegrationsByFilter retrieves many Integrations conforming to a filter.
+// ListPipelineRunsByFilter retrieves many PipelineRuns conforming to a filter.
 // TODO change to pass a struct instead of bson.M
-func ListIntegrationsByFilter(ctx context.Context, filter bson.M, integrations *[]models.Integration) error {
+func ListPipelineRunsByFilter(ctx context.Context, filter bson.M, pipelineRuns *[]models.PipelineRun) error {
 	service := mongodb.NewService()
 	database := os.Getenv("MONGODB_DATABASE")
 	err := service.Connect(ctx, database)
@@ -65,12 +65,12 @@ func ListIntegrationsByFilter(ctx context.Context, filter bson.M, integrations *
 	}
 	defer service.Disconnect(ctx)
 
-	err = service.Find(ctx, integrationCollection, filter, integrations)
+	err = service.Find(ctx, pipelineRunCollection, filter, pipelineRuns)
 	return err
 }
 
-// UpdateIntegration updates an Integration.
-func UpdateIntegration(ctx context.Context, ID string, integration *models.Integration) error {
+// UpdatePipelineRun updates an PipelineRun.
+func UpdatePipelineRun(ctx context.Context, ID string, pipelineRun *models.PipelineRun) error {
 	service := mongodb.NewService()
 	database := os.Getenv("MONGODB_DATABASE")
 	err := service.Connect(ctx, database)
@@ -79,17 +79,17 @@ func UpdateIntegration(ctx context.Context, ID string, integration *models.Integ
 	}
 	defer service.Disconnect(ctx)
 
-	err = service.UpdateOne(ctx, integrationCollection, ID, &integration)
+	err = service.UpdateOne(ctx, pipelineRunCollection, ID, &pipelineRun)
 	if err != nil {
 		return err
 	}
 
-	integration.ID = ID
+	pipelineRun.ID = ID
 	return nil
 }
 
-// DeleteIntegration deletes an Integration.
-func DeleteIntegration(ctx context.Context, ID string) error {
+// DeletePipelineRun deletes an PipelineRun.
+func DeletePipelineRun(ctx context.Context, ID string) error {
 	service := mongodb.NewService()
 	database := os.Getenv("MONGODB_DATABASE")
 	err := service.Connect(ctx, database)
@@ -98,6 +98,6 @@ func DeleteIntegration(ctx context.Context, ID string) error {
 	}
 	defer service.Disconnect(ctx)
 
-	err = service.DeleteOne(ctx, integrationCollection, ID)
+	err = service.DeleteOne(ctx, pipelineRunCollection, ID)
 	return err
 }

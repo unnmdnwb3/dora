@@ -186,8 +186,8 @@ func (c *Client) GetCommits(projectID string, referenceBranch string) (*[]models
 	return &commits, nil
 }
 
-// GetWorkflowRuns gets all workflow runs of a project
-func (c *Client) GetWorkflowRuns(projectID string, referenceBranch string) (*[]models.WorkflowRun, error) {
+// GetPipelineRuns gets all workflow runs of a project
+func (c *Client) GetPipelineRuns(projectID string, referenceBranch string) (*[]models.PipelineRun, error) {
 	client := &http.Client{}
 
 	uri := fmt.Sprintf("%s/projects/%s/pipelines", c.URI, projectID)
@@ -217,11 +217,11 @@ func (c *Client) GetWorkflowRuns(projectID string, referenceBranch string) (*[]m
 		log.Fatalln(err)
 	}
 
-	workflowRuns := []models.WorkflowRun{}
-	err = json.Unmarshal(body, &workflowRuns)
+	pipelineRuns := []models.PipelineRun{}
+	err = json.Unmarshal(body, &pipelineRuns)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	return &workflowRuns, nil
+	return &pipelineRuns, nil
 }
