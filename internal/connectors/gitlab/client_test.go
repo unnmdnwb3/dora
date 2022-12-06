@@ -119,10 +119,10 @@ var _ = Describe("gitlab.Client", func() {
 		})
 	})
 
-	var deployRuns []models.WorkflowRun
-	_ = test.FromTestData("./../../../test/data/gitlab/workflow_runs.json", &deployRuns)
+	var pipelineRuns []models.PipelineRun
+	_ = test.FromTestData("./../../../test/data/gitlab/pipeline_runs.json", &pipelineRuns)
 
-	var _ = When("WorkflowRuns", func() {
+	var _ = When("PipelineRuns", func() {
 		It("get all deploy runs", func() {
 			mock := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
@@ -137,9 +137,9 @@ var _ = Describe("gitlab.Client", func() {
 				URI:  mock.URL,
 			}
 
-			deployRuns, err := client.GetWorkflowRuns(projectID, referenceBranch)
+			pipelineRuns, err := client.GetPipelineRuns(projectID, referenceBranch)
 			Expect(err).To(BeNil())
-			Expect(len(*deployRuns)).To(Equal(2))
+			Expect(len(*pipelineRuns)).To(Equal(2))
 		})
 	})
 })
