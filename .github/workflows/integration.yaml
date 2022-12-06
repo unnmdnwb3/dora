@@ -24,4 +24,4 @@ jobs:
       - name: Install Ginkgo
         run: go install github.com/onsi/ginkgo/v2/ginkgo@latest
       - name: Tests
-        run: ginkgo -r -v --randomizeAllSpecs --randomizeSuites
+        run: ginkgo -r -v --randomize-all --randomize-suites

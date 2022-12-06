@@ -19,5 +19,12 @@ func SetupRouter() *gin.Engine {
 	router.PUT("/api/v1/integrations/:id", handler.UpdateIntegration)
 	router.DELETE("/api/v1/integrations/:id", handler.DeleteIntegration)
 
+	// routes for dataflows
+	router.POST("/api/v1/dataflows", handler.CreateDataflow)
+	router.GET("/api/v1/dataflows", handler.ListDataflows)
+	router.GET("/api/v1/dataflows/:id", handler.GetDataflow)
+	router.PUT("/api/v1/dataflows/:id", handler.UpdateDataflow)
+	router.DELETE("/api/v1/dataflows/:id", handler.DeleteDataflow)
+
 	return router
 }

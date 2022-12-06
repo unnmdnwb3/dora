@@ -1,7 +1,7 @@
 package models
 
-// Repository described the body of version control
-type Repository struct {
+// Pipeline describes a workflow tool for CICD
+type Pipeline struct {
 	IntegrationID  string `bson:"integration_id" json:"integration_id"`
 	ExternalID     string `bson:"external_id" json:"external_id"`
 	NamespacedName string `bson:"namespaced_name" json:"namespaced_name"`
