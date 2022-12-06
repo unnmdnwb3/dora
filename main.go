@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/unnmdnwb3/dora/internal/api"
 	"github.com/unnmdnwb3/dora/internal/database/mongodb"
@@ -15,7 +16,8 @@ func main() {
 	ctx := context.Background()
 
 	service := mongodb.NewService()
-	err := service.Connect(ctx, mongodb.DefaultDatabase)
+	database := os.Getenv("MONGODB_DATABASE")
+	err := service.Connect(ctx, database)
 	if err != nil {
 		log.Fatalln(err)
 	}

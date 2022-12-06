@@ -27,17 +27,17 @@ var _ = Describe("mongodb.Service", func() {
 		_ = godotenv.Load("./../../../test/.env")
 
 		service = mongodb.NewService()
-		service.Connect(ctx, "dora_test")
+		service.Connect(ctx, os.Getenv("MONGODB_DATABASE"))
 	})
 
 	var _ = AfterEach(func() {
+		service.DB.Drop(ctx)
+		defer service.Disconnect(ctx)
+
 		os.Remove("MONGODB_URI")
 		os.Remove("MONGODB_PORT")
 		os.Remove("MONGODB_USER")
 		os.Remove("MONGODB_PASSWORD")
-
-		service.DB.Drop(ctx)
-		defer service.Disconnect(ctx)
 	})
 
 	var _ = When("ConnectionString", func() {
@@ -83,13 +83,13 @@ var _ = Describe("mongodb.Service", func() {
 			}
 			integration3 := models.Integration{
 				Type:        "sc",
-				Provider:    "gihub",
+				Provider:    "github",
 				BearerToken: "bearertoken",
 				URI:         "https://github.com",
 			}
-			service.InsertOne(ctx, "integration", &integration1)
-			service.InsertOne(ctx, "integration", &integration2)
-			service.InsertOne(ctx, "integration", &integration3)
+			_ = service.InsertOne(ctx, "integration", &integration1)
+			_ = service.InsertOne(ctx, "integration", &integration2)
+			_ = service.InsertOne(ctx, "integration", &integration3)
 			Expect(integration1.ID).To(Not(BeNil()))
 			Expect(integration2.ID).To(Not(BeNil()))
 			Expect(integration3.ID).To(Not(BeNil()))

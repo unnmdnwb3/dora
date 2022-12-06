@@ -12,9 +12,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// DefaultDatabase defines the default database name
-const DefaultDatabase = "dora"
-
 // Service provides the functionality to use
 type Service struct {
 	Client *mongo.Client
