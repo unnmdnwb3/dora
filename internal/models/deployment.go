@@ -2,7 +2,6 @@ package models
 
 // Deployment describes a deployed and monitored runnable
 type Deployment struct {
-	ID            string `bson:"_id,omitempty"`
-	IntegrationID string `bson:"integration_id"`
-	TargetURI     string `bson:"target_uri"`
+	IntegrationID string `bson:"integration_id" json:"integration_id"`
+	TargetURI     string `bson:"target_uri" json:"target_uri"`
 }
