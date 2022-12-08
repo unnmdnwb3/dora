@@ -17,7 +17,7 @@ func TestDAOS(t *testing.T) {
 }
 
 var _ = BeforeEach(func() {
-	_ = godotenv.Load("./../../../../test/.env")
+	_ = godotenv.Load("./../../test/.env")
 })
 
 var _ = AfterEach(func() {
