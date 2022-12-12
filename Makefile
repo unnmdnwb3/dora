@@ -2,8 +2,8 @@ compose:
 	docker compose build
 	docker compose up
 
-copy-empty-env:
-	cp .env.empty .env
+copy-test-env:
+	cp .test.env .env
 
 mongo-run:
 	docker run \
