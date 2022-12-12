@@ -12,7 +12,7 @@ mongo-run:
 		-p 27017:27017 \
 		-e MONGO_INITDB_ROOT_USERNAME=user \
 		-e MONGO_INITDB_ROOT_PASSWORD=password \
-		mongo:latest
+		mongo:latest | :
 
 mongo-stop:
 	docker stop mongo-test
