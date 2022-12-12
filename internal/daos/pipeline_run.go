@@ -26,6 +26,26 @@ func CreatePipelineRun(ctx context.Context, pipelineRun *models.PipelineRun) err
 	return err
 }
 
+// CreatePipelineRuns creates many new PipelineRuns.
+func CreatePipelineRuns(ctx context.Context, pipelineRuns *[]models.PipelineRun) error {
+	service := mongodb.NewService()
+	database := os.Getenv("MONGODB_DATABASE")
+	err := service.Connect(ctx, database)
+	if err != nil {
+		return err
+	}
+	defer service.Disconnect(ctx)
+
+	for index, pipelineRun := range *pipelineRuns {
+		err = service.InsertOne(ctx, pipelineRunCollection, &pipelineRun)
+		if err != nil {
+			return err
+		}
+		(*pipelineRuns)[index] = pipelineRun
+	}
+	return nil
+}
+
 // GetPipelineRun retrieves an PipelineRun.
 func GetPipelineRun(ctx context.Context, ID string, pipelineRun *models.PipelineRun) error {
 	service := mongodb.NewService()
