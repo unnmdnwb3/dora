@@ -32,7 +32,7 @@ var _ = Describe("mongodb.Service", func() {
 		_ = test.FromTestData("./../../test/data/gitlab/pipeline_runs.json", &pipelineRuns)
 
 		gitlabMock = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if r.Method == http.MethodGet && r.URL.Path == "/api/v4/projects/40649465/pipelines" {
+			if r.Method == http.MethodGet && r.URL.Path == "/projects/40649465/pipelines" {
 				w.WriteHeader(http.StatusOK)
 				json, _ := json.Marshal(pipelineRuns)
 				w.Write(json)
@@ -86,22 +86,6 @@ var _ = Describe("mongodb.Service", func() {
 
 	var _ = When("ImportPipelineRuns", func() {
 		It("gets all PipelineRuns of a Pipeline and persists them.", func() {
-			_ = godotenv.Load("./../../test/.env")
-
-			var pipelineRuns []models.PipelineRun
-			_ = test.FromTestData("./../../test/data/gitlab/pipeline_runs.json", &pipelineRuns)
-
-			gitlabMock = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				if r.Method == http.MethodGet && r.URL.Path == "/projects/40649465/pipelines" {
-					w.WriteHeader(http.StatusOK)
-					json, _ := json.Marshal(pipelineRuns)
-					w.Write(json)
-				}
-			}))
-			defer gitlabMock.Close()
-
-			os.Setenv("GITLAB_URI", gitlabMock.URL)
-
 			pipeline := models.Pipeline{
 				IntegrationID:  "638e00b85edd5vef25e5e9a2",
 				ExternalID:     "40649465",
