@@ -74,18 +74,14 @@ func ConnectionString() (string, error) {
 // InsertOne inserts a document into a collection.
 func (s *Service) InsertOne(ctx context.Context, collection string, v any) error {
 	coll := s.DB.Collection(collection)
+
 	insertOneResult, err := coll.InsertOne(ctx, v)
 	if err != nil {
 		return err
 	}
 
-	filter := bson.M{"_id": insertOneResult.InsertedID}
-	applicationResult := coll.FindOne(ctx, filter)
-	if applicationResult.Err() != nil {
-		return err
-	}
+	err = s.FindOneByID(ctx, collection, insertOneResult.InsertedID.(primitive.ObjectID).Hex(), v)
 
-	err = applicationResult.Decode(v)
 	return err
 }
 
@@ -99,6 +95,7 @@ func (s *Service) Find(ctx context.Context, collection string, filter bson.M, vs
 	}
 
 	err = cursor.All(ctx, vs)
+
 	return err
 }
 
@@ -112,6 +109,7 @@ func (s *Service) FindOne(ctx context.Context, collection string, filter bson.M,
 	}
 
 	err := findOneResult.Decode(v)
+
 	return err
 }
 

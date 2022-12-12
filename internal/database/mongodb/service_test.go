@@ -61,7 +61,7 @@ var _ = Describe("mongodb.Service", func() {
 				BearerToken: "bearertoken",
 				URI:         "https://gitlab.com",
 			}
-			err := service.InsertOne(ctx, "integration", &integration)
+			err := service.InsertOne(ctx, "integrations", &integration)
 			Expect(err).To(BeNil())
 			Expect(integration.ID).To(Not(BeEmpty()))
 		})
@@ -87,16 +87,16 @@ var _ = Describe("mongodb.Service", func() {
 				BearerToken: "bearertoken",
 				URI:         "https://github.com",
 			}
-			_ = service.InsertOne(ctx, "integration", &integration1)
-			_ = service.InsertOne(ctx, "integration", &integration2)
-			_ = service.InsertOne(ctx, "integration", &integration3)
+			_ = service.InsertOne(ctx, "integrations", &integration1)
+			_ = service.InsertOne(ctx, "integrations", &integration2)
+			_ = service.InsertOne(ctx, "integrations", &integration3)
 			Expect(integration1.ID).To(Not(BeNil()))
 			Expect(integration2.ID).To(Not(BeNil()))
 			Expect(integration3.ID).To(Not(BeNil()))
 
 			var findIntegrations []models.Integration
 			filter := bson.M{"type": "sc"}
-			err := service.Find(ctx, "integration", filter, &findIntegrations)
+			err := service.Find(ctx, "integrations", filter, &findIntegrations)
 			Expect(err).To(BeNil())
 			Expect(findIntegrations).To(HaveLen(3))
 		})
@@ -110,12 +110,12 @@ var _ = Describe("mongodb.Service", func() {
 				BearerToken: "bearertoken",
 				URI:         "https://gitlab.com",
 			}
-			service.InsertOne(ctx, "integration", &integration)
+			service.InsertOne(ctx, "integrations", &integration)
 			Expect(integration.ID).To(Not(BeNil()))
 
 			var findIntegration models.Integration
 			filter := bson.M{"uri": "https://gitlab.com"}
-			err := service.FindOne(ctx, "integration", filter, &findIntegration)
+			err := service.FindOne(ctx, "integrations", filter, &findIntegration)
 			Expect(err).To(BeNil())
 			Expect(findIntegration.ID).To(Equal(integration.ID))
 		})
@@ -129,11 +129,11 @@ var _ = Describe("mongodb.Service", func() {
 				BearerToken: "bearertoken",
 				URI:         "https://gitlab.com",
 			}
-			service.InsertOne(ctx, "integration", &integration)
+			service.InsertOne(ctx, "integrations", &integration)
 			Expect(integration.ID).To(Not(BeNil()))
 
 			var findIntegration models.Integration
-			err := service.FindOneByID(ctx, "integration", integration.ID, &findIntegration)
+			err := service.FindOneByID(ctx, "integrations", integration.ID, &findIntegration)
 			Expect(err).To(BeNil())
 			Expect(findIntegration.ID).To(Equal(integration.ID))
 		})
@@ -147,7 +147,7 @@ var _ = Describe("mongodb.Service", func() {
 				BearerToken: "bearertoken",
 				URI:         "https://gitlab.com",
 			}
-			service.InsertOne(ctx, "integration", &integration)
+			service.InsertOne(ctx, "integrations", &integration)
 			Expect(integration.ID).To(Not(BeNil()))
 
 			updateIntegration := models.Integration{
@@ -156,7 +156,7 @@ var _ = Describe("mongodb.Service", func() {
 				BearerToken: "newbearertoken",
 				URI:         "https://gitlab.com",
 			}
-			err := service.UpdateOne(ctx, "integration", integration.ID, &updateIntegration)
+			err := service.UpdateOne(ctx, "integrations", integration.ID, &updateIntegration)
 			Expect(err).To(BeNil())
 			Expect(updateIntegration.BearerToken).To(Equal("newbearertoken"))
 		})
@@ -170,14 +170,14 @@ var _ = Describe("mongodb.Service", func() {
 				BearerToken: "bearertoken",
 				URI:         "https://gitlab.com",
 			}
-			service.InsertOne(ctx, "integration", &integration)
+			service.InsertOne(ctx, "integrations", &integration)
 			Expect(integration.ID).To(Not(BeNil()))
 
-			err := service.DeleteOne(ctx, "integration", integration.ID)
+			err := service.DeleteOne(ctx, "integrations", integration.ID)
 			Expect(err).To(BeNil())
 
 			var findIntegration models.Integration
-			err = service.FindOneByID(ctx, "integration", integration.ID, &findIntegration)
+			err = service.FindOneByID(ctx, "integrations", integration.ID, &findIntegration)
 			Expect(err).To(Not(BeNil()))
 		})
 	})
