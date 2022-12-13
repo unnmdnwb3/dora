@@ -68,7 +68,6 @@ func ListPipelineRuns(ctx context.Context, pipelineID string, pipelineRuns *[]mo
 }
 
 // ListPipelineRunsByFilter retrieves many PipelineRuns conforming to a filter.
-// TODO change to pass a struct instead of bson.M
 func ListPipelineRunsByFilter(ctx context.Context, filter bson.M, pipelineRuns *[]models.PipelineRun) error {
 	service := mongodb.NewService()
 	database := os.Getenv("MONGODB_DATABASE")
