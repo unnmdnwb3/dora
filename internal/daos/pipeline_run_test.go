@@ -19,7 +19,8 @@ var _ = Describe("daos.pipelineRun", func() {
 			createdAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:29:50.092Z")
 			updatedAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:35:51.459Z")
 			pipelineRun := models.PipelineRun{
-				ProjectID:   "15392086",
+				PipelineID:  "15392086",
+				ExternalID:  "713437228",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -38,7 +39,8 @@ var _ = Describe("daos.pipelineRun", func() {
 			createdAt1, _ := time.Parse(time.RFC3339, "2020-02-04T14:29:50.092Z")
 			updatedAt1, _ := time.Parse(time.RFC3339, "2020-02-04T14:35:51.459Z")
 			pipelineRun1 := models.PipelineRun{
-				ProjectID:   "15392086",
+				PipelineID:  "15392086",
+				ExternalID:  "713437228",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -50,7 +52,8 @@ var _ = Describe("daos.pipelineRun", func() {
 			createdAt2, _ := time.Parse(time.RFC3339, "2020-02-04T14:39:50.092Z")
 			updatedAt2, _ := time.Parse(time.RFC3339, "2020-02-04T14:45:51.459Z")
 			pipelineRun2 := models.PipelineRun{
-				ProjectID:   "15392086",
+				PipelineID:  "15392086",
+				ExternalID:  "713437229",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -71,7 +74,8 @@ var _ = Describe("daos.pipelineRun", func() {
 			createdAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:29:50.092Z")
 			updatedAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:35:51.459Z")
 			pipelineRun := models.PipelineRun{
-				ProjectID:   "15392086",
+				PipelineID:  "15392086",
+				ExternalID:  "713437228",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -95,7 +99,8 @@ var _ = Describe("daos.pipelineRun", func() {
 			createdAt1, _ := time.Parse(time.RFC3339, "2020-02-04T14:29:50.092Z")
 			updatedAt1, _ := time.Parse(time.RFC3339, "2020-02-04T14:35:51.459Z")
 			pipelineRun1 := models.PipelineRun{
-				ProjectID:   "15392086",
+				PipelineID:  "15392086",
+				ExternalID:  "713437228",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -107,7 +112,8 @@ var _ = Describe("daos.pipelineRun", func() {
 			createdAt2, _ := time.Parse(time.RFC3339, "2020-02-04T14:39:50.092Z")
 			updatedAt2, _ := time.Parse(time.RFC3339, "2020-02-04T14:45:51.459Z")
 			pipelineRun2 := models.PipelineRun{
-				ProjectID:   "15392086",
+				PipelineID:  "15392086",
+				ExternalID:  "713437229",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -121,7 +127,7 @@ var _ = Describe("daos.pipelineRun", func() {
 			Expect(pipelineRun2.ID).To(Not(BeNil()))
 
 			var findPipelineRuns []models.PipelineRun
-			err := daos.ListPipelineRuns(ctx, &findPipelineRuns)
+			err := daos.ListPipelineRuns(ctx, pipelineRun1.PipelineID, &findPipelineRuns)
 			Expect(err).To(BeNil())
 			Expect(findPipelineRuns).To(HaveLen(2))
 		})
@@ -132,7 +138,8 @@ var _ = Describe("daos.pipelineRun", func() {
 			createdAt1, _ := time.Parse(time.RFC3339, "2020-02-04T14:29:50.092Z")
 			updatedAt1, _ := time.Parse(time.RFC3339, "2020-02-04T14:35:51.459Z")
 			pipelineRun1 := models.PipelineRun{
-				ProjectID:   "15392086",
+				PipelineID:  "15392086",
+				ExternalID:  "713437228",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -144,7 +151,8 @@ var _ = Describe("daos.pipelineRun", func() {
 			createdAt2, _ := time.Parse(time.RFC3339, "2020-02-04T14:39:50.092Z")
 			updatedAt2, _ := time.Parse(time.RFC3339, "2020-02-04T14:45:51.459Z")
 			pipelineRun2 := models.PipelineRun{
-				ProjectID:   "15392086",
+				PipelineID:  "15392086",
+				ExternalID:  "713437229",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -170,7 +178,8 @@ var _ = Describe("daos.pipelineRun", func() {
 			createdAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:29:50.092Z")
 			updatedAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:35:51.459Z")
 			pipelineRun := models.PipelineRun{
-				ProjectID:   "15392086",
+				PipelineID:  "15392086",
+				ExternalID:  "713437228",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -184,7 +193,8 @@ var _ = Describe("daos.pipelineRun", func() {
 
 			newUpdatedAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:45:51.459Z")
 			updatePipelineRun := models.PipelineRun{
-				ProjectID:   "15392086",
+				PipelineID:  "15392086",
+				ExternalID:  "713437228",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -203,7 +213,8 @@ var _ = Describe("daos.pipelineRun", func() {
 			createdAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:29:50.092Z")
 			updatedAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:35:51.459Z")
 			pipelineRun := models.PipelineRun{
-				ProjectID:   "15392086",
+				PipelineID:  "15392086",
+				ExternalID:  "713437228",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
