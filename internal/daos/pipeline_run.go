@@ -61,21 +61,13 @@ func GetPipelineRun(ctx context.Context, ID string, pipelineRun *models.Pipeline
 }
 
 // ListPipelineRuns retrieves many PipelineRuns.
-func ListPipelineRuns(ctx context.Context, pipelineRuns *[]models.PipelineRun) error {
-	service := mongodb.NewService()
-	database := os.Getenv("MONGODB_DATABASE")
-	err := service.Connect(ctx, database)
-	if err != nil {
-		return err
-	}
-	defer service.Disconnect(ctx)
-
-	err = service.Find(ctx, pipelineRunCollection, bson.M{}, pipelineRuns)
+func ListPipelineRuns(ctx context.Context, pipelineID string, pipelineRuns *[]models.PipelineRun) error {
+	filter := bson.M{"pipeline_id": pipelineID}
+	err := ListPipelineRunsByFilter(ctx, filter, pipelineRuns)
 	return err
 }
 
 // ListPipelineRunsByFilter retrieves many PipelineRuns conforming to a filter.
-// TODO change to pass a struct instead of bson.M
 func ListPipelineRunsByFilter(ctx context.Context, filter bson.M, pipelineRuns *[]models.PipelineRun) error {
 	service := mongodb.NewService()
 	database := os.Getenv("MONGODB_DATABASE")

@@ -5,7 +5,8 @@ import "time"
 // PipelineRun describes a single run of a CICD pipeline
 type PipelineRun struct {
 	ID          string    `json:"id" bson:"_id,omitempty"`
-	ProjectID   string    `json:"project_id" bson:"project_id"`
+	PipelineID  string    `json:"pipeline_id" bson:"pipeline_id"`
+	ExternalID  string    `bson:"external_id" json:"external_id"`
 	Ref         string    `json:"ref" bson:"ref"`
 	Status      string    `json:"status" bson:"status"`
 	EventSource string    `json:"source" bson:"event_source"`
