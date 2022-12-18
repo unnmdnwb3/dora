@@ -1,12 +1,11 @@
 package models
 
-import "time"
+import "go.mongodb.org/mongo-driver/bson/primitive"
 
 // DeploymentFrequency represents the frequency of deployments
 type DeploymentFrequency struct {
-	ID                 string       `bson:"_id,omitempty"`
-	DataflowID         string       `bson:"dataflow_id"`
-	Date               time.Weekday `bson:"date" json:"date"`
-	PipelineRunsPerDay int          `bson:"pipeline_runs_per_day" json:"pipeline_runs_per_day"`
-	MovingAverage      float64      `bson:"moving_average" json:"moving_average"`
+	DataflowID        primitive.ObjectID `bson:"dataflow_id" json:"dataflow_id"`
+	Dates             []string           `bson:"date" json:"date"`
+	DailyPipelineRuns []int              `bson:"daily_pipeline_runs" json:"daily_pipeline_runs"`
+	MovingAverages    []float64          `bson:"moving_average" json:"moving_average"`
 }

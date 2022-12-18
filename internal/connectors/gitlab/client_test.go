@@ -23,14 +23,15 @@ var _ = Describe("gitlab.Client", func() {
 	projectID := "15392086"
 	referenceBranch := "main"
 
-	var organisations []models.Organisation
-	_ = test.FromTestData("./../../../test/data/gitlab/organisations.json", &organisations)
-
 	var _ = When("GetOrganisations", func() {
 		It("get all organisations", func() {
+			var fixture []models.Organisation
+			err := test.UnmarshalFixture("./../../../test/data/gitlab/organisations.json", &fixture)
+			Expect(err).To(BeNil())
+
 			mock := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
-				json, _ := json.Marshal(organisations)
+				json, _ := json.Marshal(fixture)
 				w.Write(json)
 
 			}))
@@ -43,18 +44,19 @@ var _ = Describe("gitlab.Client", func() {
 
 			organisations, err := client.GetOrganisations()
 			Expect(err).To(BeNil())
-			Expect(len(*organisations)).To(Equal(2))
+			Expect(len(*organisations)).To(Equal(4))
 		})
 	})
 
-	var repositories []models.Repository
-	_ = test.FromTestData("./../../../test/data/gitlab/repositories.json", &repositories)
-
 	var _ = When("GetRepositories", func() {
 		It("get all repositories", func() {
+			var fixture []models.Repository
+			err := test.UnmarshalFixture("./../../../test/data/gitlab/repositories.json", &fixture)
+			Expect(err).To(BeNil())
+
 			mock := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
-				json, _ := json.Marshal(repositories)
+				json, _ := json.Marshal(fixture)
 				w.Write(json)
 
 			}))
@@ -71,14 +73,15 @@ var _ = Describe("gitlab.Client", func() {
 		})
 	})
 
-	var commits []models.Commit
-	_ = test.FromTestData("./../../../test/data/gitlab/commits.json", &commits)
-
 	var _ = When("GetCommits", func() {
 		It("get all commits of a repository", func() {
+			var fixture []models.Commit
+			err := test.UnmarshalFixture("./../../../test/data/gitlab/commits.json", &fixture)
+			Expect(err).To(BeNil())
+
 			mock := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
-				json, _ := json.Marshal(commits)
+				json, _ := json.Marshal(fixture)
 				w.Write(json)
 
 			}))
@@ -95,14 +98,15 @@ var _ = Describe("gitlab.Client", func() {
 		})
 	})
 
-	var pullRequests []models.PullRequest
-	_ = test.FromTestData("./../../../test/data/gitlab/pull_requests.json", &pullRequests)
-
 	var _ = When("GetPullRequests", func() {
 		It("get all pull requests of a repository", func() {
+			var fixture []models.PullRequest
+			err := test.UnmarshalFixture("./../../../test/data/gitlab/pull_requests.json", &fixture)
+			Expect(err).To(BeNil())
+
 			mock := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
-				json, _ := json.Marshal(pullRequests)
+				json, _ := json.Marshal(fixture)
 				w.Write(json)
 
 			}))
@@ -119,14 +123,15 @@ var _ = Describe("gitlab.Client", func() {
 		})
 	})
 
-	var pipelineRuns []models.PipelineRun
-	_ = test.FromTestData("./../../../test/data/gitlab/pipeline_runs.json", &pipelineRuns)
-
 	var _ = When("PipelineRuns", func() {
-		It("get all deploy runs", func() {
+		It("get all pipeline runs", func() {
+			var fixture []models.PipelineRun
+			err := test.UnmarshalFixture("./../../../test/data/gitlab/pipeline_runs.json", &fixture)
+			Expect(err).To(BeNil())
+
 			mock := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
-				json, _ := json.Marshal(organisations)
+				json, _ := json.Marshal(fixture)
 				w.Write(json)
 
 			}))
@@ -137,9 +142,9 @@ var _ = Describe("gitlab.Client", func() {
 				URI:  mock.URL,
 			}
 
-			pipelineRuns, err := client.GetPipelineRuns(projectID, referenceBranch)
+			pipelineRuns, err := client.GetPipelineRuns(15392086, referenceBranch)
 			Expect(err).To(BeNil())
-			Expect(len(*pipelineRuns)).To(Equal(2))
+			Expect(len(*pipelineRuns)).To(Equal(4))
 		})
 	})
 })
