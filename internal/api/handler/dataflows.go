@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/unnmdnwb3/dora/internal/daos"
 	"github.com/unnmdnwb3/dora/internal/models"
+	"github.com/unnmdnwb3/dora/internal/utils/types"
 )
 
 // CreateDataflow creates a new Dataflow.
@@ -37,7 +38,12 @@ func GetDataflow(c *gin.Context) {
 	}
 
 	var dataflow models.Dataflow
-	err = daos.GetDataflow(ctx, params.ID, &dataflow)
+	dataflowID, err := types.StringToObjectID(params.ID)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+	}
+
+	err = daos.GetDataflow(ctx, dataflowID, &dataflow)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
@@ -74,12 +80,17 @@ func UpdateDataflow(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
 
-	err = daos.UpdateDataflow(ctx, params.ID, &dataflow)
+	dataflowID, err := types.StringToObjectID(params.ID)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
 
-	dataflow.ID = params.ID
+	err = daos.UpdateDataflow(ctx, dataflowID, &dataflow)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+	}
+
+	dataflow.ID = dataflowID
 	c.JSON(http.StatusOK, dataflow)
 }
 
@@ -93,7 +104,12 @@ func DeleteDataflow(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
 
-	err = daos.DeleteDataflow(ctx, params.ID)
+	dataflowID, err := types.StringToObjectID(params.ID)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+	}
+
+	err = daos.DeleteDataflow(ctx, dataflowID)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}

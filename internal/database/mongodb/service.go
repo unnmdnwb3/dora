@@ -80,7 +80,7 @@ func (s *Service) InsertOne(ctx context.Context, collection string, v any) error
 		return err
 	}
 
-	err = s.FindOneByID(ctx, collection, insertOneResult.InsertedID.(primitive.ObjectID).Hex(), v)
+	err = s.FindOneByID(ctx, collection, insertOneResult.InsertedID.(primitive.ObjectID), v)
 
 	return err
 }
@@ -114,26 +114,16 @@ func (s *Service) FindOne(ctx context.Context, collection string, filter bson.M,
 }
 
 // FindOneByID finds a documents with a specific ID in a collection.
-func (s *Service) FindOneByID(ctx context.Context, collection string, ID string, v any) error {
-	objectID, err := primitive.ObjectIDFromHex(ID)
-	if err != nil {
-		return err
-	}
-
+func (s *Service) FindOneByID(ctx context.Context, collection string, objectID primitive.ObjectID, v any) error {
 	filter := bson.M{"_id": objectID}
-	err = s.FindOne(ctx, collection, filter, v)
+	err := s.FindOne(ctx, collection, filter, v)
 
 	return err
 }
 
 // UpdateOne updates a document in a collection.
-func (s *Service) UpdateOne(ctx context.Context, collection string, ID string, v any) error {
+func (s *Service) UpdateOne(ctx context.Context, collection string, objectID primitive.ObjectID, v any) error {
 	coll := s.DB.Collection(collection)
-
-	objectID, err := primitive.ObjectIDFromHex(ID)
-	if err != nil {
-		return err
-	}
 
 	filter := bson.M{"_id": objectID}
 	update := bson.M{"$set": v}
@@ -144,20 +134,15 @@ func (s *Service) UpdateOne(ctx context.Context, collection string, ID string, v
 	}
 
 	if updateOneResult.MatchedCount == 0 {
-		return fmt.Errorf("id for update not found: %s", ID)
+		return fmt.Errorf("id for update not found: %s", objectID.Hex())
 	}
 
 	return nil
 }
 
 // DeleteOne deletes a document in a collection.
-func (s *Service) DeleteOne(ctx context.Context, collection string, ID string) error {
+func (s *Service) DeleteOne(ctx context.Context, collection string, objectID primitive.ObjectID) error {
 	coll := s.DB.Collection(collection)
-
-	objectID, err := primitive.ObjectIDFromHex(ID)
-	if err != nil {
-		return err
-	}
 
 	filter := bson.M{"_id": objectID}
 	deleteResult, err := coll.DeleteOne(ctx, filter)
@@ -166,7 +151,7 @@ func (s *Service) DeleteOne(ctx context.Context, collection string, ID string) e
 	}
 
 	if deleteResult.DeletedCount == 0 {
-		return fmt.Errorf("id for delete not found: %s", ID)
+		return fmt.Errorf("id for delete not found: %s", objectID.Hex())
 	}
 
 	return nil

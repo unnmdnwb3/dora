@@ -4,8 +4,8 @@ import "time"
 
 // PullRequest describes a successfully merged pull-request
 type PullRequest struct {
-	ID               string    `json:"id"`
-	ProjectID        string    `json:"project_id"`
+	ID               int       `json:"id"`
+	ProjectID        int       `json:"project_id"`
 	Title            string    `json:"title"`
 	CreatedAt        time.Time `json:"created_at"`
 	UpdatedAt        time.Time `json:"updated_at"`

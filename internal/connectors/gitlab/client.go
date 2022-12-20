@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/unnmdnwb3/dora/internal/models"
 )
@@ -187,13 +188,13 @@ func (c *Client) GetCommits(projectID string, referenceBranch string) (*[]models
 }
 
 // GetPipelineRuns gets all workflow runs of a project
-func (c *Client) GetPipelineRuns(projectID string, referenceBranch string) (*[]models.PipelineRun, error) {
+func (c *Client) GetPipelineRuns(projectID int, referenceBranch string) (*[]models.PipelineRun, error) {
 	client := &http.Client{}
 
-	uri := fmt.Sprintf("%s/projects/%s/pipelines", c.URI, projectID)
+	uri := fmt.Sprintf("%s/projects/%s/pipelines", c.URI, strconv.Itoa(projectID))
 	req, err := http.NewRequest(http.MethodGet, uri, nil)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 
 	bearer := fmt.Sprintf("Bearer %s", c.Auth)
@@ -208,19 +209,19 @@ func (c *Client) GetPipelineRuns(projectID string, referenceBranch string) (*[]m
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 
-	pipelineRuns := []models.PipelineRun{}
+	var pipelineRuns []models.PipelineRun
 	err = json.Unmarshal(body, &pipelineRuns)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 
 	return &pipelineRuns, nil

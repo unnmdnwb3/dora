@@ -7,6 +7,7 @@ import (
 	"github.com/unnmdnwb3/dora/internal/database/mongodb"
 	"github.com/unnmdnwb3/dora/internal/models"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // default integrationCollection
@@ -27,7 +28,7 @@ func CreateIntegration(ctx context.Context, integration *models.Integration) err
 }
 
 // GetIntegration retrieves an Integration.
-func GetIntegration(ctx context.Context, ID string, integration *models.Integration) error {
+func GetIntegration(ctx context.Context, objectID primitive.ObjectID, integration *models.Integration) error {
 	service := mongodb.NewService()
 	database := os.Getenv("MONGODB_DATABASE")
 	err := service.Connect(ctx, database)
@@ -36,7 +37,7 @@ func GetIntegration(ctx context.Context, ID string, integration *models.Integrat
 	}
 	defer service.Disconnect(ctx)
 
-	err = service.FindOneByID(ctx, integrationCollection, ID, integration)
+	err = service.FindOneByID(ctx, integrationCollection, objectID, integration)
 	return err
 }
 
@@ -70,7 +71,7 @@ func ListIntegrationsByFilter(ctx context.Context, filter bson.M, integrations *
 }
 
 // UpdateIntegration updates an Integration.
-func UpdateIntegration(ctx context.Context, ID string, integration *models.Integration) error {
+func UpdateIntegration(ctx context.Context, objectID primitive.ObjectID, integration *models.Integration) error {
 	service := mongodb.NewService()
 	database := os.Getenv("MONGODB_DATABASE")
 	err := service.Connect(ctx, database)
@@ -79,17 +80,17 @@ func UpdateIntegration(ctx context.Context, ID string, integration *models.Integ
 	}
 	defer service.Disconnect(ctx)
 
-	err = service.UpdateOne(ctx, integrationCollection, ID, &integration)
+	err = service.UpdateOne(ctx, integrationCollection, objectID, &integration)
 	if err != nil {
 		return err
 	}
 
-	integration.ID = ID
+	integration.ID = objectID
 	return nil
 }
 
 // DeleteIntegration deletes an Integration.
-func DeleteIntegration(ctx context.Context, ID string) error {
+func DeleteIntegration(ctx context.Context, objectID primitive.ObjectID) error {
 	service := mongodb.NewService()
 	database := os.Getenv("MONGODB_DATABASE")
 	err := service.Connect(ctx, database)
@@ -98,6 +99,6 @@ func DeleteIntegration(ctx context.Context, ID string) error {
 	}
 	defer service.Disconnect(ctx)
 
-	err = service.DeleteOne(ctx, integrationCollection, ID)
+	err = service.DeleteOne(ctx, integrationCollection, objectID)
 	return err
 }

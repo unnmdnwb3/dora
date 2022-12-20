@@ -1,4 +1,4 @@
-package services
+package trigger
 
 import (
 	"context"
@@ -8,45 +8,26 @@ import (
 	"github.com/unnmdnwb3/dora/internal/models"
 )
 
-// InitializeDataflow creates a new Dataflow, gets the historical data
-// and sets up webhooks for new events from the provided sources
-func InitializeDataflow(ctx context.Context, dataflow *models.Dataflow) (*models.Dataflow, error) {
-	dataflow, err := CreateDataflow(ctx, dataflow)
-	if err != nil {
-		return nil, err
-	}
-
-	err = ImportHistoricalData(ctx, dataflow)
-	err = CreateWebhooks(ctx, dataflow)
-	return dataflow, err
-}
-
-// CreateDataflow creates a new Dataflow.
-func CreateDataflow(ctx context.Context, dataflow *models.Dataflow) (*models.Dataflow, error) {
-	err := daos.CreateDataflow(ctx, dataflow)
-	return dataflow, err
-}
-
-// ImportHistoricalData gets and persists historical data for each defined source in a Dataflow.
-func ImportHistoricalData(ctx context.Context, dataflow *models.Dataflow) error {
+// ImportData gets and persists historical data for each defined source in a Dataflow.
+func ImportData(ctx context.Context, dataflow *models.Dataflow) error {
 	commitsChannel := make(chan error)
 	defer close(commitsChannel)
-	go ImportCommits(ctx, commitsChannel, dataflow.Repository)
+	go ImportCommits(ctx, commitsChannel, &dataflow.Repository)
 
-	runsChannel := make(chan error)
-	defer close(runsChannel)
-	go ImportPipelineRuns(ctx, runsChannel, dataflow.Pipeline)
+	pipelineRunsChannel := make(chan error)
+	defer close(pipelineRunsChannel)
+	go ImportPipelineRuns(ctx, pipelineRunsChannel, &dataflow.Pipeline)
 
 	incidentsChannel := make(chan error)
 	defer close(incidentsChannel)
-	go ImportIncidents(ctx, incidentsChannel, dataflow.Deployment)
+	go ImportIncidents(ctx, incidentsChannel, &dataflow.Deployment)
 
 	err := <-commitsChannel
 	if err != nil {
 		return err
 	}
 
-	err = <-runsChannel
+	err = <-pipelineRunsChannel
 	if err != nil {
 		return err
 	}
@@ -70,13 +51,13 @@ func ImportPipelineRuns(ctx context.Context, channel chan error, pipeline *model
 		return
 	}
 
-	pipelines, err := client.GetPipelineRuns(pipeline.ExternalID, pipeline.DefaultBranch)
+	pipelineRuns, err := client.GetPipelineRuns(pipeline.ExternalID, pipeline.DefaultBranch)
 	if err != nil {
 		channel <- err
 		return
 	}
 
-	err = daos.CreatePipelineRuns(ctx, pipelines)
+	err = daos.CreatePipelineRuns(ctx, pipeline.ID, pipelineRuns)
 	if err != nil {
 		channel <- err
 		return
