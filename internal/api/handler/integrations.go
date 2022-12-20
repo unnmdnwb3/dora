@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/unnmdnwb3/dora/internal/daos"
 	"github.com/unnmdnwb3/dora/internal/models"
+	"github.com/unnmdnwb3/dora/internal/utils/types"
 )
 
 // CreateIntegration creates a new Integration.
@@ -37,7 +38,12 @@ func GetIntegration(c *gin.Context) {
 	}
 
 	var integration models.Integration
-	err = daos.GetIntegration(ctx, params.ID, &integration)
+	integrationID, err := types.StringToObjectID(params.ID)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+	}
+
+	err = daos.GetIntegration(ctx, integrationID, &integration)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
@@ -74,12 +80,17 @@ func UpdateIntegration(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
 
-	err = daos.UpdateIntegration(ctx, params.ID, &integration)
+	integrationID, err := types.StringToObjectID(params.ID)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
 
-	integration.ID = params.ID
+	err = daos.UpdateIntegration(ctx, integrationID, &integration)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+	}
+
+	integration.ID = integrationID
 	c.JSON(http.StatusOK, integration)
 }
 
@@ -93,7 +104,12 @@ func DeleteIntegration(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
 
-	err = daos.DeleteIntegration(ctx, params.ID)
+	integrationID, err := types.StringToObjectID(params.ID)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+	}
+
+	err = daos.DeleteIntegration(ctx, integrationID)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
