@@ -6,19 +6,32 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/unnmdnwb3/dora/internal/connectors/gitlab"
+	"github.com/unnmdnwb3/dora/internal/daos"
+	"github.com/unnmdnwb3/dora/internal/models"
 )
 
 // GetRepositories gets all repositories
 func GetRepositories(c *gin.Context) {
-	client, err := gitlab.NewClient()
+	ctx := c.Request.Context()
+
+	var integrations []models.Integration
+	err := daos.ListIntegrations(ctx, &integrations)
 	if err != nil {
-		log.Fatalln(err.Error())
+		c.AbortWithError(http.StatusBadRequest, err)
 	}
 
-	repositories, err := client.GetRepositories()
-	if err != nil {
-		log.Fatalln(err.Error())
+	allRepositories := []models.Repository{}
+	for _, integration := range integrations {
+		// TODO: currently only gitlab is supported
+		client := gitlab.NewClient(integration.URI, integration.BearerToken)
+
+		repositories, err := client.GetRepositories()
+		if err != nil {
+			log.Fatalln(err.Error())
+		}
+
+		allRepositories = append(allRepositories, *repositories...)
 	}
 
-	c.IndentedJSON(http.StatusOK, repositories)
+	c.IndentedJSON(http.StatusOK, allRepositories)
 }

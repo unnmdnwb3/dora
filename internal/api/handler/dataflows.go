@@ -74,13 +74,13 @@ func UpdateDataflow(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
 
-	var dataflow models.Dataflow
-	err = c.ShouldBind(&dataflow)
+	dataflowID, err := types.StringToObjectID(params.ID)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
 
-	dataflowID, err := types.StringToObjectID(params.ID)
+	var dataflow models.Dataflow
+	err = c.ShouldBind(&dataflow)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}

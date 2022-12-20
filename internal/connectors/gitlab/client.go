@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 
 	"github.com/unnmdnwb3/dora/internal/models"
@@ -19,23 +18,11 @@ type Client struct {
 }
 
 // NewClient creates a new Gitlab API client
-func NewClient() (*Client, error) {
-	uriID := "GITLAB_URI"
-	uri := os.Getenv(uriID)
-	if uri == "" {
-		return nil, fmt.Errorf("could not find env:  %s", uriID)
-	}
-
-	authID := "GITLAB_BEARER"
-	auth := os.Getenv(authID)
-	if auth == "" {
-		return nil, fmt.Errorf("could not find env:  %s", authID)
-	}
-
+func NewClient(URI string, auth string) *Client {
 	return &Client{
-		URI:  uri,
+		URI:  URI,
 		Auth: auth,
-	}, nil
+	}
 }
 
 // GetOrganisations gets all organisations readable with the bearer token provided
