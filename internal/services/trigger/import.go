@@ -22,18 +22,18 @@ func ImportData(ctx context.Context, dataflow *models.Dataflow) error {
 	defer close(incidentsChannel)
 	go ImportIncidents(ctx, incidentsChannel, &dataflow.Deployment)
 
-	err := <-commitsChannel
-	if err != nil {
-		return err
-	}
+	// need to wait for each channel get a message, otherwise send on a closed channel will panic
+	commitsErr := <-commitsChannel
+	pipelineRunsErr := <-pipelineRunsChannel
+	incidentsErr := <-incidentsChannel
 
-	err = <-pipelineRunsChannel
-	if err != nil {
-		return err
+	if commitsErr != nil {
+		return commitsErr
 	}
-
-	err = <-incidentsChannel
-	return err
+	if pipelineRunsErr != nil {
+		return pipelineRunsErr
+	}
+	return incidentsErr
 
 }
 
@@ -45,7 +45,14 @@ func ImportCommits(ctx context.Context, channel chan error, repository *models.R
 
 // ImportPipelineRuns gets and persists historical data for each run of a pipeline.
 func ImportPipelineRuns(ctx context.Context, channel chan error, pipeline *models.Pipeline) {
-	client, err := gitlab.NewClient()
+	var integration models.Integration
+	err := daos.GetIntegration(ctx, pipeline.IntegrationID, &integration)
+	if err != nil {
+		channel <- err
+		return
+	}
+
+	client := gitlab.NewClient(integration.URI, integration.BearerToken)
 	if err != nil {
 		channel <- err
 		return

@@ -33,8 +33,6 @@ var _ = Describe("services.metrics", func() {
 		service.DB.Drop(ctx)
 		defer service.Disconnect(ctx)
 
-		os.Remove("GITLAB_BEARER")
-		os.Remove("GITLAB_URI")
 		os.Remove("MONGODB_URI")
 		os.Remove("MONGODB_PORT")
 		os.Remove("MONGODB_USER")

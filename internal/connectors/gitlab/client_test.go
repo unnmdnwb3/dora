@@ -20,8 +20,10 @@ func TestClient(t *testing.T) {
 }
 
 var _ = Describe("gitlab.Client", func() {
-	projectID := "15392086"
-	referenceBranch := "main"
+	var (
+		projectID       = "15392086"
+		referenceBranch = "main"
+	)
 
 	var _ = When("GetOrganisations", func() {
 		It("get all organisations", func() {
@@ -37,10 +39,7 @@ var _ = Describe("gitlab.Client", func() {
 			}))
 			defer mock.Close()
 
-			client := gitlab.Client{
-				Auth: "token",
-				URI:  mock.URL,
-			}
+			client := gitlab.NewClient(mock.URL, "bearertoken")
 
 			organisations, err := client.GetOrganisations()
 			Expect(err).To(BeNil())

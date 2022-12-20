@@ -37,8 +37,6 @@ var _ = Describe("services.trigger.import", func() {
 			json, _ := json.Marshal(pipelineRuns)
 			w.Write(json)
 		}))
-
-		os.Setenv("GITLAB_URI", gitlabMock.URL)
 	})
 
 	var _ = AfterEach(func() {
@@ -51,8 +49,6 @@ var _ = Describe("services.trigger.import", func() {
 
 		defer gitlabMock.Close()
 
-		os.Remove("GITLAB_BEARER")
-		os.Remove("GITLAB_URI")
 		os.Remove("MONGODB_URI")
 		os.Remove("MONGODB_PORT")
 		os.Remove("MONGODB_USER")
@@ -61,18 +57,28 @@ var _ = Describe("services.trigger.import", func() {
 
 	var _ = When("ImportPipelineRuns", func() {
 		It("gets all PipelineRuns of a Pipeline and persists them.", func() {
+			integration := models.Integration{
+				ID:          primitive.NewObjectID(),
+				URI:         gitlabMock.URL,
+				BearerToken: "bearertoken",
+			}
+			err := daos.CreateIntegration(ctx, &integration)
+			Expect(err).To(BeNil())
+
 			pipeline := models.Pipeline{
 				ID:             primitive.NewObjectID(),
-				IntegrationID:  primitive.NewObjectID(),
+				IntegrationID:  integration.ID,
 				ExternalID:     externalID,
 				NamespacedName: "foobar/foobar",
 				DefaultBranch:  "main",
 				URI:            "https://gitlab.com/foobar/foobar/-/pipelines",
 			}
+
 			channel := make(chan error)
 			defer close(channel)
+
 			go trigger.ImportPipelineRuns(ctx, channel, &pipeline)
-			err := <-channel
+			err = <-channel
 			Expect(err).To(BeNil())
 
 			var pipelineRuns []models.PipelineRun
@@ -84,6 +90,14 @@ var _ = Describe("services.trigger.import", func() {
 
 	var _ = When("ImportData", func() {
 		It("parallelizes the data import of all defined sources.", func() {
+			integration := models.Integration{
+				ID:          primitive.NewObjectID(),
+				URI:         gitlabMock.URL,
+				BearerToken: "bearertoken",
+			}
+			err := daos.CreateIntegration(ctx, &integration)
+			Expect(err).To(BeNil())
+
 			repository := models.Repository{
 				IntegrationID:  primitive.NewObjectID(),
 				ExternalID:     externalID,
@@ -92,7 +106,7 @@ var _ = Describe("services.trigger.import", func() {
 				URI:            "https://gitlab.com/foobar/foobar",
 			}
 			pipeline := models.Pipeline{
-				IntegrationID:  primitive.NewObjectID(),
+				IntegrationID:  integration.ID,
 				ExternalID:     externalID,
 				NamespacedName: "foobar/foobar",
 				DefaultBranch:  "main",
@@ -107,7 +121,7 @@ var _ = Describe("services.trigger.import", func() {
 				Pipeline:   pipeline,
 				Deployment: deployment,
 			}
-			err := daos.CreateDataflow(ctx, &dataflow)
+			err = daos.CreateDataflow(ctx, &dataflow)
 			Expect(err).To(BeNil())
 
 			err = trigger.ImportData(ctx, &dataflow)
