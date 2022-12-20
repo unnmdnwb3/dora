@@ -9,7 +9,7 @@ import (
 // PipelineRun describes a single run of a CICD pipeline
 type PipelineRun struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty"`
-	PipelineID  primitive.ObjectID `bson:"pipeline_id;omitempty"`
+	PipelineID  primitive.ObjectID `bson:"pipeline_id" json:"pipeline_id"`
 	ExternalID  int                `bson:"external_id" json:"id"`
 	Ref         string             `json:"ref" bson:"ref"`
 	Status      string             `json:"status" bson:"status"`

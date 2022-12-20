@@ -7,6 +7,7 @@ import (
 	"github.com/unnmdnwb3/dora/internal/database/mongodb"
 	"github.com/unnmdnwb3/dora/internal/models"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // default dataflowCollection
@@ -22,12 +23,16 @@ func CreateDataflow(ctx context.Context, dataflow *models.Dataflow) error {
 	}
 	defer service.Disconnect(ctx)
 
+	dataflow.Repository.ID = primitive.NewObjectID()
+	dataflow.Pipeline.ID = primitive.NewObjectID()
+	dataflow.Deployment.ID = primitive.NewObjectID()
+
 	err = service.InsertOne(ctx, dataflowCollection, dataflow)
 	return err
 }
 
 // GetDataflow retrieves an Dataflow.
-func GetDataflow(ctx context.Context, ID string, dataflow *models.Dataflow) error {
+func GetDataflow(ctx context.Context, objectID primitive.ObjectID, dataflow *models.Dataflow) error {
 	service := mongodb.NewService()
 	database := os.Getenv("MONGODB_DATABASE")
 	err := service.Connect(ctx, database)
@@ -36,7 +41,7 @@ func GetDataflow(ctx context.Context, ID string, dataflow *models.Dataflow) erro
 	}
 	defer service.Disconnect(ctx)
 
-	err = service.FindOneByID(ctx, dataflowCollection, ID, dataflow)
+	err = service.FindOneByID(ctx, dataflowCollection, objectID, dataflow)
 	return err
 }
 
@@ -70,7 +75,7 @@ func ListDataflowsByFilter(ctx context.Context, filter bson.M, dataflows *[]mode
 }
 
 // UpdateDataflow updates an Dataflow.
-func UpdateDataflow(ctx context.Context, ID string, dataflow *models.Dataflow) error {
+func UpdateDataflow(ctx context.Context, objectID primitive.ObjectID, dataflow *models.Dataflow) error {
 	service := mongodb.NewService()
 	database := os.Getenv("MONGODB_DATABASE")
 	err := service.Connect(ctx, database)
@@ -79,17 +84,17 @@ func UpdateDataflow(ctx context.Context, ID string, dataflow *models.Dataflow) e
 	}
 	defer service.Disconnect(ctx)
 
-	err = service.UpdateOne(ctx, dataflowCollection, ID, &dataflow)
+	err = service.UpdateOne(ctx, dataflowCollection, objectID, &dataflow)
 	if err != nil {
 		return err
 	}
 
-	dataflow.ID = ID
+	dataflow.ID = objectID
 	return nil
 }
 
 // DeleteDataflow deletes an Dataflow.
-func DeleteDataflow(ctx context.Context, ID string) error {
+func DeleteDataflow(ctx context.Context, objectID primitive.ObjectID) error {
 	service := mongodb.NewService()
 	database := os.Getenv("MONGODB_DATABASE")
 	err := service.Connect(ctx, database)
@@ -98,6 +103,6 @@ func DeleteDataflow(ctx context.Context, ID string) error {
 	}
 	defer service.Disconnect(ctx)
 
-	err = service.DeleteOne(ctx, dataflowCollection, ID)
+	err = service.DeleteOne(ctx, dataflowCollection, objectID)
 	return err
 }

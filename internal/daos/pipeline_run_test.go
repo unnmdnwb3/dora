@@ -9,18 +9,21 @@ import (
 	"github.com/unnmdnwb3/dora/internal/daos"
 	"github.com/unnmdnwb3/dora/internal/models"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 var _ = Describe("daos.pipelineRun", func() {
 	ctx := context.Background()
+	externalID := 713437228
 
 	var _ = When("CreatePipelineRun", func() {
 		It("creates creates a new PipelineRun.", func() {
+			pipelineID := primitive.NewObjectID()
 			createdAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:29:50.092Z")
 			updatedAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:35:51.459Z")
 			pipelineRun := models.PipelineRun{
-				PipelineID:  "15392086",
-				ExternalID:  "713437228",
+				PipelineID:  pipelineID,
+				ExternalID:  externalID,
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -28,7 +31,7 @@ var _ = Describe("daos.pipelineRun", func() {
 				UpdatedAt:   updatedAt,
 				URI:         "https://gitlab.com/foobar/foobar/-/pipelines/114884002",
 			}
-			err := daos.CreatePipelineRun(ctx, &pipelineRun)
+			err := daos.CreatePipelineRun(ctx, pipelineID, &pipelineRun)
 			Expect(err).To(BeNil())
 			Expect(pipelineRun.ID).To(Not(BeEmpty()))
 		})
@@ -36,11 +39,12 @@ var _ = Describe("daos.pipelineRun", func() {
 
 	var _ = When("CreatePipelineRuns", func() {
 		It("creates creates many new PipelineRuns.", func() {
+			pipelineID := primitive.NewObjectID()
 			createdAt1, _ := time.Parse(time.RFC3339, "2020-02-04T14:29:50.092Z")
 			updatedAt1, _ := time.Parse(time.RFC3339, "2020-02-04T14:35:51.459Z")
 			pipelineRun1 := models.PipelineRun{
-				PipelineID:  "15392086",
-				ExternalID:  "713437228",
+				PipelineID:  pipelineID,
+				ExternalID:  externalID,
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -52,8 +56,8 @@ var _ = Describe("daos.pipelineRun", func() {
 			createdAt2, _ := time.Parse(time.RFC3339, "2020-02-04T14:39:50.092Z")
 			updatedAt2, _ := time.Parse(time.RFC3339, "2020-02-04T14:45:51.459Z")
 			pipelineRun2 := models.PipelineRun{
-				PipelineID:  "15392086",
-				ExternalID:  "713437229",
+				PipelineID:  pipelineID,
+				ExternalID:  externalID,
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -62,7 +66,7 @@ var _ = Describe("daos.pipelineRun", func() {
 				URI:         "https://gitlab.com/foobar/foobar/-/pipelines/114884003",
 			}
 			pipelineRuns := []models.PipelineRun{pipelineRun1, pipelineRun2}
-			err := daos.CreatePipelineRuns(ctx, &pipelineRuns)
+			err := daos.CreatePipelineRuns(ctx, pipelineID, &pipelineRuns)
 			Expect(err).To(BeNil())
 			Expect(pipelineRuns[0].ID).To(Not(BeEmpty()))
 			Expect(pipelineRuns[1].ID).To(Not(BeEmpty()))
@@ -71,11 +75,12 @@ var _ = Describe("daos.pipelineRun", func() {
 
 	var _ = When("GetPipelineRun", func() {
 		It("retrieves an PipelineRun.", func() {
+			pipelineID := primitive.NewObjectID()
 			createdAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:29:50.092Z")
 			updatedAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:35:51.459Z")
 			pipelineRun := models.PipelineRun{
-				PipelineID:  "15392086",
-				ExternalID:  "713437228",
+				PipelineID:  pipelineID,
+				ExternalID:  externalID,
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -83,7 +88,7 @@ var _ = Describe("daos.pipelineRun", func() {
 				UpdatedAt:   updatedAt,
 				URI:         "https://gitlab.com/foobar/foobar/-/pipelines/114884002",
 			}
-			err := daos.CreatePipelineRun(ctx, &pipelineRun)
+			err := daos.CreatePipelineRun(ctx, pipelineID, &pipelineRun)
 			Expect(err).To(BeNil())
 			Expect(pipelineRun.ID).To(Not(BeEmpty()))
 
@@ -96,11 +101,12 @@ var _ = Describe("daos.pipelineRun", func() {
 
 	var _ = When("ListPipelineRuns", func() {
 		It("retrieves many PipelineRuns.", func() {
+			pipelineID := primitive.NewObjectID()
 			createdAt1, _ := time.Parse(time.RFC3339, "2020-02-04T14:29:50.092Z")
 			updatedAt1, _ := time.Parse(time.RFC3339, "2020-02-04T14:35:51.459Z")
 			pipelineRun1 := models.PipelineRun{
-				PipelineID:  "15392086",
-				ExternalID:  "713437228",
+				PipelineID:  pipelineID,
+				ExternalID:  externalID,
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -112,8 +118,8 @@ var _ = Describe("daos.pipelineRun", func() {
 			createdAt2, _ := time.Parse(time.RFC3339, "2020-02-04T14:39:50.092Z")
 			updatedAt2, _ := time.Parse(time.RFC3339, "2020-02-04T14:45:51.459Z")
 			pipelineRun2 := models.PipelineRun{
-				PipelineID:  "15392086",
-				ExternalID:  "713437229",
+				PipelineID:  pipelineID,
+				ExternalID:  externalID,
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -121,25 +127,25 @@ var _ = Describe("daos.pipelineRun", func() {
 				UpdatedAt:   updatedAt2,
 				URI:         "https://gitlab.com/foobar/foobar/-/pipelines/114884003",
 			}
-			_ = daos.CreatePipelineRun(ctx, &pipelineRun1)
-			_ = daos.CreatePipelineRun(ctx, &pipelineRun2)
-			Expect(pipelineRun1.ID).To(Not(BeNil()))
-			Expect(pipelineRun2.ID).To(Not(BeNil()))
+			pipelineRuns := []models.PipelineRun{pipelineRun1, pipelineRun2}
+			err := daos.CreatePipelineRuns(ctx, pipelineID, &pipelineRuns)
+			Expect(err).To(BeNil())
 
 			var findPipelineRuns []models.PipelineRun
-			err := daos.ListPipelineRuns(ctx, pipelineRun1.PipelineID, &findPipelineRuns)
+			err = daos.ListPipelineRuns(ctx, pipelineID, &findPipelineRuns)
 			Expect(err).To(BeNil())
-			Expect(findPipelineRuns).To(HaveLen(2))
+			Expect(len(findPipelineRuns)).To(Equal(2))
 		})
 	})
 
 	var _ = When("ListPipelineRunsByFilter", func() {
 		It("retrieves many PipelineRuns conforming to a filter.", func() {
+			pipelineID := primitive.NewObjectID()
 			createdAt1, _ := time.Parse(time.RFC3339, "2020-02-04T14:29:50.092Z")
 			updatedAt1, _ := time.Parse(time.RFC3339, "2020-02-04T14:35:51.459Z")
 			pipelineRun1 := models.PipelineRun{
-				PipelineID:  "15392086",
-				ExternalID:  "713437228",
+				PipelineID:  pipelineID,
+				ExternalID:  externalID,
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -151,8 +157,8 @@ var _ = Describe("daos.pipelineRun", func() {
 			createdAt2, _ := time.Parse(time.RFC3339, "2020-02-04T14:39:50.092Z")
 			updatedAt2, _ := time.Parse(time.RFC3339, "2020-02-04T14:45:51.459Z")
 			pipelineRun2 := models.PipelineRun{
-				PipelineID:  "15392086",
-				ExternalID:  "713437229",
+				PipelineID:  pipelineID,
+				ExternalID:  externalID,
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -160,14 +166,13 @@ var _ = Describe("daos.pipelineRun", func() {
 				UpdatedAt:   updatedAt2,
 				URI:         "https://gitlab.com/foobar/foobar/-/pipelines/114884003",
 			}
-			_ = daos.CreatePipelineRun(ctx, &pipelineRun1)
-			_ = daos.CreatePipelineRun(ctx, &pipelineRun2)
-			Expect(pipelineRun1.ID).To(Not(BeNil()))
-			Expect(pipelineRun2.ID).To(Not(BeNil()))
+			pipelineRuns := []models.PipelineRun{pipelineRun1, pipelineRun2}
+			err := daos.CreatePipelineRuns(ctx, pipelineID, &pipelineRuns)
+			Expect(err).To(BeNil())
 
 			var findPipelineRuns []models.PipelineRun
 			filter := bson.M{"uri": pipelineRun1.URI}
-			err := daos.ListPipelineRunsByFilter(ctx, filter, &findPipelineRuns)
+			err = daos.ListPipelineRunsByFilter(ctx, filter, &findPipelineRuns)
 			Expect(err).To(BeNil())
 			Expect(findPipelineRuns).To(HaveLen(1))
 		})
@@ -175,11 +180,12 @@ var _ = Describe("daos.pipelineRun", func() {
 
 	var _ = When("UpdatePipelineRun", func() {
 		It("updates an PipelineRun.", func() {
+			pipelineID := primitive.NewObjectID()
 			createdAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:29:50.092Z")
 			updatedAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:35:51.459Z")
 			pipelineRun := models.PipelineRun{
-				PipelineID:  "15392086",
-				ExternalID:  "713437228",
+				PipelineID:  pipelineID,
+				ExternalID:  externalID,
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -187,14 +193,14 @@ var _ = Describe("daos.pipelineRun", func() {
 				UpdatedAt:   updatedAt,
 				URI:         "https://gitlab.com/foobar/foobar/-/pipelines/114884002",
 			}
-			err := daos.CreatePipelineRun(ctx, &pipelineRun)
+			err := daos.CreatePipelineRun(ctx, pipelineID, &pipelineRun)
 			Expect(err).To(BeNil())
 			Expect(pipelineRun.ID).To(Not(BeEmpty()))
 
 			newUpdatedAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:45:51.459Z")
 			updatePipelineRun := models.PipelineRun{
-				PipelineID:  "15392086",
-				ExternalID:  "713437228",
+				PipelineID:  pipelineID,
+				ExternalID:  externalID,
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -210,11 +216,12 @@ var _ = Describe("daos.pipelineRun", func() {
 
 	var _ = When("DeleteOne", func() {
 		It("deletes a document with ID in a collection", func() {
+			pipelineID := primitive.NewObjectID()
 			createdAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:29:50.092Z")
 			updatedAt, _ := time.Parse(time.RFC3339, "2020-02-04T14:35:51.459Z")
 			pipelineRun := models.PipelineRun{
-				PipelineID:  "15392086",
-				ExternalID:  "713437228",
+				PipelineID:  pipelineID,
+				ExternalID:  externalID,
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -222,7 +229,7 @@ var _ = Describe("daos.pipelineRun", func() {
 				UpdatedAt:   updatedAt,
 				URI:         "https://gitlab.com/foobar/foobar/-/pipelines/114884002",
 			}
-			err := daos.CreatePipelineRun(ctx, &pipelineRun)
+			err := daos.CreatePipelineRun(ctx, pipelineID, &pipelineRun)
 			Expect(err).To(BeNil())
 			Expect(pipelineRun.ID).To(Not(BeEmpty()))
 
