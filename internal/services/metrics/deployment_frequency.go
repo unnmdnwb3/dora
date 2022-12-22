@@ -3,6 +3,7 @@ package metrics
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/unnmdnwb3/dora/internal/daos"
@@ -133,17 +134,14 @@ func CompletePipelineRunsPerDays(pipelineRunsPerDays *[]models.PipelineRunsPerDa
 	if len(*dates) <= len(*pipelineRunsPerDays) {
 		return nil, fmt.Errorf("more pipeline runs per day than dates provided")
 	}
-	if (*dates)[0].Before((*pipelineRunsPerDays)[0].Date) {
-		return nil, fmt.Errorf("first date is before first pipeline runs aggregate date")
-	}
-	if (*dates)[len(*dates)-1].After((*pipelineRunsPerDays)[len(*pipelineRunsPerDays)-1].Date) {
-		return nil, fmt.Errorf("last date is after last pipeline runs aggregate date")
-	}
+
+	log.Println("dates", len(*dates), *dates)
+	log.Println("pipelineRunsPerDays", len(*pipelineRunsPerDays), *pipelineRunsPerDays)
 
 	dailyPipelineRuns := make([]int, len(*dates))
 	curr := 0
 	for index, date := range *dates {
-		if date == (*pipelineRunsPerDays)[curr].Date {
+		if curr < len(*pipelineRunsPerDays) && date == (*pipelineRunsPerDays)[curr].Date {
 			dailyPipelineRuns[index] = (*pipelineRunsPerDays)[curr].TotalPipelineRuns
 			curr++
 		} else {
