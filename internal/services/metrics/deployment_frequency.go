@@ -3,7 +3,6 @@ package metrics
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/unnmdnwb3/dora/internal/daos"
@@ -134,9 +133,6 @@ func CompletePipelineRunsPerDays(pipelineRunsPerDays *[]models.PipelineRunsPerDa
 	if len(*dates) <= len(*pipelineRunsPerDays) {
 		return nil, fmt.Errorf("more pipeline runs per day than dates provided")
 	}
-
-	log.Println("dates", len(*dates), *dates)
-	log.Println("pipelineRunsPerDays", len(*pipelineRunsPerDays), *pipelineRunsPerDays)
 
 	dailyPipelineRuns := make([]int, len(*dates))
 	curr := 0

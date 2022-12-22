@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -27,7 +26,7 @@ func GetRepositories(c *gin.Context) {
 
 		repositories, err := client.GetRepositories()
 		if err != nil {
-			log.Fatalln(err.Error())
+			c.AbortWithError(http.StatusBadRequest, err)
 		}
 
 		allRepositories = append(allRepositories, *repositories...)

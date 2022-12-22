@@ -19,5 +19,17 @@ services:
     volumes:
       - mongodb:/data/db
     command: mongod --quiet --logpath /dev/null 
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - prometheus:/prometheus
+      - ./deploy/prometheus.yaml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - mongodb
+      - dora
 volumes:
-  mongodb:
+  mongodb: {}
+  prometheus: {}

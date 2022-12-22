@@ -2,12 +2,17 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/unnmdnwb3/dora/internal/api/handler"
 )
 
 // SetupRouter initializes the router and all routes to be served
 func SetupRouter() *gin.Engine {
 	router := gin.Default()
+
+	// route for prometheus metrics
+	router.GET("/healthz", handler.Healthz)
+	router.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	// routes for repositories
 	router.GET("/api/v1/repositories", handler.GetRepositories)
