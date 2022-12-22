@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"strconv"
 
@@ -32,7 +31,7 @@ func (c *Client) GetOrganisations() (*[]models.Organisation, error) {
 	uri := fmt.Sprintf("%s/groups", c.URI)
 	req, err := http.NewRequest(http.MethodGet, uri, nil)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 
 	bearer := fmt.Sprintf("Bearer %s", c.Auth)
@@ -40,19 +39,19 @@ func (c *Client) GetOrganisations() (*[]models.Organisation, error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 
 	organisations := []models.Organisation{}
 	err = json.Unmarshal(body, &organisations)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 
 	return &organisations, nil
@@ -65,7 +64,7 @@ func (c *Client) GetRepositories() (*[]models.Repository, error) {
 	uri := fmt.Sprintf("%s/projects", c.URI)
 	req, err := http.NewRequest(http.MethodGet, uri, nil)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 
 	bearer := fmt.Sprintf("Bearer %s", c.Auth)
@@ -78,19 +77,19 @@ func (c *Client) GetRepositories() (*[]models.Repository, error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 
 	repositories := []models.Repository{}
 	err = json.Unmarshal(body, &repositories)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 
 	return &repositories, nil
@@ -103,7 +102,7 @@ func (c *Client) GetPullRequests(projectID string, targetBranch string) (*[]mode
 	uri := fmt.Sprintf("%s/projects/%s/merge_requests", c.URI, projectID)
 	req, err := http.NewRequest(http.MethodGet, uri, nil)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 
 	bearer := fmt.Sprintf("Bearer %s", c.Auth)
@@ -117,19 +116,19 @@ func (c *Client) GetPullRequests(projectID string, targetBranch string) (*[]mode
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 
 	pullRequests := []models.PullRequest{}
 	err = json.Unmarshal(body, &pullRequests)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 
 	return &pullRequests, nil
@@ -142,7 +141,7 @@ func (c *Client) GetCommits(projectID string, referenceBranch string) (*[]models
 	uri := fmt.Sprintf("%s/projects/%s/repository/commits", c.URI, projectID)
 	req, err := http.NewRequest(http.MethodGet, uri, nil)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 
 	bearer := fmt.Sprintf("Bearer %s", c.Auth)
@@ -156,19 +155,19 @@ func (c *Client) GetCommits(projectID string, referenceBranch string) (*[]models
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 
 	commits := []models.Commit{}
 	err = json.Unmarshal(body, &commits)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 
 	return &commits, nil
