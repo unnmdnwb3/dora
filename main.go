@@ -19,12 +19,12 @@ func main() {
 	database := os.Getenv("MONGODB_DATABASE")
 	err := service.Connect(ctx, database)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("Could not connect to database: ", err.Error())
 	}
 
 	err = service.Client.Ping(context.TODO(), readpref.Primary())
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("Could not ping database: ", err.Error())
 	}
 
 	fmt.Println("Successfully connected to database.")
@@ -35,6 +35,6 @@ func main() {
 	log.Println("\nThe server is running and listening on localhost! 🚀")
 	err = http.ListenAndServe(":8080", router)
 	if err != nil {
-		log.Fatalln("The server encountered a fatal error:", err)
+		log.Fatalln("The server encountered a fatal error: ", err.Error())
 	}
 }
