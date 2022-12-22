@@ -26,5 +26,8 @@ func SetupRouter() *gin.Engine {
 	router.PUT("/api/v1/dataflows/:id", handler.UpdateDataflow)
 	router.DELETE("/api/v1/dataflows/:id", handler.DeleteDataflow)
 
+	// routes for metrics
+	router.POST("/api/v1/metrics/deployment-frequency", handler.DeploymentFrequency)
+
 	return router
 }

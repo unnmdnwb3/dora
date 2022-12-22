@@ -13,3 +13,10 @@ type DeploymentFrequency struct {
 	DailyPipelineRuns []int              `bson:"daily_pipeline_runs" json:"daily_pipeline_runs"`
 	MovingAverages    []float64          `bson:"moving_average" json:"moving_average"`
 }
+
+// DeploymentFrequencyRequest represents the request to calculate the deployment frequency
+type DeploymentFrequencyRequest struct {
+	DataflowID primitive.ObjectID `bson:"dataflow_id" json:"dataflow_id"`
+	EndDate    time.Time          `bson:"end_date" json:"end_date"`
+	Window     int                `bson:"window" json:"window"`
+}

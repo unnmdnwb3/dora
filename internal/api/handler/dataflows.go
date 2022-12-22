@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/unnmdnwb3/dora/internal/daos"
 	"github.com/unnmdnwb3/dora/internal/models"
+	"github.com/unnmdnwb3/dora/internal/services/trigger"
 	"github.com/unnmdnwb3/dora/internal/utils/types"
 )
 
@@ -21,6 +22,18 @@ func CreateDataflow(c *gin.Context) {
 
 	err = daos.CreateDataflow(ctx, &dataflow)
 	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+	}
+
+	err = trigger.ImportData(ctx, &dataflow)
+	if err != nil {
+		_ = daos.DeleteDataflow(ctx, dataflow.ID)
+		c.AbortWithError(http.StatusBadRequest, err)
+	}
+
+	err = trigger.CreatePipelineRunsPerDays(ctx, dataflow.Pipeline.ID)
+	if err != nil {
+		_ = daos.DeleteDataflow(ctx, dataflow.ID)
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
 
