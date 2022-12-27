@@ -26,7 +26,8 @@ services:
       - 9090:9090
     volumes:
       - prometheus:/prometheus
-      - ./deploy/prometheus.yaml:/etc/prometheus/prometheus.yml
+      - ./tools/prometheus.yaml:/etc/prometheus/prometheus.yml
+      - ./tools/prometheus.rules.yaml:/etc/prometheus/prometheus.rules.yml
     depends_on:
       - mongodb
       - dora

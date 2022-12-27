@@ -12,52 +12,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// // CalculateDeploymentFrequency calculates the deployment frequency for a given dataflow.
-// func CalculateDeploymentFrequency(ctx context.Context, dataflowID string, window int) (*models.DeploymentFrequency, error) {
-// 	var dataflow models.Dataflow
-// 	err := daos.GetDataflow(ctx, dataflowID, &dataflow)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	pipelineID := dataflow.Pipeline.ID
-// 	timeRange := (window - 1) * 2
-// 	today := times.Date(time.Now())
-// 	startDate := today.AddDate(0, 0, -timeRange)
-
-// 	var pipelineRunsAggregate []models.PipelineRunsPerDay
-// 	filter := bson.M{"pipeline_id": pipelineID, "date": bson.M{"$gte": startDate}}
-// 	err = daos.ListPipelineRunsPerDaysByFilter(ctx, filter, &pipelineRunsAggregate)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	if len(pipelineRunsAggregate) == 0 {
-// 		return nil, fmt.Errorf("no pipeline runs found for pipeline %s", pipelineID)
-// 	}
-
-// 	dates, err := GetDates(&pipelineRunsAggregate)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	dailyPipelineRuns, err := GetDailyPipelineRuns(&pipelineRunsAggregate)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	movingAverages, err := CalculateMovingAverages(dailyPipelineRuns, window)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return &models.DeploymentFrequency{
-// 		DataflowID:        pipelineID,
-// 		Dates:             *dates,
-// 		DailyPipelineRuns: *dailyPipelineRuns,
-// 		MovingAverages:    *movingAverages,
-// 	}, nil
-// }
-
 // CalculateDeploymentFrequency calculates the deployment frequency for a given dataflow.
 func CalculateDeploymentFrequency(ctx context.Context, dataflowID primitive.ObjectID, window int, endDate time.Time) (*models.DeploymentFrequency, error) {
 	var dataflow models.Dataflow
