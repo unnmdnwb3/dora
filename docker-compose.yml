@@ -27,6 +27,7 @@ services:
     volumes:
       - prometheus:/prometheus
       - ./tools/prometheus.yaml:/etc/prometheus/prometheus.yml
+      - ./tools/prometheus.rules.yaml:/etc/prometheus/prometheus.rules.yml
     depends_on:
       - mongodb
       - dora

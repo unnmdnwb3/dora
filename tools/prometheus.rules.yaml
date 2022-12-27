@@ -1,0 +1,5 @@
+groups:
+  - name: dora
+    rules:
+    - record: job:http_total_requests:internal_server_error_percentage
+      expr: sum(increase(http_requests_total{code="500"}[5m])) / sum(increase(http_requests_total{code="200"}[5m]))
