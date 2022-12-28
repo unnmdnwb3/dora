@@ -32,7 +32,6 @@ var _ = Describe("daos.dataflow", func() {
 			}
 			deployment := models.Deployment{
 				IntegrationID: primitive.NewObjectID(),
-				TargetURI:     "https://localhost:9090",
 			}
 			dataflow := models.Dataflow{
 				Repository: repository,
@@ -66,7 +65,6 @@ var _ = Describe("daos.dataflow", func() {
 			}
 			deployment := models.Deployment{
 				IntegrationID: primitive.NewObjectID(),
-				TargetURI:     "https://localhost:9090",
 			}
 			dataflow := models.Dataflow{
 				Repository: repository,
@@ -102,7 +100,6 @@ var _ = Describe("daos.dataflow", func() {
 			}
 			deployment1 := models.Deployment{
 				IntegrationID: primitive.NewObjectID(),
-				TargetURI:     "https://localhost:9090",
 			}
 			dataflow1 := models.Dataflow{
 				Repository: repository1,
@@ -128,7 +125,6 @@ var _ = Describe("daos.dataflow", func() {
 			}
 			deployment2 := models.Deployment{
 				IntegrationID: primitive.NewObjectID(),
-				TargetURI:     "https://localhost:9090",
 			}
 			dataflow2 := models.Dataflow{
 				Repository: repository2,
@@ -163,7 +159,6 @@ var _ = Describe("daos.dataflow", func() {
 			}
 			deployment1 := models.Deployment{
 				IntegrationID: primitive.NewObjectID(),
-				TargetURI:     "https://localhost:9090",
 			}
 			dataflow1 := models.Dataflow{
 				Repository: repository1,
@@ -189,7 +184,6 @@ var _ = Describe("daos.dataflow", func() {
 			}
 			deployment2 := models.Deployment{
 				IntegrationID: primitive.NewObjectID(),
-				TargetURI:     "https://localhost:9090",
 			}
 			dataflow2 := models.Dataflow{
 				Repository: repository2,
@@ -224,7 +218,6 @@ var _ = Describe("daos.dataflow", func() {
 			}
 			deployment := models.Deployment{
 				IntegrationID: primitive.NewObjectID(),
-				TargetURI:     "https://localhost:9090",
 			}
 			dataflow := models.Dataflow{
 				Repository: repository,
@@ -237,7 +230,6 @@ var _ = Describe("daos.dataflow", func() {
 
 			newDeployment := models.Deployment{
 				IntegrationID: primitive.NewObjectID(),
-				TargetURI:     "https://localhost:9091",
 			}
 			updateDataflow := models.Dataflow{
 				Repository: repository,
@@ -247,7 +239,7 @@ var _ = Describe("daos.dataflow", func() {
 
 			err = daos.UpdateDataflow(ctx, dataflow.ID, &updateDataflow)
 			Expect(err).To(BeNil())
-			Expect(updateDataflow.Deployment.TargetURI).To(Equal(newDeployment.TargetURI))
+			Expect(updateDataflow.Deployment.IntegrationID).To(Equal(newDeployment.IntegrationID))
 		})
 	})
 
@@ -269,7 +261,6 @@ var _ = Describe("daos.dataflow", func() {
 			}
 			deployment := models.Deployment{
 				IntegrationID: primitive.NewObjectID(),
-				TargetURI:     "https://localhost:9090",
 			}
 			dataflow := models.Dataflow{
 				Repository: repository,
