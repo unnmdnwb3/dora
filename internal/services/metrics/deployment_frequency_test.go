@@ -120,7 +120,6 @@ var _ = Describe("services.metrics", func() {
 			}
 			deployment := models.Deployment{
 				IntegrationID: primitive.NewObjectID(),
-				TargetURI:     "https://localhost:9090",
 			}
 			dataflow := models.Dataflow{
 				Repository: repository,
