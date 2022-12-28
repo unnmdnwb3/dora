@@ -14,7 +14,7 @@ var _ = Describe("daos.integration", func() {
 	ctx := context.Background()
 
 	var _ = When("CreateIntegration", func() {
-		It("creates creates a new Integration.", func() {
+		It("creates a new Integration.", func() {
 			integration := models.Integration{
 				Type:        "sc",
 				Provider:    "gitlab",

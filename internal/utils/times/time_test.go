@@ -70,4 +70,22 @@ var _ = Describe("mongodb.Service", func() {
 			Expect(d).To(Equal("2019-10-09"))
 		})
 	})
+
+	var _ = When("Duration", func() {
+		It("returns the duration from a Prometheus step.", func() {
+			d, err := times.Duration("1m")
+			Expect(err).To(BeNil())
+			Expect(d).To(Equal(1 * time.Minute))
+		})
+
+		It("returns an error if the number is invalid", func() {
+			_, err := times.Duration("-1m")
+			Expect(err).To(Not(BeNil()))
+		})
+
+		It("returns an error if no number is provided", func() {
+			_, err := times.Duration("xyzm")
+			Expect(err).To(Not(BeNil()))
+		})
+	})
 })

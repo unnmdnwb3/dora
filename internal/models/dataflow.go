@@ -34,5 +34,8 @@ type Pipeline struct {
 type Deployment struct {
 	ID            primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
 	IntegrationID primitive.ObjectID `bson:"integration_id,omitempty" json:"integration_id"`
-	TargetURI     string             `bson:"target_uri" json:"target_uri"`
+	Query         string             `bson:"query" json:"query"`
+	Step          string             `bson:"step" json:"step"` // step is the time between each query according to the Prometheus API
+	Relation      string             `bson:"relation" json:"relation"`
+	Threshold     float64            `bson:"threshold" json:"threshold"`
 }
