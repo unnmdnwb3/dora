@@ -27,8 +27,8 @@ func CreateIncident(ctx context.Context, incident *models.Incident) error {
 	return err
 }
 
-// GetIncident retrieves an Incident.
-func GetIncident(ctx context.Context, objectID primitive.ObjectID, incident *models.Incident) error {
+// CreateIncidents creates many new Incidents.
+func CreateIncidents(ctx context.Context, incidents *[]models.Incident) error {
 	service := mongodb.NewService()
 	database := os.Getenv("MONGODB_DATABASE")
 	err := service.Connect(ctx, database)
@@ -37,26 +37,38 @@ func GetIncident(ctx context.Context, objectID primitive.ObjectID, incident *mod
 	}
 	defer service.Disconnect(ctx)
 
-	err = service.FindOneByID(ctx, incidentCollection, objectID, incident)
+	for index, incident := range *incidents {
+		err = service.InsertOne(ctx, incidentCollection, &incident)
+		if err != nil {
+			return err
+		}
+		(*incidents)[index] = incident
+	}
+	return nil
+}
+
+// GetIncident retrieves an Incident.
+func GetIncident(ctx context.Context, incidentID primitive.ObjectID, incident *models.Incident) error {
+	service := mongodb.NewService()
+	database := os.Getenv("MONGODB_DATABASE")
+	err := service.Connect(ctx, database)
+	if err != nil {
+		return err
+	}
+	defer service.Disconnect(ctx)
+
+	err = service.FindOneByID(ctx, incidentCollection, incidentID, incident)
 	return err
 }
 
 // ListIncidents retrieves many Incidents.
-func ListIncidents(ctx context.Context, incidents *[]models.Incident) error {
-	service := mongodb.NewService()
-	database := os.Getenv("MONGODB_DATABASE")
-	err := service.Connect(ctx, database)
-	if err != nil {
-		return err
-	}
-	defer service.Disconnect(ctx)
-
-	err = service.Find(ctx, incidentCollection, bson.M{}, incidents)
+func ListIncidents(ctx context.Context, deploymentID primitive.ObjectID, incidents *[]models.Incident) error {
+	filter := bson.M{"deployment_id": deploymentID}
+	err := ListIncidentsByFilter(ctx, filter, incidents)
 	return err
 }
 
 // ListIncidentsByFilter retrieves many Incidents conforming to a filter.
-// TODO change to pass a struct instead of bson.M
 func ListIncidentsByFilter(ctx context.Context, filter bson.M, incidents *[]models.Incident) error {
 	service := mongodb.NewService()
 	database := os.Getenv("MONGODB_DATABASE")
@@ -71,7 +83,7 @@ func ListIncidentsByFilter(ctx context.Context, filter bson.M, incidents *[]mode
 }
 
 // UpdateIncident updates an Incident.
-func UpdateIncident(ctx context.Context, objectID primitive.ObjectID, incident *models.Incident) error {
+func UpdateIncident(ctx context.Context, incidentID primitive.ObjectID, incident *models.Incident) error {
 	service := mongodb.NewService()
 	database := os.Getenv("MONGODB_DATABASE")
 	err := service.Connect(ctx, database)
@@ -80,17 +92,17 @@ func UpdateIncident(ctx context.Context, objectID primitive.ObjectID, incident *
 	}
 	defer service.Disconnect(ctx)
 
-	err = service.UpdateOne(ctx, incidentCollection, objectID, &incident)
+	err = service.UpdateOne(ctx, incidentCollection, incidentID, &incident)
 	if err != nil {
 		return err
 	}
 
-	incident.ID = objectID
+	incident.ID = incidentID
 	return nil
 }
 
 // DeleteIncident deletes an Incident.
-func DeleteIncident(ctx context.Context, objectID primitive.ObjectID) error {
+func DeleteIncident(ctx context.Context, incidentID primitive.ObjectID) error {
 	service := mongodb.NewService()
 	database := os.Getenv("MONGODB_DATABASE")
 	err := service.Connect(ctx, database)
@@ -99,6 +111,6 @@ func DeleteIncident(ctx context.Context, objectID primitive.ObjectID) error {
 	}
 	defer service.Disconnect(ctx)
 
-	err = service.DeleteOne(ctx, incidentCollection, objectID)
+	err = service.DeleteOne(ctx, incidentCollection, incidentID)
 	return err
 }

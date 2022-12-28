@@ -28,6 +28,28 @@ var _ = Describe("daos.incident", func() {
 		})
 	})
 
+	var _ = When("CreatePipelineRuns", func() {
+		It("creates creates many new PipelineRuns.", func() {
+			deploymentID := primitive.NewObjectID()
+			incident1 := models.Incident{
+				DeploymentID: deploymentID,
+				StartDate:    time.Date(2022, 12, 27, 13, 16, 42, 0, time.UTC),
+				EndDate:      time.Date(2022, 12, 27, 13, 21, 42, 0, time.UTC),
+			}
+
+			incident2 := models.Incident{
+				DeploymentID: deploymentID,
+				StartDate:    time.Date(2022, 12, 27, 14, 16, 42, 0, time.UTC),
+				EndDate:      time.Date(2022, 12, 27, 14, 21, 42, 0, time.UTC),
+			}
+			incidents := []models.Incident{incident1, incident2}
+			err := daos.CreateIncidents(ctx, &incidents)
+			Expect(err).To(BeNil())
+			Expect(incidents[0].ID).To(Not(BeEmpty()))
+			Expect(incidents[1].ID).To(Not(BeEmpty()))
+		})
+	})
+
 	var _ = When("GetIncident", func() {
 		It("retrieves an Incident.", func() {
 			incident := models.Incident{
@@ -48,18 +70,19 @@ var _ = Describe("daos.incident", func() {
 
 	var _ = When("ListIncidents", func() {
 		It("retrieves many Incidents.", func() {
+			deploymentID := primitive.NewObjectID()
 			incident1 := models.Incident{
-				DeploymentID: primitive.NewObjectID(),
+				DeploymentID: deploymentID,
 				StartDate:    time.Date(2022, 12, 27, 13, 16, 42, 0, time.UTC),
 				EndDate:      time.Date(2022, 12, 27, 13, 21, 42, 0, time.UTC),
 			}
 			incident2 := models.Incident{
-				DeploymentID: primitive.NewObjectID(),
+				DeploymentID: deploymentID,
 				StartDate:    time.Date(2022, 12, 27, 14, 51, 21, 0, time.UTC),
 				EndDate:      time.Date(2022, 12, 27, 14, 59, 34, 0, time.UTC),
 			}
 			incident3 := models.Incident{
-				DeploymentID: primitive.NewObjectID(),
+				DeploymentID: deploymentID,
 				StartDate:    time.Date(2022, 12, 28, 21, 27, 40, 0, time.UTC),
 				EndDate:      time.Date(2022, 12, 28, 21, 45, 46, 0, time.UTC),
 			}
@@ -71,7 +94,7 @@ var _ = Describe("daos.incident", func() {
 			Expect(incident3.ID).To(Not(BeNil()))
 
 			var findIncidents []models.Incident
-			err := daos.ListIncidents(ctx, &findIncidents)
+			err := daos.ListIncidents(ctx, deploymentID, &findIncidents)
 			Expect(err).To(BeNil())
 			Expect(findIncidents).To(HaveLen(3))
 		})
