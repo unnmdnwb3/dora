@@ -10,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-var _ = Describe("daos.dataflow", func() {
+var _ = Describe("daos.Dataflow", func() {
 	ctx := context.Background()
 	externalID := 40649465
 

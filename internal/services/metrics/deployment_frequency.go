@@ -57,24 +57,6 @@ func CalculateDeploymentFrequency(ctx context.Context, dataflowID primitive.Obje
 	}, nil
 }
 
-// DatesBetween returns a slice of dates between the start and end dates.
-func DatesBetween(startDate time.Time, endDate time.Time) (*[]time.Time, error) {
-	startDate = times.Date(startDate)
-	endDate = times.Date(endDate)
-
-	if startDate.After(endDate) {
-		return nil, fmt.Errorf("start date is after end date")
-	}
-
-	dates := []time.Time{}
-	for date := startDate; date.Before(endDate); date = date.AddDate(0, 0, 1) {
-		dates = append(dates, times.Date(date))
-	}
-	dates = append(dates, times.Date(endDate))
-
-	return &dates, nil
-}
-
 // CompletePipelineRunsPerDays returns a slice of the number of pipeline runs per day,
 // since provided PipelineRunsPerDays only account for the dates that any pipeline runs were found.
 func CompletePipelineRunsPerDays(pipelineRunsPerDays *[]models.PipelineRunsPerDay, dates *[]time.Time) (*[]int, error) {
@@ -82,7 +64,7 @@ func CompletePipelineRunsPerDays(pipelineRunsPerDays *[]models.PipelineRunsPerDa
 		return nil, fmt.Errorf("no pipeline runs aggregates provided")
 	}
 	if len(*dates) == 0 {
-		return nil, fmt.Errorf("no dates provided pipeline runs aggregates")
+		return nil, fmt.Errorf("no dates provided")
 	}
 	if len(*dates) <= len(*pipelineRunsPerDays) {
 		return nil, fmt.Errorf("more pipeline runs per day than dates provided")
@@ -100,29 +82,4 @@ func CompletePipelineRunsPerDays(pipelineRunsPerDays *[]models.PipelineRunsPerDa
 	}
 
 	return &dailyPipelineRuns, nil
-}
-
-// CalculateMovingAverages calculates the moving averages for a given slice of deployments per day.
-func CalculateMovingAverages(pipelineRunsPerDays *[]int, window int) (*[]float64, error) {
-	if len(*pipelineRunsPerDays) == 0 {
-		return nil, fmt.Errorf("no deployments per day provided to calculate moving averages")
-	}
-	if len(*pipelineRunsPerDays) != (window*2)-1 {
-		return nil, fmt.Errorf("number of pipeline runs per day provided to calculate moving averages does not match window")
-	}
-
-	offset := window - 1
-	totalDeploymentsInWindow := 0
-	for index := 0; index < offset; index++ {
-		totalDeploymentsInWindow += (*pipelineRunsPerDays)[index]
-	}
-
-	movingAverages := make([]float64, len(*pipelineRunsPerDays)-offset)
-	for index := offset; index < len(*pipelineRunsPerDays); index++ {
-		totalDeploymentsInWindow += (*pipelineRunsPerDays)[index]
-		movingAverages[index-offset] = float64(totalDeploymentsInWindow) / float64(window)
-		totalDeploymentsInWindow -= (*pipelineRunsPerDays)[index-offset]
-	}
-
-	return &movingAverages, nil
 }

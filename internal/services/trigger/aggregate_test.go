@@ -173,6 +173,80 @@ var _ = Describe("services.trigger.aggregate", func() {
 		})
 	})
 
+	var _ = When("CalculateIncidentsPerDays", func() {
+		It("calculates IncidentsPerDays based on Incidents.", func() {
+			deploymentID := primitive.NewObjectID()
+			incident1 := models.Incident{
+				DeploymentID: deploymentID,
+				StartDate:    time.Date(2022, 12, 27, 13, 16, 42, 0, time.UTC),
+				EndDate:      time.Date(2022, 12, 27, 14, 16, 42, 0, time.UTC),
+			}
+
+			incident2 := models.Incident{
+				DeploymentID: deploymentID,
+				StartDate:    time.Date(2022, 12, 27, 17, 39, 21, 0, time.UTC),
+				EndDate:      time.Date(2022, 12, 27, 17, 54, 21, 0, time.UTC),
+			}
+
+			incident3 := models.Incident{
+				DeploymentID: deploymentID,
+				StartDate:    time.Date(2022, 12, 29, 02, 21, 42, 0, time.UTC),
+				EndDate:      time.Date(2022, 12, 29, 02, 41, 42, 0, time.UTC),
+			}
+
+			incidents := []models.Incident{incident1, incident2, incident3}
+			err := daos.CreateIncidents(ctx, &incidents)
+			Expect(err).To(BeNil())
+
+			incidentsPerDays, err := trigger.CalculateIncidentsPerDays(ctx, &incidents)
+			Expect(err).To(BeNil())
+			Expect(len(*incidentsPerDays)).To(Equal(2))
+			Expect((*incidentsPerDays)[0].TotalIncidents).To(Equal(2))
+			Expect((*incidentsPerDays)[0].TotalDuration).To(Equal(float64(4500)))
+			Expect((*incidentsPerDays)[1].TotalIncidents).To(Equal(1))
+			Expect((*incidentsPerDays)[1].TotalDuration).To(Equal(float64(1200)))
+		})
+	})
+
+	var _ = When("CreateIncidentsPerDays", func() {
+		It("creates IncidentsPerDays based on Incidents.", func() {
+			deploymentID := primitive.NewObjectID()
+			incident1 := models.Incident{
+				DeploymentID: deploymentID,
+				StartDate:    time.Date(2022, 12, 27, 13, 16, 42, 0, time.UTC),
+				EndDate:      time.Date(2022, 12, 27, 14, 16, 42, 0, time.UTC),
+			}
+
+			incident2 := models.Incident{
+				DeploymentID: deploymentID,
+				StartDate:    time.Date(2022, 12, 27, 17, 39, 21, 0, time.UTC),
+				EndDate:      time.Date(2022, 12, 27, 17, 54, 21, 0, time.UTC),
+			}
+
+			incident3 := models.Incident{
+				DeploymentID: deploymentID,
+				StartDate:    time.Date(2022, 12, 29, 02, 21, 42, 0, time.UTC),
+				EndDate:      time.Date(2022, 12, 29, 02, 41, 42, 0, time.UTC),
+			}
+
+			incidents := []models.Incident{incident1, incident2, incident3}
+			err := daos.CreateIncidents(ctx, &incidents)
+			Expect(err).To(BeNil())
+
+			err = trigger.CreateIncidentsPerDays(ctx, deploymentID)
+			Expect(err).To(BeNil())
+
+			var incidentsPerDays []models.IncidentsPerDay
+			err = daos.ListIncidentsPerDays(ctx, deploymentID, &incidentsPerDays)
+			Expect(err).To(BeNil())
+			Expect(incidentsPerDays).To(HaveLen(2))
+			Expect(incidentsPerDays[0].TotalIncidents).To(Equal(2))
+			Expect(incidentsPerDays[0].TotalDuration).To(Equal(float64(4500)))
+			Expect(incidentsPerDays[1].TotalIncidents).To(Equal(1))
+			Expect(incidentsPerDays[1].TotalDuration).To(Equal(float64(1200)))
+		})
+	})
+
 	var _ = When("CalculateIncidents", func() {
 		It("calculates Incidents based on MonitoringDataPoints.", func() {
 			deployment := models.Deployment{

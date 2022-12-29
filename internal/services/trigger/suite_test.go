@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestServices(t *testing.T) {
+func TestTrigger(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "services.trigger Suite")
 }

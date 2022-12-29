@@ -16,7 +16,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-var _ = Describe("services.metrics", func() {
+var _ = Describe("services.metrics.deployment_frequency", func() {
 	var (
 		ctx        = context.Background()
 		externalID = 40649465
@@ -39,40 +39,8 @@ var _ = Describe("services.metrics", func() {
 		os.Remove("MONGODB_PASSWORD")
 	})
 
-	var _ = When("CalculateMovingAverages", func() {
-		It("returns a list of MovingAverages.", func() {
-			deploymentsPerDay := []int{1, 2, 3, 4, 5}
-
-			movingAverages, err := metrics.CalculateMovingAverages(&deploymentsPerDay, 3)
-			Expect(err).To(BeNil())
-			Expect(len(*movingAverages)).To(Equal(3))
-			Expect((*movingAverages)[0]).To(Equal(2.0))
-			Expect((*movingAverages)[1]).To(Equal(3.0))
-			Expect((*movingAverages)[2]).To(Equal(4.0))
-		})
-	})
-
-	var _ = When("DatesBetween", func() {
-		It("returns a list of dates between two dates.", func() {
-			startDate, _ := time.Parse(time.RFC3339, "2020-02-04T14:29:50.092Z")
-			endDate, _ := time.Parse(time.RFC3339, "2020-02-10T15:29:50.092Z")
-
-			dates, err := metrics.DatesBetween(startDate, endDate)
-			Expect(err).To(BeNil())
-			Expect(len(*dates)).To(Equal(7))
-		})
-
-		It("returns an error", func() {
-			startDateAfterEndDate, _ := time.Parse(time.RFC3339, "2020-02-06T14:29:50.092Z")
-			endDate, _ := time.Parse(time.RFC3339, "2020-02-04T14:29:50.092Z")
-
-			_, err := metrics.DatesBetween(startDateAfterEndDate, endDate)
-			Expect(err).To(Not(BeNil()))
-		})
-	})
-
-	var _ = When("CompleteDailyPipelineRuns", func() {
-		It("returns the complete list of daily pipeline runs between two dates.", func() {
+	var _ = When("CompletePipelineRunsPerDays", func() {
+		It("returns the complete list of pipeline runs per day between two dates.", func() {
 			pipelineID := primitive.NewObjectID()
 			date1, _ := time.Parse(time.RFC3339, "2020-02-04T00:00:00.000Z")
 			date2, _ := time.Parse(time.RFC3339, "2020-02-05T00:00:00.000Z")
@@ -120,6 +88,10 @@ var _ = Describe("services.metrics", func() {
 			}
 			deployment := models.Deployment{
 				IntegrationID: primitive.NewObjectID(),
+				Query:         "job:http_total_requests:internal_server_error_percentage",
+				Step:          "5m",
+				Relation:      "gt",
+				Threshold:     0.2,
 			}
 			dataflow := models.Dataflow{
 				Repository: repository,

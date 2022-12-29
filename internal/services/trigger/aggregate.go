@@ -33,28 +33,92 @@ func CalculatePipelineRunsPerDays(ctx context.Context, pipelineRuns *[]models.Pi
 	pipelineRunsPerDays := []models.PipelineRunsPerDay{}
 
 	date := (*pipelineRuns)[0].UpdatedAt
-	count := 0
+	countPerDay := 0
 
 	for index := 0; index < len(*pipelineRuns); index++ {
 		if !times.SameDay(date, (*pipelineRuns)[index].UpdatedAt) {
 			dayDate := times.Date(date)
 			pipelineRunsPerDay := models.PipelineRunsPerDay{
+				PipelineID:        (*pipelineRuns)[index].PipelineID,
 				Date:              dayDate,
-				TotalPipelineRuns: count,
+				TotalPipelineRuns: countPerDay,
 			}
+
 			pipelineRunsPerDays = append(pipelineRunsPerDays, pipelineRunsPerDay)
+
 			date = (*pipelineRuns)[index].UpdatedAt
-			count = 0
+			countPerDay = 0
 		}
-		count++
+
+		countPerDay++
 	}
 
 	pipelineRunsPerDays = append(pipelineRunsPerDays, models.PipelineRunsPerDay{
 		Date:              times.Date(date),
-		TotalPipelineRuns: count,
+		TotalPipelineRuns: countPerDay,
 	})
 
 	return &pipelineRunsPerDays, nil
+}
+
+// CreateIncidentsPerDays calculates and creates the incidents for each day.
+func CreateIncidentsPerDays(ctx context.Context, deploymentID primitive.ObjectID) error {
+	var incidents []models.Incident
+	err := daos.ListIncidents(ctx, deploymentID, &incidents)
+	if err != nil {
+		return err
+	}
+
+	incidentsPerDays, err := CalculateIncidentsPerDays(ctx, &incidents)
+	if err != nil {
+		return err
+	}
+
+	err = daos.CreateIncidentsPerDays(ctx, deploymentID, incidentsPerDays)
+	return err
+}
+
+// CalculateIncidentsPerDays calculates the incidents per day.
+// If no incident is found for a date, no aggregate will be created for that date!
+func CalculateIncidentsPerDays(ctx context.Context, incidents *[]models.Incident) (*[]models.IncidentsPerDay, error) {
+	incidentsPerDays := []models.IncidentsPerDay{}
+
+	date := (*incidents)[0].StartDate
+	var countPerDay int
+	var durationPerDay time.Duration
+
+	for index := 0; index < len(*incidents); index++ {
+		newDate := (*incidents)[index].StartDate
+
+		if !times.SameDay(date, newDate) {
+			dayDate := times.Date(date)
+			incidentsPerDay := models.IncidentsPerDay{
+				DeploymentID:   (*incidents)[index].DeploymentID,
+				Date:           dayDate,
+				TotalIncidents: countPerDay,
+				TotalDuration:  durationPerDay.Seconds(),
+			}
+
+			incidentsPerDays = append(incidentsPerDays, incidentsPerDay)
+
+			date = (*incidents)[index].StartDate
+			countPerDay = 0
+			durationPerDay = 0
+		}
+
+		countPerDay++
+		start := (*incidents)[index].StartDate
+		end := (*incidents)[index].EndDate
+		durationPerDay += end.Sub(start)
+	}
+
+	incidentsPerDays = append(incidentsPerDays, models.IncidentsPerDay{
+		Date:           times.Date(date),
+		TotalIncidents: countPerDay,
+		TotalDuration:  durationPerDay.Seconds(),
+	})
+
+	return &incidentsPerDays, nil
 }
 
 // CreateIncidents calculates and creates the incidents for a given deployment.
@@ -126,7 +190,7 @@ func CalculateIncidents(ctx context.Context, deployment *models.Deployment, moni
 		isIncidentPrev = isIncident
 	}
 
-	// add last incident if it is still open
+	// add last incident if still open
 	if isIncidentPrev {
 		incident := models.Incident{
 			DeploymentID: deployment.ID,
