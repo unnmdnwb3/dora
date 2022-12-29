@@ -10,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-var _ = Describe("daos.integration", func() {
+var _ = Describe("daos.Integration", func() {
 	ctx := context.Background()
 
 	var _ = When("CreateIntegration", func() {

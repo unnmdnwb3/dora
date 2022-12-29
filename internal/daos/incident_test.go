@@ -12,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-var _ = Describe("daos.incident", func() {
+var _ = Describe("daos.Incident", func() {
 	ctx := context.Background()
 
 	var _ = When("CreateIncident", func() {

@@ -12,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-var _ = Describe("daos.pipelineRun", func() {
+var _ = Describe("daos.PipelineRun", func() {
 	ctx := context.Background()
 	externalID := 713437228
 
