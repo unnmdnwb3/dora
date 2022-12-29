@@ -47,8 +47,8 @@ var _ = Describe("prometheus.Client", func() {
 			monitoringDataPoints, err := client.CreateMonitoringDataPoints(queryRangeResponse)
 			Expect(err).To(BeNil())
 			Expect(len(*monitoringDataPoints)).To(Equal(17))
-			Expect((*monitoringDataPoints)[16].Value).To(Equal(0.14143852143852312))
-			Expect((*monitoringDataPoints)[16].CreatedAt).To(Equal(time.Date(2022, 12, 27, 13, 16, 42, 0, time.UTC)))
+			Expect((*monitoringDataPoints)[16].Value).To(Equal(0.281))
+			Expect((*monitoringDataPoints)[16].CreatedAt).To(Equal(time.Date(2022, 12, 28, 14, 43, 12, 0, time.UTC)))
 		})
 	})
 
@@ -57,9 +57,8 @@ var _ = Describe("prometheus.Client", func() {
 			monitoringDataPoints, err := client.GetMonitoringDataPoints()
 			Expect(err).To(BeNil())
 			Expect(len(*monitoringDataPoints)).To(Equal(17))
-			Expect((*monitoringDataPoints)[16].Value).To(Equal(0.14143852143852312))
-			Expect((*monitoringDataPoints)[16].CreatedAt).To(Equal(time.Date(2022, 12, 27, 13, 16, 42, 0, time.UTC)))
+			Expect((*monitoringDataPoints)[16].Value).To(Equal(0.281))
+			Expect((*monitoringDataPoints)[16].CreatedAt).To(Equal(time.Date(2022, 12, 28, 14, 43, 12, 0, time.UTC)))
 		})
 	})
-
 })

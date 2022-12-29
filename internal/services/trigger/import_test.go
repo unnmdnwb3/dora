@@ -10,6 +10,7 @@ import (
 	"github.com/joho/godotenv"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/unnmdnwb3/dora/internal/connectors/prometheus"
 	"github.com/unnmdnwb3/dora/internal/daos"
 	"github.com/unnmdnwb3/dora/internal/database/mongodb"
 	"github.com/unnmdnwb3/dora/internal/models"
@@ -20,9 +21,10 @@ import (
 
 var _ = Describe("services.trigger.import", func() {
 	var (
-		ctx        = context.Background()
-		gitlabMock *httptest.Server
+		gitlabMock     *httptest.Server
+		prometheusMock *httptest.Server
 
+		ctx        = context.Background()
 		externalID = 15392086
 	)
 
@@ -35,6 +37,14 @@ var _ = Describe("services.trigger.import", func() {
 		gitlabMock = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 			json, _ := json.Marshal(pipelineRuns)
+			w.Write(json)
+		}))
+
+		var queryRangeResponse prometheus.QueryRangeResponse
+		_ = test.UnmarshalFixture("./../../../test/data/prometheus/query_range.json", &queryRangeResponse)
+		prometheusMock = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			json, _ := json.Marshal(queryRangeResponse)
 			w.Write(json)
 		}))
 	})
@@ -88,33 +98,109 @@ var _ = Describe("services.trigger.import", func() {
 		})
 	})
 
-	var _ = When("ImportData", func() {
-		It("parallelizes the data import of all defined sources.", func() {
+	var _ = When("ImportMonitoringDataPoints", func() {
+		It("gets all MonitoringDataPoints of a Deployment.", func() {
 			integration := models.Integration{
 				ID:          primitive.NewObjectID(),
-				URI:         gitlabMock.URL,
+				URI:         prometheusMock.URL,
 				BearerToken: "bearertoken",
 			}
 			err := daos.CreateIntegration(ctx, &integration)
 			Expect(err).To(BeNil())
 
+			deployment := models.Deployment{
+				IntegrationID: integration.ID,
+				Query:         "job:http_total_requests:internal_server_error_percentage",
+				Step:          "5m",
+				Relation:      "gt",
+				Threshold:     0.2,
+			}
+
+			monitoringDataPoints, err := trigger.ImportMonitoringDataPoints(ctx, &deployment)
+			Expect(err).To(BeNil())
+			Expect(len(*monitoringDataPoints)).To(Equal(17))
+		})
+	})
+
+	var _ = When("ImportIncidents", func() {
+		It("gets all Incidents of a Deployment and persists them.", func() {
+			integration := models.Integration{
+				ID:          primitive.NewObjectID(),
+				URI:         prometheusMock.URL,
+				BearerToken: "bearertoken",
+			}
+			err := daos.CreateIntegration(ctx, &integration)
+			Expect(err).To(BeNil())
+
+			deployment := models.Deployment{
+				IntegrationID: integration.ID,
+				Query:         "job:http_total_requests:internal_server_error_percentage",
+				Step:          "5m",
+				Relation:      "gt",
+				Threshold:     0.2,
+			}
+
+			channel := make(chan error)
+			defer close(channel)
+
+			go trigger.ImportIncidents(ctx, channel, &deployment)
+			err = <-channel
+			Expect(err).To(BeNil())
+
+			var incidents []models.Incident
+			err = daos.ListIncidents(ctx, deployment.ID, &incidents)
+			Expect(err).To(BeNil())
+			Expect(len(incidents)).To(Equal(3))
+
+		})
+	})
+
+	var _ = When("ImportData", func() {
+		It("parallelizes the data import of all defined sources.", func() {
+			repositoryIntegration := models.Integration{
+				ID:          primitive.NewObjectID(),
+				URI:         gitlabMock.URL,
+				BearerToken: "bearertoken",
+			}
+			err := daos.CreateIntegration(ctx, &repositoryIntegration)
+			Expect(err).To(BeNil())
+
+			pipelineIntegration := models.Integration{
+				ID:          primitive.NewObjectID(),
+				URI:         gitlabMock.URL,
+				BearerToken: "bearertoken",
+			}
+			err = daos.CreateIntegration(ctx, &pipelineIntegration)
+			Expect(err).To(BeNil())
+
+			deploymentIntegration := models.Integration{
+				ID:          primitive.NewObjectID(),
+				URI:         prometheusMock.URL,
+				BearerToken: "bearertoken",
+			}
+			err = daos.CreateIntegration(ctx, &deploymentIntegration)
+			Expect(err).To(BeNil())
+
 			repository := models.Repository{
-				IntegrationID:  primitive.NewObjectID(),
+				IntegrationID:  repositoryIntegration.ID,
 				ExternalID:     externalID,
 				NamespacedName: "foobar/foobar",
 				DefaultBranch:  "main",
 				URI:            "https://gitlab.com/foobar/foobar",
 			}
 			pipeline := models.Pipeline{
-				IntegrationID:  integration.ID,
+				IntegrationID:  pipelineIntegration.ID,
 				ExternalID:     externalID,
 				NamespacedName: "foobar/foobar",
 				DefaultBranch:  "main",
 				URI:            "https://gitlab.com/foobar/foobar/-/pipelines",
 			}
 			deployment := models.Deployment{
-				IntegrationID: primitive.NewObjectID(),
-				TargetURI:     "https://localhost:9090",
+				IntegrationID: deploymentIntegration.ID,
+				Query:         "job:http_total_requests:internal_server_error_percentage",
+				Step:          "5m",
+				Relation:      "gt",
+				Threshold:     0.2,
 			}
 			dataflow := models.Dataflow{
 				Repository: repository,
