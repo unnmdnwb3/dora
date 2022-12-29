@@ -16,7 +16,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-var _ = Describe("services.metrics", func() {
+var _ = Describe("services.metrics.deployment_frequency", func() {
 	var (
 		ctx        = context.Background()
 		externalID = 40649465
