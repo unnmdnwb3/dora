@@ -61,6 +61,66 @@ func CalculatePipelineRunsPerDays(ctx context.Context, pipelineRuns *[]models.Pi
 	return &pipelineRunsPerDays, nil
 }
 
+// CreateIncidentsPerDays calculates and creates the incidents for each day.
+func CreateIncidentsPerDays(ctx context.Context, deploymentID primitive.ObjectID) error {
+	var incidents []models.Incident
+	err := daos.ListIncidents(ctx, deploymentID, &incidents)
+	if err != nil {
+		return err
+	}
+
+	incidentsPerDays, err := CalculateIncidentsPerDays(ctx, &incidents)
+	if err != nil {
+		return err
+	}
+
+	err = daos.CreateIncidentsPerDays(ctx, deploymentID, incidentsPerDays)
+	return err
+}
+
+// CalculateIncidentsPerDays calculates the incidents per day.
+// If no incident is found for a date, no aggregate will be created for that date!
+func CalculateIncidentsPerDays(ctx context.Context, incidents *[]models.Incident) (*[]models.IncidentsPerDay, error) {
+	incidentsPerDays := []models.IncidentsPerDay{}
+
+	date := (*incidents)[0].StartDate
+	var countPerDay int
+	var durationPerDay time.Duration
+
+	for index := 0; index < len(*incidents); index++ {
+		newDate := (*incidents)[index].StartDate
+
+		if !times.SameDay(date, newDate) {
+			dayDate := times.Date(date)
+			incidentsPerDay := models.IncidentsPerDay{
+				DeploymentID:   (*incidents)[index].DeploymentID,
+				Date:           dayDate,
+				TotalIncidents: countPerDay,
+				TotalDuration:  durationPerDay.Seconds(),
+			}
+
+			incidentsPerDays = append(incidentsPerDays, incidentsPerDay)
+
+			date = (*incidents)[index].StartDate
+			countPerDay = 0
+			durationPerDay = 0
+		}
+
+		countPerDay++
+		start := (*incidents)[index].StartDate
+		end := (*incidents)[index].EndDate
+		durationPerDay += end.Sub(start)
+	}
+
+	incidentsPerDays = append(incidentsPerDays, models.IncidentsPerDay{
+		Date:           times.Date(date),
+		TotalIncidents: countPerDay,
+		TotalDuration:  durationPerDay.Seconds(),
+	})
+
+	return &incidentsPerDays, nil
+}
+
 // CreateIncidents calculates and creates the incidents for a given deployment.
 func CreateIncidents(ctx context.Context, deployment *models.Deployment, monitoringDataPoints *[]models.MonitoringDataPoint) error {
 	incidents, err := CalculateIncidents(ctx, deployment, monitoringDataPoints)

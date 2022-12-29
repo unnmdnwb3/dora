@@ -12,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-var _ = Describe("daos.incidentsPerDays", func() {
+var _ = Describe("daos.IncidentsPerDays", func() {
 	ctx := context.Background()
 
 	var _ = When("CreateIncidentsPerDay", func() {
@@ -20,10 +20,10 @@ var _ = Describe("daos.incidentsPerDays", func() {
 			deploymentID := primitive.NewObjectID()
 			date, _ := time.Parse(time.RFC3339, "2020-02-04T14:29:50.092Z")
 			incidentsPerDay := models.IncidentsPerDay{
-				DeploymentID:          deploymentID,
-				Date:                  date,
-				TotalIncidents:        1,
-				TotalIncidentDuration: 60,
+				DeploymentID:   deploymentID,
+				Date:           date,
+				TotalIncidents: 1,
+				TotalDuration:  60,
 			}
 			err := daos.CreateIncidentsPerDay(ctx, deploymentID, &incidentsPerDay)
 			Expect(err).To(BeNil())
@@ -36,18 +36,18 @@ var _ = Describe("daos.incidentsPerDays", func() {
 			deploymentID := primitive.NewObjectID()
 			date1, _ := time.Parse(time.RFC3339, "2020-02-04T00:00:00.000Z")
 			incidentsPerDay1 := models.IncidentsPerDay{
-				DeploymentID:          deploymentID,
-				Date:                  date1,
-				TotalIncidents:        1,
-				TotalIncidentDuration: 60,
+				DeploymentID:   deploymentID,
+				Date:           date1,
+				TotalIncidents: 1,
+				TotalDuration:  60,
 			}
 
 			date2, _ := time.Parse(time.RFC3339, "2020-02-05T00:00:00.000Z")
 			incidentsPerDay2 := models.IncidentsPerDay{
-				DeploymentID:          deploymentID,
-				Date:                  date2,
-				TotalIncidents:        2,
-				TotalIncidentDuration: 180,
+				DeploymentID:   deploymentID,
+				Date:           date2,
+				TotalIncidents: 2,
+				TotalDuration:  180,
 			}
 			incidentsPerDays := []models.IncidentsPerDay{incidentsPerDay1, incidentsPerDay2}
 			err := daos.CreateIncidentsPerDays(ctx, deploymentID, &incidentsPerDays)
@@ -62,10 +62,10 @@ var _ = Describe("daos.incidentsPerDays", func() {
 			deploymentID := primitive.NewObjectID()
 			date, _ := time.Parse(time.RFC3339, "2020-02-04T14:29:50.092Z")
 			incidentsPerDay := models.IncidentsPerDay{
-				DeploymentID:          deploymentID,
-				Date:                  date,
-				TotalIncidents:        1,
-				TotalIncidentDuration: 60,
+				DeploymentID:   deploymentID,
+				Date:           date,
+				TotalIncidents: 1,
+				TotalDuration:  60,
 			}
 			err := daos.CreateIncidentsPerDay(ctx, deploymentID, &incidentsPerDay)
 			Expect(err).To(BeNil())
@@ -83,18 +83,18 @@ var _ = Describe("daos.incidentsPerDays", func() {
 			deploymentID := primitive.NewObjectID()
 			date1, _ := time.Parse(time.RFC3339, "2020-02-04T00:00:00.000Z")
 			incidentsPerDay1 := models.IncidentsPerDay{
-				DeploymentID:          deploymentID,
-				Date:                  date1,
-				TotalIncidents:        1,
-				TotalIncidentDuration: 60,
+				DeploymentID:   deploymentID,
+				Date:           date1,
+				TotalIncidents: 1,
+				TotalDuration:  60,
 			}
 
 			date2, _ := time.Parse(time.RFC3339, "2020-02-05T00:00:00.000Z")
 			incidentsPerDay2 := models.IncidentsPerDay{
-				DeploymentID:          deploymentID,
-				Date:                  date2,
-				TotalIncidents:        2,
-				TotalIncidentDuration: 180,
+				DeploymentID:   deploymentID,
+				Date:           date2,
+				TotalIncidents: 2,
+				TotalDuration:  180,
 			}
 			incidentsPerDays := []models.IncidentsPerDay{incidentsPerDay1, incidentsPerDay2}
 			err := daos.CreateIncidentsPerDays(ctx, deploymentID, &incidentsPerDays)
@@ -112,18 +112,18 @@ var _ = Describe("daos.incidentsPerDays", func() {
 			deploymentID := primitive.NewObjectID()
 			date1, _ := time.Parse(time.RFC3339, "2020-02-04T00:00:00.000Z")
 			incidentsPerDay1 := models.IncidentsPerDay{
-				DeploymentID:          deploymentID,
-				Date:                  date1,
-				TotalIncidents:        1,
-				TotalIncidentDuration: 60,
+				DeploymentID:   deploymentID,
+				Date:           date1,
+				TotalIncidents: 1,
+				TotalDuration:  60,
 			}
 
 			date2, _ := time.Parse(time.RFC3339, "2020-02-05T00:00:00.000Z")
 			incidentsPerDay2 := models.IncidentsPerDay{
-				DeploymentID:          deploymentID,
-				Date:                  date2,
-				TotalIncidents:        2,
-				TotalIncidentDuration: 180,
+				DeploymentID:   deploymentID,
+				Date:           date2,
+				TotalIncidents: 2,
+				TotalDuration:  180,
 			}
 			incidentsPerDays := []models.IncidentsPerDay{incidentsPerDay1, incidentsPerDay2}
 			err := daos.CreateIncidentsPerDays(ctx, deploymentID, &incidentsPerDays)
@@ -142,20 +142,20 @@ var _ = Describe("daos.incidentsPerDays", func() {
 			deploymentID := primitive.NewObjectID()
 			date, _ := time.Parse(time.RFC3339, "2020-02-04T14:29:50.092Z")
 			incidentsPerDay := models.IncidentsPerDay{
-				DeploymentID:          deploymentID,
-				Date:                  date,
-				TotalIncidents:        1,
-				TotalIncidentDuration: 60,
+				DeploymentID:   deploymentID,
+				Date:           date,
+				TotalIncidents: 1,
+				TotalDuration:  60,
 			}
 			err := daos.CreateIncidentsPerDay(ctx, deploymentID, &incidentsPerDay)
 			Expect(err).To(BeNil())
 			Expect(incidentsPerDay.ID).To(Not(BeEmpty()))
 
 			updateIncidentsPerDay := models.IncidentsPerDay{
-				DeploymentID:          deploymentID,
-				Date:                  date,
-				TotalIncidents:        2,
-				TotalIncidentDuration: 180,
+				DeploymentID:   deploymentID,
+				Date:           date,
+				TotalIncidents: 2,
+				TotalDuration:  180,
 			}
 			err = daos.UpdateIncidentsPerDay(ctx, incidentsPerDay.ID, &updateIncidentsPerDay)
 			Expect(err).To(BeNil())
@@ -168,10 +168,10 @@ var _ = Describe("daos.incidentsPerDays", func() {
 			deploymentID := primitive.NewObjectID()
 			date, _ := time.Parse(time.RFC3339, "2020-02-04T14:29:50.092Z")
 			incidentsPerDay := models.IncidentsPerDay{
-				DeploymentID:          deploymentID,
-				Date:                  date,
-				TotalIncidents:        1,
-				TotalIncidentDuration: 60,
+				DeploymentID:   deploymentID,
+				Date:           date,
+				TotalIncidents: 1,
+				TotalDuration:  60,
 			}
 			err := daos.CreateIncidentsPerDay(ctx, deploymentID, &incidentsPerDay)
 			Expect(err).To(BeNil())
