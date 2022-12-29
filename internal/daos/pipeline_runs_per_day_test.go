@@ -12,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-var _ = Describe("daos.pipelineRunsPerDay", func() {
+var _ = Describe("daos.pipelineRunsPerDays", func() {
 	ctx := context.Background()
 
 	var _ = When("CreatePipelineRunsPerDay", func() {
