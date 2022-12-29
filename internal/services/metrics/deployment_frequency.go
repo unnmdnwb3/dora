@@ -64,7 +64,7 @@ func CompletePipelineRunsPerDays(pipelineRunsPerDays *[]models.PipelineRunsPerDa
 		return nil, fmt.Errorf("no pipeline runs aggregates provided")
 	}
 	if len(*dates) == 0 {
-		return nil, fmt.Errorf("no dates provided pipeline runs aggregates")
+		return nil, fmt.Errorf("no dates provided")
 	}
 	if len(*dates) <= len(*pipelineRunsPerDays) {
 		return nil, fmt.Errorf("more pipeline runs per day than dates provided")
