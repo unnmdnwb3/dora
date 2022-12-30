@@ -21,7 +21,7 @@ func TestClient(t *testing.T) {
 
 var _ = Describe("gitlab.Client", func() {
 	var (
-		projectID       = "15392086"
+		projectID       = 15392086
 		referenceBranch = "main"
 	)
 
@@ -141,7 +141,7 @@ var _ = Describe("gitlab.Client", func() {
 				URI:  mock.URL,
 			}
 
-			pipelineRuns, err := client.GetPipelineRuns(15392086, referenceBranch)
+			pipelineRuns, err := client.GetPipelineRuns(projectID, referenceBranch)
 			Expect(err).To(BeNil())
 			Expect(len(*pipelineRuns)).To(Equal(4))
 		})

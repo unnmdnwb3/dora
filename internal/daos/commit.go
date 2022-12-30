@@ -14,7 +14,7 @@ import (
 const commitCollection = "commits"
 
 // CreateCommit creates a new Commit.
-func CreateCommit(ctx context.Context, commit *models.Commit) error {
+func CreateCommit(ctx context.Context, repositoryID primitive.ObjectID, commit *models.Commit) error {
 	service := mongodb.NewService()
 	database := os.Getenv("MONGODB_DATABASE")
 	err := service.Connect(ctx, database)
@@ -23,12 +23,13 @@ func CreateCommit(ctx context.Context, commit *models.Commit) error {
 	}
 	defer service.Disconnect(ctx)
 
+	commit.RepositoryID = repositoryID
 	err = service.InsertOne(ctx, commitCollection, commit)
 	return err
 }
 
 // CreateCommits creates many new Commits.
-func CreateCommits(ctx context.Context, commits *[]models.Commit) error {
+func CreateCommits(ctx context.Context, repositoryID primitive.ObjectID, commits *[]models.Commit) error {
 	service := mongodb.NewService()
 	database := os.Getenv("MONGODB_DATABASE")
 	err := service.Connect(ctx, database)
@@ -38,6 +39,8 @@ func CreateCommits(ctx context.Context, commits *[]models.Commit) error {
 	defer service.Disconnect(ctx)
 
 	for index, commit := range *commits {
+		commit.RepositoryID = repositoryID
+
 		err = service.InsertOne(ctx, commitCollection, &commit)
 		if err != nil {
 			return err
@@ -62,8 +65,8 @@ func GetCommit(ctx context.Context, commitID primitive.ObjectID, commit *models.
 }
 
 // ListCommits retrieves many Commits.
-func ListCommits(ctx context.Context, pipelineID primitive.ObjectID, commits *[]models.Commit) error {
-	filter := bson.M{"pipeline_id": pipelineID}
+func ListCommits(ctx context.Context, repositoryID primitive.ObjectID, commits *[]models.Commit) error {
+	filter := bson.M{"repository_id": repositoryID}
 	err := ListCommitsByFilter(ctx, filter, commits)
 	return err
 }

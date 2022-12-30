@@ -14,7 +14,7 @@ import (
 const changeCollection = "changes"
 
 // CreateChange creates a new Change.
-func CreateChange(ctx context.Context, change *models.Change) error {
+func CreateChange(ctx context.Context, repositoryID primitive.ObjectID, change *models.Change) error {
 	service := mongodb.NewService()
 	database := os.Getenv("MONGODB_DATABASE")
 	err := service.Connect(ctx, database)
@@ -23,12 +23,13 @@ func CreateChange(ctx context.Context, change *models.Change) error {
 	}
 	defer service.Disconnect(ctx)
 
+	change.RepositoryID = repositoryID
 	err = service.InsertOne(ctx, changeCollection, change)
 	return err
 }
 
 // CreateChanges creates many new Changes.
-func CreateChanges(ctx context.Context, changes *[]models.Change) error {
+func CreateChanges(ctx context.Context, repositoryID primitive.ObjectID, changes *[]models.Change) error {
 	service := mongodb.NewService()
 	database := os.Getenv("MONGODB_DATABASE")
 	err := service.Connect(ctx, database)
@@ -38,6 +39,8 @@ func CreateChanges(ctx context.Context, changes *[]models.Change) error {
 	defer service.Disconnect(ctx)
 
 	for index, change := range *changes {
+		change.RepositoryID = repositoryID
+
 		err = service.InsertOne(ctx, changeCollection, &change)
 		if err != nil {
 			return err
@@ -62,8 +65,8 @@ func GetChange(ctx context.Context, changeID primitive.ObjectID, change *models.
 }
 
 // ListChanges retrieves many Changes.
-func ListChanges(ctx context.Context, pipelineID primitive.ObjectID, changes *[]models.Change) error {
-	filter := bson.M{"pipeline_id": pipelineID}
+func ListChanges(ctx context.Context, repositoryID primitive.ObjectID, changes *[]models.Change) error {
+	filter := bson.M{"repository_id": repositoryID}
 	err := ListChangesByFilter(ctx, filter, changes)
 	return err
 }
