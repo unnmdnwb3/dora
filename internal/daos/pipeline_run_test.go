@@ -159,7 +159,7 @@ var _ = Describe("daos.PipelineRun", func() {
 			pipelineRun2 := models.PipelineRun{
 				PipelineID:  pipelineID,
 				ExternalID:  externalID,
-				Ref:         "main",
+				Ref:         "develop",
 				Status:      "success",
 				EventSource: "push",
 				CreatedAt:   createdAt2,
@@ -171,7 +171,7 @@ var _ = Describe("daos.PipelineRun", func() {
 			Expect(err).To(BeNil())
 
 			var findPipelineRuns []models.PipelineRun
-			filter := bson.M{"uri": pipelineRun1.URI}
+			filter := bson.M{"ref": "main"}
 			err = daos.ListPipelineRunsByFilter(ctx, filter, &findPipelineRuns)
 			Expect(err).To(BeNil())
 			Expect(findPipelineRuns).To(HaveLen(1))
