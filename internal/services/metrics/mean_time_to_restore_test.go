@@ -16,7 +16,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-var _ = Describe("services.metrics.deployment_frequency", func() {
+var _ = Describe("services.metrics.mean_time_to_restore", func() {
 	ctx := context.Background()
 
 	var _ = BeforeEach(func() {
@@ -34,49 +34,6 @@ var _ = Describe("services.metrics.deployment_frequency", func() {
 		os.Remove("MONGODB_PORT")
 		os.Remove("MONGODB_USER")
 		os.Remove("MONGODB_PASSWORD")
-	})
-
-	var _ = When("CompleteIncidentsPerDays", func() {
-		It("returns the complete list of incidents and durations per day between two dates.", func() {
-			deploymentID := primitive.NewObjectID()
-			incidentsPerDays := []models.IncidentsPerDay{
-				{
-					DeploymentID:   deploymentID,
-					Date:           time.Date(2022, 12, 24, 0, 0, 0, 0, time.UTC),
-					TotalIncidents: 1,
-					TotalDuration:  600,
-				},
-				{
-					DeploymentID:   deploymentID,
-					Date:           time.Date(2022, 12, 26, 0, 0, 0, 0, time.UTC),
-					TotalIncidents: 2,
-					TotalDuration:  1200,
-				},
-				{
-					DeploymentID:   deploymentID,
-					Date:           time.Date(2022, 12, 27, 0, 0, 0, 0, time.UTC),
-					TotalIncidents: 1,
-					TotalDuration:  600,
-				},
-				{
-					DeploymentID:   deploymentID,
-					Date:           time.Date(2022, 12, 29, 0, 0, 0, 0, time.UTC),
-					TotalIncidents: 2,
-					TotalDuration:  1200,
-				},
-			}
-
-			dates, err := metrics.DatesBetween(
-				time.Date(2022, 12, 24, 0, 0, 0, 0, time.UTC),
-				time.Date(2022, 12, 29, 0, 0, 0, 0, time.UTC),
-			)
-			Expect(err).To(BeNil())
-
-			dailyIncidents, dailyDuration, err := metrics.CompleteIncidentsPerDays(&incidentsPerDays, dates)
-			Expect(err).To(BeNil())
-			Expect(len(*dailyIncidents)).To(Equal(6))
-			Expect(len(*dailyDuration)).To(Equal(6))
-		})
 	})
 
 	var _ = When("CalculateMeanTimeToRestore", func() {

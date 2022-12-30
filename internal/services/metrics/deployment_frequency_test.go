@@ -39,36 +39,6 @@ var _ = Describe("services.metrics.deployment_frequency", func() {
 		os.Remove("MONGODB_PASSWORD")
 	})
 
-	var _ = When("CompletePipelineRunsPerDays", func() {
-		It("returns the complete list of pipeline runs per day between two dates.", func() {
-			pipelineID := primitive.NewObjectID()
-			date1, _ := time.Parse(time.RFC3339, "2020-02-04T00:00:00.000Z")
-			date2, _ := time.Parse(time.RFC3339, "2020-02-05T00:00:00.000Z")
-			date3, _ := time.Parse(time.RFC3339, "2020-02-06T00:00:00.000Z")
-
-			dates := []time.Time{date1, date2, date3}
-			persistedDailyPipelineRuns := []models.PipelineRunsPerDay{
-				{
-					PipelineID:        pipelineID,
-					Date:              date1,
-					TotalPipelineRuns: 1,
-				},
-				{
-					PipelineID:        pipelineID,
-					Date:              date3,
-					TotalPipelineRuns: 1,
-				},
-			}
-
-			completeDailyPipelineRuns, err := metrics.CompletePipelineRunsPerDays(&persistedDailyPipelineRuns, &dates)
-			Expect(err).To(BeNil())
-			Expect(len(*completeDailyPipelineRuns)).To(Equal(3))
-			Expect((*completeDailyPipelineRuns)[0]).To(Equal(1))
-			Expect((*completeDailyPipelineRuns)[1]).To(Equal(0))
-			Expect((*completeDailyPipelineRuns)[2]).To(Equal(1))
-		})
-	})
-
 	var _ = When("CalculateDeploymentFrequency", func() {
 		It("calculates the DeploymentFrequency for a given window.", func() {
 			// create a new dataflow

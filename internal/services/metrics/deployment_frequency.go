@@ -25,7 +25,7 @@ func CalculateDeploymentFrequency(ctx context.Context, dataflowID primitive.Obje
 	startDate := times.Date(endDate.AddDate(0, 0, -timeRange))
 
 	var pipelineRunsPerDay []models.PipelineRunsPerDay
-	filter := bson.M{"pipeline_id": dataflow.Pipeline.ID, "date": bson.M{"$gte": startDate}}
+	filter := bson.M{"pipeline_id": dataflow.Pipeline.ID, "date": bson.M{"$gte": startDate, "$lte": endDate}}
 	err = daos.ListPipelineRunsPerDaysByFilter(ctx, filter, &pipelineRunsPerDay)
 	if err != nil {
 		return nil, err
@@ -55,31 +55,4 @@ func CalculateDeploymentFrequency(ctx context.Context, dataflowID primitive.Obje
 		DailyPipelineRuns: (*dailyPipelineRuns)[offset:],
 		MovingAverages:    *movingAverages,
 	}, nil
-}
-
-// CompletePipelineRunsPerDays returns a slice of the number of pipeline runs per day,
-// since provided PipelineRunsPerDays only account for the dates that any pipeline runs were found.
-func CompletePipelineRunsPerDays(pipelineRunsPerDays *[]models.PipelineRunsPerDay, dates *[]time.Time) (*[]int, error) {
-	if len(*pipelineRunsPerDays) == 0 {
-		return nil, fmt.Errorf("no pipeline runs aggregates provided")
-	}
-	if len(*dates) == 0 {
-		return nil, fmt.Errorf("no dates provided")
-	}
-	if len(*dates) <= len(*pipelineRunsPerDays) {
-		return nil, fmt.Errorf("more pipeline runs per day than dates provided")
-	}
-
-	dailyPipelineRuns := make([]int, len(*dates))
-	curr := 0
-	for index, date := range *dates {
-		if curr < len(*pipelineRunsPerDays) && date == (*pipelineRunsPerDays)[curr].Date {
-			dailyPipelineRuns[index] = (*pipelineRunsPerDays)[curr].TotalPipelineRuns
-			curr++
-		} else {
-			dailyPipelineRuns[index] = 0
-		}
-	}
-
-	return &dailyPipelineRuns, nil
 }
