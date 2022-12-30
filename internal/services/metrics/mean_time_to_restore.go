@@ -25,7 +25,7 @@ func CalculateMeanTimeToRestore(ctx context.Context, dataflowID primitive.Object
 	startDate := times.Date(endDate.AddDate(0, 0, -timeRange))
 
 	var incidentsPerDays []models.IncidentsPerDay
-	filter := bson.M{"deployment_id": dataflow.Deployment.ID, "date": bson.M{"$gte": startDate}}
+	filter := bson.M{"deployment_id": dataflow.Deployment.ID, "date": bson.M{"$gte": startDate, "$lte": endDate}}
 	err = daos.ListIncidentsPerDaysByFilter(ctx, filter, &incidentsPerDays)
 	if err != nil {
 		return nil, err
@@ -56,34 +56,4 @@ func CalculateMeanTimeToRestore(ctx context.Context, dataflowID primitive.Object
 		DailyDurations: (*dailyDurations)[offset:],
 		MovingAverages: *movingAverages,
 	}, nil
-}
-
-// CompleteIncidentsPerDays returns a slice of the number of incidents per day,
-// since provided IncidentsPerDays only account for the dates that any incidents were found.
-func CompleteIncidentsPerDays(incidentsPerDays *[]models.IncidentsPerDay, dates *[]time.Time) (*[]int, *[]int, error) {
-	if len(*incidentsPerDays) == 0 {
-		return nil, nil, fmt.Errorf("no incidents aggregates provided")
-	}
-	if len(*dates) == 0 {
-		return nil, nil, fmt.Errorf("no dates provided")
-	}
-	if len(*dates) <= len(*incidentsPerDays) {
-		return nil, nil, fmt.Errorf("more incidents per day than dates provided")
-	}
-
-	dailyIncidents := make([]int, len(*dates))
-	dailyDurations := make([]int, len(*dates))
-	curr := 0
-	for index, date := range *dates {
-		if curr < len(*incidentsPerDays) && date == (*incidentsPerDays)[curr].Date {
-			dailyIncidents[index] = (*incidentsPerDays)[curr].TotalIncidents
-			dailyDurations[index] = int((*incidentsPerDays)[curr].TotalDuration)
-			curr++
-		} else {
-			dailyIncidents[index] = 0
-			dailyDurations[index] = 0
-		}
-	}
-
-	return &dailyIncidents, &dailyDurations, nil
 }
