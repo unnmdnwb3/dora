@@ -21,8 +21,9 @@ import (
 
 var _ = Describe("services.trigger.import", func() {
 	var (
-		gitlabMock     *httptest.Server
-		prometheusMock *httptest.Server
+		gitlabRepositoryMock *httptest.Server
+		gitlabPipelineMock   *httptest.Server
+		prometheusMock       *httptest.Server
 
 		ctx        = context.Background()
 		externalID = 15392086
@@ -31,10 +32,19 @@ var _ = Describe("services.trigger.import", func() {
 	var _ = BeforeEach(func() {
 		_ = godotenv.Load("./../../../test/.env")
 
+		var commits []models.Commit
+		_ = test.UnmarshalFixture("./../../../test/data/gitlab/commits.json", &commits)
+
+		gitlabRepositoryMock = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			json, _ := json.Marshal(commits)
+			w.Write(json)
+		}))
+
 		var pipelineRuns []models.PipelineRun
 		_ = test.UnmarshalFixture("./../../../test/data/gitlab/pipeline_runs.json", &pipelineRuns)
 
-		gitlabMock = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gitlabPipelineMock = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 			json, _ := json.Marshal(pipelineRuns)
 			w.Write(json)
@@ -57,7 +67,9 @@ var _ = Describe("services.trigger.import", func() {
 		service.DB.Drop(ctx)
 		defer service.Disconnect(ctx)
 
-		defer gitlabMock.Close()
+		defer gitlabRepositoryMock.Close()
+		defer gitlabPipelineMock.Close()
+		defer prometheusMock.Close()
 
 		os.Remove("MONGODB_URI")
 		os.Remove("MONGODB_PORT")
@@ -65,11 +77,48 @@ var _ = Describe("services.trigger.import", func() {
 		os.Remove("MONGODB_PASSWORD")
 	})
 
+	var _ = When("ImportCommits", func() {
+		It("gets all Commits of a Repository and persists them.", func() {
+			integration := models.Integration{
+				ID:          primitive.NewObjectID(),
+				Provider:    "gitlab",
+				Type:        "vc",
+				URI:         gitlabRepositoryMock.URL,
+				BearerToken: "bearertoken",
+			}
+			err := daos.CreateIntegration(ctx, &integration)
+			Expect(err).To(BeNil())
+
+			repository := models.Repository{
+				ID:             primitive.NewObjectID(),
+				IntegrationID:  integration.ID,
+				ExternalID:     externalID,
+				NamespacedName: "foobar/foobar",
+				DefaultBranch:  "main",
+				URI:            "https://gitlab.com/foobar/foobar/-/pipelines",
+			}
+
+			channel := make(chan error)
+			defer close(channel)
+
+			go trigger.ImportCommits(ctx, channel, &repository)
+			err = <-channel
+			Expect(err).To(BeNil())
+
+			var commits []models.Commit
+			err = daos.ListCommits(ctx, repository.ID, &commits)
+			Expect(len(commits)).To(Equal(10))
+			Expect(err).To(BeNil())
+		})
+	})
+
 	var _ = When("ImportPipelineRuns", func() {
 		It("gets all PipelineRuns of a Pipeline and persists them.", func() {
 			integration := models.Integration{
 				ID:          primitive.NewObjectID(),
-				URI:         gitlabMock.URL,
+				Provider:    "gitlab",
+				Type:        "cicd",
+				URI:         gitlabPipelineMock.URL,
 				BearerToken: "bearertoken",
 			}
 			err := daos.CreateIntegration(ctx, &integration)
@@ -102,6 +151,8 @@ var _ = Describe("services.trigger.import", func() {
 		It("gets all MonitoringDataPoints of a Deployment.", func() {
 			integration := models.Integration{
 				ID:          primitive.NewObjectID(),
+				Provider:    "prometheus",
+				Type:        "im",
 				URI:         prometheusMock.URL,
 				BearerToken: "bearertoken",
 			}
@@ -126,6 +177,8 @@ var _ = Describe("services.trigger.import", func() {
 		It("gets all Incidents of a Deployment and persists them.", func() {
 			integration := models.Integration{
 				ID:          primitive.NewObjectID(),
+				Provider:    "prometheus",
+				Type:        "im",
 				URI:         prometheusMock.URL,
 				BearerToken: "bearertoken",
 			}
@@ -159,7 +212,9 @@ var _ = Describe("services.trigger.import", func() {
 		It("parallelizes the data import of all defined sources.", func() {
 			repositoryIntegration := models.Integration{
 				ID:          primitive.NewObjectID(),
-				URI:         gitlabMock.URL,
+				Provider:    "gitlab",
+				Type:        "vc",
+				URI:         gitlabRepositoryMock.URL,
 				BearerToken: "bearertoken",
 			}
 			err := daos.CreateIntegration(ctx, &repositoryIntegration)
@@ -167,7 +222,9 @@ var _ = Describe("services.trigger.import", func() {
 
 			pipelineIntegration := models.Integration{
 				ID:          primitive.NewObjectID(),
-				URI:         gitlabMock.URL,
+				Provider:    "gitlab",
+				Type:        "cicd",
+				URI:         gitlabPipelineMock.URL,
 				BearerToken: "bearertoken",
 			}
 			err = daos.CreateIntegration(ctx, &pipelineIntegration)
@@ -175,6 +232,8 @@ var _ = Describe("services.trigger.import", func() {
 
 			deploymentIntegration := models.Integration{
 				ID:          primitive.NewObjectID(),
+				Provider:    "prometheus",
+				Type:        "im",
 				URI:         prometheusMock.URL,
 				BearerToken: "bearertoken",
 			}
@@ -213,10 +272,21 @@ var _ = Describe("services.trigger.import", func() {
 			err = trigger.ImportData(ctx, &dataflow)
 			Expect(err).To(BeNil())
 
+			// check if data was imported
+			var commits []models.Commit
+			err = daos.ListCommits(ctx, dataflow.Repository.ID, &commits)
+			Expect(err).To(BeNil())
+			Expect(len(commits)).To(Equal(10))
+
 			var pipelineRuns []models.PipelineRun
 			err = daos.ListPipelineRuns(ctx, dataflow.Pipeline.ID, &pipelineRuns)
 			Expect(err).To(BeNil())
 			Expect(len(pipelineRuns)).To(Equal(4))
+
+			var incidents []models.Incident
+			err = daos.ListIncidents(ctx, dataflow.Deployment.ID, &incidents)
+			Expect(err).To(BeNil())
+			Expect(len(incidents)).To(Equal(3))
 		})
 	})
 })
