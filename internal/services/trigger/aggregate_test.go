@@ -45,6 +45,7 @@ var _ = Describe("services.trigger.aggregate", func() {
 			pipelineRun1 := models.PipelineRun{
 				PipelineID:  pipelineID,
 				ExternalID:  713437220,
+				Sha:         "1cfffa2ae16528e36115ece8b1f2601bcf74414e",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -58,6 +59,7 @@ var _ = Describe("services.trigger.aggregate", func() {
 			pipelineRun2 := models.PipelineRun{
 				PipelineID:  pipelineID,
 				ExternalID:  713437221,
+				Sha:         "345207c839e94a939aebdc86835ae2e2a6c85acb",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -71,6 +73,7 @@ var _ = Describe("services.trigger.aggregate", func() {
 			pipelineRun3 := models.PipelineRun{
 				PipelineID:  pipelineID,
 				ExternalID:  713437222,
+				Sha:         "dcc7ef44dc6a376854c5f2cc42b0b24aa3a9ed10",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -122,9 +125,11 @@ var _ = Describe("services.trigger.aggregate", func() {
 			// create pipeline runs
 			createdAt1, _ := time.Parse(time.RFC3339, "2019-10-09T09:11:20.861Z")
 			updatedAt1, _ := time.Parse(time.RFC3339, "2019-10-09T09:12:20.861Z")
+			pipelineID, _ := types.StringToObjectID("638e00b85edd5bef25e5e9e1")
 			pipelineRun1 := models.PipelineRun{
-				PipelineID:  dataflow.Pipeline.ID,
+				PipelineID:  pipelineID,
 				ExternalID:  713437220,
+				Sha:         "1cfffa2ae16528e36115ece8b1f2601bcf74414e",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -136,8 +141,9 @@ var _ = Describe("services.trigger.aggregate", func() {
 			createdAt2, _ := time.Parse(time.RFC3339, "2019-10-11T09:11:20.861Z")
 			updatedAt2, _ := time.Parse(time.RFC3339, "2019-10-11T09:12:20.861Z")
 			pipelineRun2 := models.PipelineRun{
-				PipelineID:  dataflow.Pipeline.ID,
+				PipelineID:  pipelineID,
 				ExternalID:  713437221,
+				Sha:         "345207c839e94a939aebdc86835ae2e2a6c85acb",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -149,8 +155,9 @@ var _ = Describe("services.trigger.aggregate", func() {
 			createdAt3, _ := time.Parse(time.RFC3339, "2019-10-11T09:13:20.861Z")
 			updatedAt3, _ := time.Parse(time.RFC3339, "2019-10-11T09:14:20.861Z")
 			pipelineRun3 := models.PipelineRun{
-				PipelineID:  dataflow.Pipeline.ID,
+				PipelineID:  pipelineID,
 				ExternalID:  713437222,
+				Sha:         "dcc7ef44dc6a376854c5f2cc42b0b24aa3a9ed10",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -341,6 +348,186 @@ var _ = Describe("services.trigger.aggregate", func() {
 			Expect(incidents[0].EndDate).To(Equal(time.Date(2022, 12, 27, 13, 26, 42, 0, time.UTC)))
 			Expect(incidents[1].StartDate).To(Equal(time.Date(2022, 12, 27, 13, 36, 44, 0, time.UTC)))
 			Expect(incidents[1].EndDate).To(Equal(time.Date(2022, 12, 27, 13, 41, 42, 0, time.UTC)))
+		})
+	})
+
+	var _ = When("GetFirstCommits", func() {
+		It("gets the first commits of a change.", func() {
+			pipelineID := primitive.NewObjectID()
+			pipelineRuns := []models.PipelineRun{
+				{
+					PipelineID:  pipelineID,
+					ExternalID:  713437228,
+					Sha:         "3d95fe3bf954501d3832e50fdd803c5f9eae3f94",
+					Ref:         "main",
+					Status:      "success",
+					EventSource: "push",
+					CreatedAt:   time.Date(2022, 12, 27, 13, 16, 42, 0, time.UTC),
+					UpdatedAt:   time.Date(2022, 12, 27, 13, 21, 42, 0, time.UTC),
+					URI:         "https://gitlab.com/foobar/foobar/-/pipelines/713437228",
+				},
+				{
+					PipelineID:  pipelineID,
+					ExternalID:  713437229,
+					Sha:         "1db209656ad1ab0e14aaa4e2fe79b6caf8b2a9e7",
+					Ref:         "main",
+					Status:      "success",
+					EventSource: "push",
+					CreatedAt:   time.Date(2022, 12, 28, 15, 37, 28, 0, time.UTC),
+					UpdatedAt:   time.Date(2022, 12, 28, 15, 43, 17, 0, time.UTC),
+					URI:         "https://gitlab.com/foobar/foobar/-/pipelines/713437229",
+				},
+			}
+
+			err := daos.CreatePipelineRuns(ctx, pipelineID, &pipelineRuns)
+			Expect(err).To(BeNil())
+
+			repositoryID := primitive.NewObjectID()
+			commits := []models.Commit{
+				{
+					RepositoryID: repositoryID,
+					CreatedAt:    time.Date(2022, 12, 27, 14, 00, 2, 0, time.UTC),
+					Sha:          "5da8e92e9f9243f7ee937170474531393a2cf48f",
+					ParentShas: []string{
+						"0c9e7c4b194a4a5c7066301a8c4f0c6c061ce9bc",
+					},
+				},
+				{
+					RepositoryID: repositoryID,
+					CreatedAt:    time.Date(2022, 12, 27, 15, 55, 34, 0, time.UTC),
+					Sha:          "b9b48bcf26ab79c77e4aa4dcf28ca466bdc3b9fa",
+					ParentShas: []string{
+						"5da8e92e9f9243f7ee937170474531393a2cf48f",
+					},
+				},
+				{
+					RepositoryID: repositoryID,
+					CreatedAt:    time.Date(2022, 12, 28, 12, 21, 5, 0, time.UTC),
+					Sha:          "3d95fe3bf954501d3832e50fdd803c5f9eae3f94",
+					ParentShas: []string{
+						"b9b48bcf26ab79c77e4aa4dcf28ca466bdc3b9fa",
+						"5da8e92e9f9243f7ee937170474531393a2cf48f",
+					},
+				},
+				{
+					RepositoryID: repositoryID,
+					CreatedAt:    time.Date(2022, 12, 28, 12, 46, 21, 0, time.UTC),
+					Sha:          "487d6aedb92ab76bdc03957aceece75db906796e",
+					ParentShas: []string{
+						"3d95fe3bf954501d3832e50fdd803c5f9eae3f94",
+					},
+				},
+				{
+					RepositoryID: repositoryID,
+					CreatedAt:    time.Date(2022, 12, 28, 13, 01, 11, 0, time.UTC),
+					Sha:          "1db209656ad1ab0e14aaa4e2fe79b6caf8b2a9e7",
+					ParentShas: []string{
+						"487d6aedb92ab76bdc03957aceece75db906796e",
+						"3d95fe3bf954501d3832e50fdd803c5f9eae3f94",
+					},
+				},
+			}
+
+			err = daos.CreateCommits(ctx, repositoryID, &commits)
+			Expect(err).To(BeNil())
+
+			firstCommits, err := trigger.GetFirstCommits(ctx, repositoryID, &pipelineRuns)
+			Expect(err).To(BeNil())
+			Expect(len(*firstCommits)).To(Equal(2))
+			Expect((*firstCommits)[0].Sha).To(Equal("b9b48bcf26ab79c77e4aa4dcf28ca466bdc3b9fa"))
+			Expect((*firstCommits)[1].Sha).To(Equal("487d6aedb92ab76bdc03957aceece75db906796e"))
+		})
+	})
+
+	var _ = When("CreateChanges", func() {
+		It("creates changes from pipeline runs and commits.", func() {
+			pipelineID := primitive.NewObjectID()
+			pipelineRuns := []models.PipelineRun{
+				{
+					PipelineID:  pipelineID,
+					ExternalID:  713437228,
+					Sha:         "3d95fe3bf954501d3832e50fdd803c5f9eae3f94",
+					Ref:         "main",
+					Status:      "success",
+					EventSource: "push",
+					CreatedAt:   time.Date(2022, 12, 27, 13, 16, 42, 0, time.UTC),
+					UpdatedAt:   time.Date(2022, 12, 27, 13, 21, 42, 0, time.UTC),
+					URI:         "https://gitlab.com/foobar/foobar/-/pipelines/713437228",
+				},
+				{
+					PipelineID:  pipelineID,
+					ExternalID:  713437229,
+					Sha:         "1db209656ad1ab0e14aaa4e2fe79b6caf8b2a9e7",
+					Ref:         "main",
+					Status:      "success",
+					EventSource: "push",
+					CreatedAt:   time.Date(2022, 12, 28, 15, 37, 28, 0, time.UTC),
+					UpdatedAt:   time.Date(2022, 12, 28, 15, 43, 17, 0, time.UTC),
+					URI:         "https://gitlab.com/foobar/foobar/-/pipelines/713437229",
+				},
+			}
+
+			err := daos.CreatePipelineRuns(ctx, pipelineID, &pipelineRuns)
+			Expect(err).To(BeNil())
+
+			repositoryID := primitive.NewObjectID()
+			commits := []models.Commit{
+				{
+					RepositoryID: repositoryID,
+					CreatedAt:    time.Date(2022, 12, 27, 11, 0, 2, 0, time.UTC),
+					Sha:          "5da8e92e9f9243f7ee937170474531393a2cf48f",
+					ParentShas: []string{
+						"0c9e7c4b194a4a5c7066301a8c4f0c6c061ce9bc",
+					},
+				},
+				{
+					RepositoryID: repositoryID,
+					CreatedAt:    time.Date(2022, 12, 27, 12, 26, 34, 0, time.UTC),
+					Sha:          "b9b48bcf26ab79c77e4aa4dcf28ca466bdc3b9fa",
+					ParentShas: []string{
+						"5da8e92e9f9243f7ee937170474531393a2cf48f",
+					},
+				},
+				{
+					RepositoryID: repositoryID,
+					CreatedAt:    time.Date(2022, 12, 27, 13, 21, 41, 0, time.UTC),
+					Sha:          "3d95fe3bf954501d3832e50fdd803c5f9eae3f94",
+					ParentShas: []string{
+						"b9b48bcf26ab79c77e4aa4dcf28ca466bdc3b9fa",
+						"5da8e92e9f9243f7ee937170474531393a2cf48f",
+					},
+				},
+				{
+					RepositoryID: repositoryID,
+					CreatedAt:    time.Date(2022, 12, 28, 12, 46, 21, 0, time.UTC),
+					Sha:          "487d6aedb92ab76bdc03957aceece75db906796e",
+					ParentShas: []string{
+						"3d95fe3bf954501d3832e50fdd803c5f9eae3f94",
+					},
+				},
+				{
+					RepositoryID: repositoryID,
+					CreatedAt:    time.Date(2022, 12, 28, 15, 37, 20, 0, time.UTC),
+					Sha:          "1db209656ad1ab0e14aaa4e2fe79b6caf8b2a9e7",
+					ParentShas: []string{
+						"487d6aedb92ab76bdc03957aceece75db906796e",
+						"3d95fe3bf954501d3832e50fdd803c5f9eae3f94",
+					},
+				},
+			}
+
+			err = daos.CreateCommits(ctx, repositoryID, &commits)
+			Expect(err).To(BeNil())
+
+			err = trigger.CreateChanges(ctx, repositoryID, pipelineID)
+			Expect(err).To(BeNil())
+
+			var changes []models.Change
+			err = daos.ListChanges(ctx, repositoryID, &changes)
+
+			Expect(len(changes)).To(Equal(2))
+			Expect(changes[0].LeadTime).To(Equal(float64(3308)))
+			Expect(changes[1].LeadTime).To(Equal(float64(10616)))
 		})
 	})
 })
