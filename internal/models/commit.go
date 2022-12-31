@@ -12,5 +12,5 @@ type Commit struct {
 	RepositoryID primitive.ObjectID `json:"repository_id" bson:"repository_id"`
 	Sha          string             `json:"id" bson:"sha"`
 	CreatedAt    time.Time          `json:"created_at" bson:"created_at"`
-	ParentIds    []string           `json:"parent_ids" bson:"parent_ids"`
+	ParentShas   []string           `json:"parent_ids" bson:"parent_shas"`
 }

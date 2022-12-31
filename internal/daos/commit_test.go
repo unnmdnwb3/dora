@@ -22,7 +22,7 @@ var _ = Describe("daos.Commit", func() {
 				RepositoryID: repositoryID,
 				CreatedAt:    time.Date(2022, 12, 27, 13, 16, 42, 0, time.UTC),
 				Sha:          "1db209656ad1ab0e14aaa4e2fe79b6caf8b2a9e7",
-				ParentIds: []string{
+				ParentShas: []string{
 					"487d6aedb92ab76bdc03957aceece75db906796e",
 					"3d95fe3bf954501d3832e50fdd803c5f9eae3f94",
 				},
@@ -41,7 +41,7 @@ var _ = Describe("daos.Commit", func() {
 					RepositoryID: repositoryID,
 					CreatedAt:    time.Date(2022, 12, 27, 13, 16, 42, 0, time.UTC),
 					Sha:          "1db209656ad1ab0e14aaa4e2fe79b6caf8b2a9e7",
-					ParentIds: []string{
+					ParentShas: []string{
 						"487d6aedb92ab76bdc03957aceece75db906796e",
 						"3d95fe3bf954501d3832e50fdd803c5f9eae3f94",
 					},
@@ -50,7 +50,7 @@ var _ = Describe("daos.Commit", func() {
 					RepositoryID: repositoryID,
 					CreatedAt:    time.Date(2022, 12, 27, 13, 21, 42, 0, time.UTC),
 					Sha:          "487d6aedb92ab76bdc03957aceece75db906796e",
-					ParentIds: []string{
+					ParentShas: []string{
 						"398dc0ca313035ea4eb7ab3f29a5500631660fb7",
 					},
 				},
@@ -69,7 +69,7 @@ var _ = Describe("daos.Commit", func() {
 				RepositoryID: repositoryID,
 				CreatedAt:    time.Date(2022, 12, 27, 13, 16, 42, 0, time.UTC),
 				Sha:          "1db209656ad1ab0e14aaa4e2fe79b6caf8b2a9e7",
-				ParentIds: []string{
+				ParentShas: []string{
 					"487d6aedb92ab76bdc03957aceece75db906796e",
 					"3d95fe3bf954501d3832e50fdd803c5f9eae3f94",
 				},
@@ -93,7 +93,7 @@ var _ = Describe("daos.Commit", func() {
 					RepositoryID: repositoryID,
 					CreatedAt:    time.Date(2022, 12, 27, 13, 16, 42, 0, time.UTC),
 					Sha:          "1db209656ad1ab0e14aaa4e2fe79b6caf8b2a9e7",
-					ParentIds: []string{
+					ParentShas: []string{
 						"487d6aedb92ab76bdc03957aceece75db906796e",
 						"3d95fe3bf954501d3832e50fdd803c5f9eae3f94",
 					},
@@ -102,7 +102,7 @@ var _ = Describe("daos.Commit", func() {
 					RepositoryID: repositoryID,
 					CreatedAt:    time.Date(2022, 12, 27, 13, 21, 42, 0, time.UTC),
 					Sha:          "487d6aedb92ab76bdc03957aceece75db906796e",
-					ParentIds: []string{
+					ParentShas: []string{
 						"398dc0ca313035ea4eb7ab3f29a5500631660fb7",
 					},
 				},
@@ -128,7 +128,7 @@ var _ = Describe("daos.Commit", func() {
 					RepositoryID: repositoryID,
 					CreatedAt:    time.Date(2022, 12, 27, 13, 16, 42, 0, time.UTC),
 					Sha:          "1db209656ad1ab0e14aaa4e2fe79b6caf8b2a9e7",
-					ParentIds: []string{
+					ParentShas: []string{
 						"487d6aedb92ab76bdc03957aceece75db906796e",
 						"3d95fe3bf954501d3832e50fdd803c5f9eae3f94",
 					},
@@ -137,7 +137,7 @@ var _ = Describe("daos.Commit", func() {
 					RepositoryID: differentRepositoryID,
 					CreatedAt:    time.Date(2022, 12, 27, 13, 21, 42, 0, time.UTC),
 					Sha:          "487d6aedb92ab76bdc03957aceece75db906796e",
-					ParentIds: []string{
+					ParentShas: []string{
 						"398dc0ca313035ea4eb7ab3f29a5500631660fb7",
 					},
 				},
@@ -163,7 +163,7 @@ var _ = Describe("daos.Commit", func() {
 				RepositoryID: repositoryID,
 				CreatedAt:    time.Date(2022, 12, 27, 13, 16, 42, 0, time.UTC),
 				Sha:          "1db209656ad1ab0e14aaa4e2fe79b6caf8b2a9e7",
-				ParentIds: []string{
+				ParentShas: []string{
 					"487d6aedb92ab76bdc03957aceece75db906796e",
 					"3d95fe3bf954501d3832e50fdd803c5f9eae3f94",
 				},
@@ -176,7 +176,7 @@ var _ = Describe("daos.Commit", func() {
 				RepositoryID: primitive.NewObjectID(),
 				CreatedAt:    time.Date(2022, 12, 27, 13, 26, 42, 0, time.UTC),
 				Sha:          "1db209656ad1ab0e14aaa4e2fe79b6caf8b2a9e7",
-				ParentIds: []string{
+				ParentShas: []string{
 					"487d6aedb92ab76bdc03957aceece75db906796e",
 					"3d95fe3bf954501d3832e50fdd803c5f9eae3f94",
 				},
@@ -194,7 +194,7 @@ var _ = Describe("daos.Commit", func() {
 				RepositoryID: repositoryID,
 				CreatedAt:    time.Date(2022, 12, 27, 13, 16, 42, 0, time.UTC),
 				Sha:          "1db209656ad1ab0e14aaa4e2fe79b6caf8b2a9e7",
-				ParentIds: []string{
+				ParentShas: []string{
 					"487d6aedb92ab76bdc03957aceece75db906796e",
 					"3d95fe3bf954501d3832e50fdd803c5f9eae3f94",
 				},
