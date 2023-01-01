@@ -141,3 +141,33 @@ func CompletePipelineRunsPerDays(pipelineRunsPerDays *[]models.PipelineRunsPerDa
 
 	return &dailyPipelineRuns, nil
 }
+
+// CompleteChangesPerDays returns a slice of the number of changes per day,
+// since provided ChangesPerDays only account for the dates that any changes were found.
+func CompleteChangesPerDays(changesPerDays *[]models.ChangesPerDay, dates *[]time.Time) (*[]int, *[]int, error) {
+	if len(*changesPerDays) == 0 {
+		return nil, nil, fmt.Errorf("no change aggregates provided")
+	}
+	if len(*dates) == 0 {
+		return nil, nil, fmt.Errorf("no dates provided")
+	}
+	if len(*dates) < len(*changesPerDays) {
+		return nil, nil, fmt.Errorf("more changes per day than dates provided")
+	}
+
+	dailyChanges := make([]int, len(*dates))
+	dailyLeadTimes := make([]int, len(*dates))
+	curr := 0
+	for index, date := range *dates {
+		if curr < len(*changesPerDays) && date == (*changesPerDays)[curr].Date {
+			dailyChanges[index] = (*changesPerDays)[curr].TotalChanges
+			dailyLeadTimes[index] = int((*changesPerDays)[curr].TotalLeadTime)
+			curr++
+		} else {
+			dailyChanges[index] = 0
+			dailyLeadTimes[index] = 0
+		}
+	}
+
+	return &dailyChanges, &dailyLeadTimes, nil
+}
