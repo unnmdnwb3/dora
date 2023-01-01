@@ -12,7 +12,7 @@ type ChangeFailureRate struct {
 	Dates            []time.Time        `bson:"date" json:"date"`
 	DailyIncidents   []int              `bson:"daily_incidents" json:"daily_incidents"`
 	DailyDeployments []int              `bson:"daily_deployments" json:"daily_deployments"`
-	MovingAverages   []float64          `bson:"moving_average" json:"moving_average"`
+	MovingAverages   []float64          `bson:"moving_averages" json:"moving_averages"`
 }
 
 // ChangeFailureRateRequest represents the request to calculate the change failure rate

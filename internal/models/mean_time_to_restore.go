@@ -12,7 +12,7 @@ type MeanTimeToRestore struct {
 	Dates          []time.Time        `bson:"date" json:"date"`
 	DailyIncidents []int              `bson:"daily_incidents" json:"daily_incidents"`
 	DailyDurations []int              `bson:"daily_durations" json:"daily_durations"`
-	MovingAverages []float64          `bson:"moving_average" json:"moving_average"`
+	MovingAverages []float64          `bson:"moving_averages" json:"moving_averages"`
 }
 
 // MeanTimeToRestoreRequest represents the request to calculate the mean time to restore
