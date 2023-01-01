@@ -129,4 +129,47 @@ var _ = Describe("services.metrics.metrics", func() {
 			Expect((*completeDailyPipelineRuns)[2]).To(Equal(1))
 		})
 	})
+
+	var _ = When("CompleteChangesPerDays", func() {
+		It("returns the complete list of changes and lead times per day between two dates.", func() {
+			deploymentID := primitive.NewObjectID()
+			changesPerDays := []models.ChangesPerDay{
+				{
+					RepositoryID:  deploymentID,
+					Date:          time.Date(2022, 12, 24, 0, 0, 0, 0, time.UTC),
+					TotalChanges:  1,
+					TotalLeadTime: 600,
+				},
+				{
+					RepositoryID:  deploymentID,
+					Date:          time.Date(2022, 12, 26, 0, 0, 0, 0, time.UTC),
+					TotalChanges:  2,
+					TotalLeadTime: 1200,
+				},
+				{
+					RepositoryID:  deploymentID,
+					Date:          time.Date(2022, 12, 27, 0, 0, 0, 0, time.UTC),
+					TotalChanges:  1,
+					TotalLeadTime: 600,
+				},
+				{
+					RepositoryID:  deploymentID,
+					Date:          time.Date(2022, 12, 29, 0, 0, 0, 0, time.UTC),
+					TotalChanges:  2,
+					TotalLeadTime: 1200,
+				},
+			}
+
+			dates, err := metrics.DatesBetween(
+				time.Date(2022, 12, 24, 0, 0, 0, 0, time.UTC),
+				time.Date(2022, 12, 29, 0, 0, 0, 0, time.UTC),
+			)
+			Expect(err).To(BeNil())
+
+			dailyChanges, dailyLeadTimes, err := metrics.CompleteChangesPerDays(&changesPerDays, dates)
+			Expect(err).To(BeNil())
+			Expect(len(*dailyChanges)).To(Equal(6))
+			Expect(len(*dailyLeadTimes)).To(Equal(6))
+		})
+	})
 })

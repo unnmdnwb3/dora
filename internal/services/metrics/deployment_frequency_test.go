@@ -77,6 +77,7 @@ var _ = Describe("services.metrics.deployment_frequency", func() {
 			pipelineRun1 := models.PipelineRun{
 				PipelineID:  dataflow.Pipeline.ID,
 				ExternalID:  713437220,
+				Sha:         "1cfffa2ae16528e36115ece8b1f2601bcf74414e",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -90,6 +91,7 @@ var _ = Describe("services.metrics.deployment_frequency", func() {
 			pipelineRun2 := models.PipelineRun{
 				PipelineID:  dataflow.Pipeline.ID,
 				ExternalID:  713437220,
+				Sha:         "345207c839e94a939aebdc86835ae2e2a6c85acb",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -103,6 +105,7 @@ var _ = Describe("services.metrics.deployment_frequency", func() {
 			pipelineRun3 := models.PipelineRun{
 				PipelineID:  dataflow.Pipeline.ID,
 				ExternalID:  713437221,
+				Sha:         "dcc7ef44dc6a376854c5f2cc42b0b24aa3a9ed10",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -116,6 +119,7 @@ var _ = Describe("services.metrics.deployment_frequency", func() {
 			pipelineRun4 := models.PipelineRun{
 				PipelineID:  dataflow.Pipeline.ID,
 				ExternalID:  713437222,
+				Sha:         "05358053edd401e1fba272ecfe6f8839e9d8fdec",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -129,6 +133,7 @@ var _ = Describe("services.metrics.deployment_frequency", func() {
 			pipelineRun5 := models.PipelineRun{
 				PipelineID:  dataflow.Pipeline.ID,
 				ExternalID:  713437223,
+				Sha:         "e6425994236ddd01a8ed24852d5f0ec19e70d701",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -142,6 +147,7 @@ var _ = Describe("services.metrics.deployment_frequency", func() {
 			pipelineRun6 := models.PipelineRun{
 				PipelineID:  dataflow.Pipeline.ID,
 				ExternalID:  713437224,
+				Sha:         "19950955997854e605aca6b27f3b7bec6063069a",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",

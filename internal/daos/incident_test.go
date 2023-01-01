@@ -28,8 +28,8 @@ var _ = Describe("daos.Incident", func() {
 		})
 	})
 
-	var _ = When("CreatePipelineRuns", func() {
-		It("creates creates many new PipelineRuns.", func() {
+	var _ = When("CreateIncidents", func() {
+		It("creates creates many new Incidents.", func() {
 			deploymentID := primitive.NewObjectID()
 			incident1 := models.Incident{
 				DeploymentID: deploymentID,

@@ -24,6 +24,7 @@ var _ = Describe("daos.PipelineRun", func() {
 			pipelineRun := models.PipelineRun{
 				PipelineID:  pipelineID,
 				ExternalID:  externalID,
+				Sha:         "1cfffa2ae16528e36115ece8b1f2601bcf74414e",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -45,6 +46,7 @@ var _ = Describe("daos.PipelineRun", func() {
 			pipelineRun1 := models.PipelineRun{
 				PipelineID:  pipelineID,
 				ExternalID:  externalID,
+				Sha:         "1cfffa2ae16528e36115ece8b1f2601bcf74414e",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -58,6 +60,7 @@ var _ = Describe("daos.PipelineRun", func() {
 			pipelineRun2 := models.PipelineRun{
 				PipelineID:  pipelineID,
 				ExternalID:  externalID,
+				Sha:         "345207c839e94a939aebdc86835ae2e2a6c85acb",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -81,6 +84,7 @@ var _ = Describe("daos.PipelineRun", func() {
 			pipelineRun := models.PipelineRun{
 				PipelineID:  pipelineID,
 				ExternalID:  externalID,
+				Sha:         "1cfffa2ae16528e36115ece8b1f2601bcf74414e",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -107,6 +111,7 @@ var _ = Describe("daos.PipelineRun", func() {
 			pipelineRun1 := models.PipelineRun{
 				PipelineID:  pipelineID,
 				ExternalID:  externalID,
+				Sha:         "1cfffa2ae16528e36115ece8b1f2601bcf74414e",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -120,6 +125,7 @@ var _ = Describe("daos.PipelineRun", func() {
 			pipelineRun2 := models.PipelineRun{
 				PipelineID:  pipelineID,
 				ExternalID:  externalID,
+				Sha:         "345207c839e94a939aebdc86835ae2e2a6c85acb",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -146,6 +152,7 @@ var _ = Describe("daos.PipelineRun", func() {
 			pipelineRun1 := models.PipelineRun{
 				PipelineID:  pipelineID,
 				ExternalID:  externalID,
+				Sha:         "1cfffa2ae16528e36115ece8b1f2601bcf74414e",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -159,7 +166,8 @@ var _ = Describe("daos.PipelineRun", func() {
 			pipelineRun2 := models.PipelineRun{
 				PipelineID:  pipelineID,
 				ExternalID:  externalID,
-				Ref:         "main",
+				Sha:         "345207c839e94a939aebdc86835ae2e2a6c85acb",
+				Ref:         "develop",
 				Status:      "success",
 				EventSource: "push",
 				CreatedAt:   createdAt2,
@@ -171,7 +179,7 @@ var _ = Describe("daos.PipelineRun", func() {
 			Expect(err).To(BeNil())
 
 			var findPipelineRuns []models.PipelineRun
-			filter := bson.M{"uri": pipelineRun1.URI}
+			filter := bson.M{"ref": "main"}
 			err = daos.ListPipelineRunsByFilter(ctx, filter, &findPipelineRuns)
 			Expect(err).To(BeNil())
 			Expect(findPipelineRuns).To(HaveLen(1))
@@ -186,6 +194,7 @@ var _ = Describe("daos.PipelineRun", func() {
 			pipelineRun := models.PipelineRun{
 				PipelineID:  pipelineID,
 				ExternalID:  externalID,
+				Sha:         "1cfffa2ae16528e36115ece8b1f2601bcf74414e",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -201,6 +210,7 @@ var _ = Describe("daos.PipelineRun", func() {
 			updatePipelineRun := models.PipelineRun{
 				PipelineID:  pipelineID,
 				ExternalID:  externalID,
+				Sha:         "1cfffa2ae16528e36115ece8b1f2601bcf74414e",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",
@@ -222,6 +232,7 @@ var _ = Describe("daos.PipelineRun", func() {
 			pipelineRun := models.PipelineRun{
 				PipelineID:  pipelineID,
 				ExternalID:  externalID,
+				Sha:         "1cfffa2ae16528e36115ece8b1f2601bcf74414e",
 				Ref:         "main",
 				Status:      "success",
 				EventSource: "push",

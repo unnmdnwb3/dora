@@ -96,10 +96,10 @@ func (c *Client) GetRepositories() (*[]models.Repository, error) {
 }
 
 // GetPullRequests gets all pull requests of a repository
-func (c *Client) GetPullRequests(projectID string, targetBranch string) (*[]models.PullRequest, error) {
+func (c *Client) GetPullRequests(projectID int, targetBranch string) (*[]models.PullRequest, error) {
 	client := &http.Client{}
 
-	uri := fmt.Sprintf("%s/projects/%s/merge_requests", c.URI, projectID)
+	uri := fmt.Sprintf("%s/projects/%s/merge_requests", c.URI, strconv.Itoa(projectID))
 	req, err := http.NewRequest(http.MethodGet, uri, nil)
 	if err != nil {
 		return nil, err
@@ -135,10 +135,10 @@ func (c *Client) GetPullRequests(projectID string, targetBranch string) (*[]mode
 }
 
 // GetCommits gets all commits of a repository
-func (c *Client) GetCommits(projectID string, referenceBranch string) (*[]models.Commit, error) {
+func (c *Client) GetCommits(projectID int, referenceBranch string) (*[]models.Commit, error) {
 	client := &http.Client{}
 
-	uri := fmt.Sprintf("%s/projects/%s/repository/commits", c.URI, projectID)
+	uri := fmt.Sprintf("%s/projects/%s/repository/commits", c.URI, strconv.Itoa(projectID))
 	req, err := http.NewRequest(http.MethodGet, uri, nil)
 	if err != nil {
 		return nil, err

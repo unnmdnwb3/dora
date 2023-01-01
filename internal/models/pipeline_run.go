@@ -11,6 +11,7 @@ type PipelineRun struct {
 	ID          primitive.ObjectID `bson:"_id,omitempty"`
 	PipelineID  primitive.ObjectID `bson:"pipeline_id" json:"pipeline_id"`
 	ExternalID  int                `bson:"external_id" json:"id"`
+	Sha         string             `json:"sha" bson:"sha"`
 	Ref         string             `json:"ref" bson:"ref"`
 	Status      string             `json:"status" bson:"status"`
 	EventSource string             `json:"source" bson:"event_source"`

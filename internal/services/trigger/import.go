@@ -42,7 +42,31 @@ func ImportData(ctx context.Context, dataflow *models.Dataflow) error {
 
 // ImportCommits gets and persists historical data for each commit in a repository.
 func ImportCommits(ctx context.Context, channel chan error, repository *models.Repository) {
-	// TODO implement
+	var integration models.Integration
+	err := daos.GetIntegration(ctx, repository.IntegrationID, &integration)
+	if err != nil {
+		channel <- err
+		return
+	}
+
+	client := gitlab.NewClient(integration.URI, integration.BearerToken)
+	if err != nil {
+		channel <- err
+		return
+	}
+
+	commits, err := client.GetCommits(repository.ExternalID, repository.DefaultBranch)
+	if err != nil {
+		channel <- err
+		return
+	}
+
+	err = daos.CreateCommits(ctx, repository.ID, commits)
+	if err != nil {
+		channel <- err
+		return
+	}
+
 	channel <- nil
 }
 
