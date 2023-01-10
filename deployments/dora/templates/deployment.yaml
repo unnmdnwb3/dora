@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name}}
+  labels:
+    app: {{ .Values.name}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.name}}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.name}}
+    spec:
+      containers:
+      - name: {{ .Values.name}}
+        image: unnmdnwb3/dora:0.0.1
+        ports:
+        - containerPort: 8080
+        env:
+        - name: MONGODB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: dora-mongodb
+              key: mongodb-root-password
+        - name: MONGODB_URI
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.name}}
+              key: mongodb-uri
+        - name: MONGODB_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.name}}
+              key: mongodb-db
+        - name: MONGODB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.name}}
+              key: mongodb-user

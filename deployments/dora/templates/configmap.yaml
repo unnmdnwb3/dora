@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.name}}
+data:
+  mongodb-uri: "dora-mongodb:27017"
+  mongodb-db: "dora"
+  mongodb-user: "root"
