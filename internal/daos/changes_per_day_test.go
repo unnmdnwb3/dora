@@ -18,13 +18,15 @@ var _ = Describe("daos.ChangesPerDays", func() {
 	var _ = When("CreateChangesPerDay", func() {
 		It("creates creates a new pipelineRunsPerDay.", func() {
 			repositoryID := primitive.NewObjectID()
+			pipelineID := primitive.NewObjectID()
 			changesPerDay := models.ChangesPerDay{
 				RepositoryID:  repositoryID,
+				PipelineID:    pipelineID,
 				Date:          time.Date(2022, 12, 27, 0, 0, 0, 0, time.UTC),
 				TotalChanges:  1,
 				TotalLeadTime: 300,
 			}
-			err := daos.CreateChangesPerDay(ctx, repositoryID, &changesPerDay)
+			err := daos.CreateChangesPerDay(ctx, repositoryID, pipelineID, &changesPerDay)
 			Expect(err).To(BeNil())
 			Expect(changesPerDay.ID).To(Not(BeEmpty()))
 		})
@@ -33,9 +35,11 @@ var _ = Describe("daos.ChangesPerDays", func() {
 	var _ = When("CreateChangesPerDays", func() {
 		It("creates creates many new ChangesPerDays.", func() {
 			repositoryID := primitive.NewObjectID()
+			pipelineID := primitive.NewObjectID()
 			changesPerDays := []models.ChangesPerDay{
 				{
 					RepositoryID:  repositoryID,
+					PipelineID:    pipelineID,
 					Date:          time.Date(2022, 12, 27, 0, 0, 0, 0, time.UTC),
 					TotalChanges:  1,
 					TotalLeadTime: 300,
@@ -43,12 +47,13 @@ var _ = Describe("daos.ChangesPerDays", func() {
 
 				{
 					RepositoryID:  repositoryID,
+					PipelineID:    pipelineID,
 					Date:          time.Date(2022, 12, 28, 0, 0, 0, 0, time.UTC),
 					TotalChanges:  2,
 					TotalLeadTime: 450,
 				},
 			}
-			err := daos.CreateChangesPerDays(ctx, repositoryID, &changesPerDays)
+			err := daos.CreateChangesPerDays(ctx, repositoryID, pipelineID, &changesPerDays)
 			Expect(err).To(BeNil())
 			Expect(changesPerDays[0].ID).To(Not(BeEmpty()))
 			Expect(changesPerDays[1].ID).To(Not(BeEmpty()))
@@ -58,13 +63,15 @@ var _ = Describe("daos.ChangesPerDays", func() {
 	var _ = When("GetChangesPerDay", func() {
 		It("retrieves an ChangesPerDay.", func() {
 			repositoryID := primitive.NewObjectID()
+			pipelineID := primitive.NewObjectID()
 			changesPerDay := models.ChangesPerDay{
 				RepositoryID:  repositoryID,
+				PipelineID:    primitive.NewObjectID(),
 				Date:          time.Date(2022, 12, 27, 0, 0, 0, 0, time.UTC),
 				TotalChanges:  1,
 				TotalLeadTime: 300,
 			}
-			err := daos.CreateChangesPerDay(ctx, repositoryID, &changesPerDay)
+			err := daos.CreateChangesPerDay(ctx, repositoryID, pipelineID, &changesPerDay)
 			Expect(err).To(BeNil())
 			Expect(changesPerDay.ID).To(Not(BeEmpty()))
 
@@ -78,9 +85,11 @@ var _ = Describe("daos.ChangesPerDays", func() {
 	var _ = When("ListChangesPerDays", func() {
 		It("retrieves many ChangesPerDays.", func() {
 			repositoryID := primitive.NewObjectID()
+			pipelineID := primitive.NewObjectID()
 			changesPerDays := []models.ChangesPerDay{
 				{
 					RepositoryID:  repositoryID,
+					PipelineID:    pipelineID,
 					Date:          time.Date(2022, 12, 27, 0, 0, 0, 0, time.UTC),
 					TotalChanges:  1,
 					TotalLeadTime: 300,
@@ -88,16 +97,17 @@ var _ = Describe("daos.ChangesPerDays", func() {
 
 				{
 					RepositoryID:  repositoryID,
+					PipelineID:    pipelineID,
 					Date:          time.Date(2022, 12, 28, 0, 0, 0, 0, time.UTC),
 					TotalChanges:  2,
 					TotalLeadTime: 450,
 				},
 			}
-			err := daos.CreateChangesPerDays(ctx, repositoryID, &changesPerDays)
+			err := daos.CreateChangesPerDays(ctx, repositoryID, pipelineID, &changesPerDays)
 			Expect(err).To(BeNil())
 
 			var findChangesPerDays []models.ChangesPerDay
-			err = daos.ListChangesPerDays(ctx, repositoryID, &findChangesPerDays)
+			err = daos.ListChangesPerDays(ctx, repositoryID, pipelineID, &findChangesPerDays)
 			Expect(err).To(BeNil())
 			Expect(len(findChangesPerDays)).To(Equal(2))
 		})
@@ -106,9 +116,11 @@ var _ = Describe("daos.ChangesPerDays", func() {
 	var _ = When("ListChangesPerDaysByFilter", func() {
 		It("retrieves many ChangesPerDays conforming to a filter.", func() {
 			repositoryID := primitive.NewObjectID()
+			pipelineID := primitive.NewObjectID()
 			changesPerDays := []models.ChangesPerDay{
 				{
 					RepositoryID:  repositoryID,
+					PipelineID:    pipelineID,
 					Date:          time.Date(2022, 12, 27, 0, 0, 0, 0, time.UTC),
 					TotalChanges:  1,
 					TotalLeadTime: 300,
@@ -116,12 +128,13 @@ var _ = Describe("daos.ChangesPerDays", func() {
 
 				{
 					RepositoryID:  repositoryID,
+					PipelineID:    pipelineID,
 					Date:          time.Date(2022, 12, 28, 0, 0, 0, 0, time.UTC),
 					TotalChanges:  2,
 					TotalLeadTime: 450,
 				},
 			}
-			err := daos.CreateChangesPerDays(ctx, repositoryID, &changesPerDays)
+			err := daos.CreateChangesPerDays(ctx, repositoryID, pipelineID, &changesPerDays)
 			Expect(err).To(BeNil())
 
 			var findChangesPerDays []models.ChangesPerDay
@@ -136,13 +149,15 @@ var _ = Describe("daos.ChangesPerDays", func() {
 	var _ = When("UpdateChangesPerDay", func() {
 		It("updates an ChangesPerDay.", func() {
 			repositoryID := primitive.NewObjectID()
+			pipelineID := primitive.NewObjectID()
 			changesPerDay := models.ChangesPerDay{
 				RepositoryID:  repositoryID,
+				PipelineID:    pipelineID,
 				Date:          time.Date(2022, 12, 27, 0, 0, 0, 0, time.UTC),
 				TotalChanges:  1,
 				TotalLeadTime: 300,
 			}
-			err := daos.CreateChangesPerDay(ctx, repositoryID, &changesPerDay)
+			err := daos.CreateChangesPerDay(ctx, repositoryID, pipelineID, &changesPerDay)
 			Expect(err).To(BeNil())
 			Expect(changesPerDay.ID).To(Not(BeEmpty()))
 
@@ -161,13 +176,15 @@ var _ = Describe("daos.ChangesPerDays", func() {
 	var _ = When("DeleteOne", func() {
 		It("deletes a document with ID in a collection", func() {
 			repositoryID := primitive.NewObjectID()
+			pipelineID := primitive.NewObjectID()
 			changesPerDay := models.ChangesPerDay{
 				RepositoryID:  repositoryID,
+				PipelineID:    pipelineID,
 				Date:          time.Date(2022, 12, 27, 0, 0, 0, 0, time.UTC),
 				TotalChanges:  1,
 				TotalLeadTime: 300,
 			}
-			err := daos.CreateChangesPerDay(ctx, repositoryID, &changesPerDay)
+			err := daos.CreateChangesPerDay(ctx, repositoryID, pipelineID, &changesPerDay)
 			Expect(err).To(BeNil())
 			Expect(changesPerDay.ID).To(Not(BeEmpty()))
 

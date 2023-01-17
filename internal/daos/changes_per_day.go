@@ -14,7 +14,7 @@ import (
 const changesPerDayCollection = "changes_per_days"
 
 // CreateChangesPerDay creates a new ChangesPerDay.
-func CreateChangesPerDay(ctx context.Context, repositoryID primitive.ObjectID, changesPerDay *models.ChangesPerDay) error {
+func CreateChangesPerDay(ctx context.Context, repositoryID primitive.ObjectID, pipelineID primitive.ObjectID, changesPerDay *models.ChangesPerDay) error {
 	service := mongodb.NewService()
 	database := os.Getenv("MONGODB_DATABASE")
 	err := service.Connect(ctx, database)
@@ -24,13 +24,14 @@ func CreateChangesPerDay(ctx context.Context, repositoryID primitive.ObjectID, c
 	defer service.Disconnect(ctx)
 
 	changesPerDay.RepositoryID = repositoryID
+	changesPerDay.PipelineID = pipelineID
 
 	err = service.InsertOne(ctx, changesPerDayCollection, changesPerDay)
 	return err
 }
 
 // CreateChangesPerDays creates many new ChangesPerDay.
-func CreateChangesPerDays(ctx context.Context, repositoryID primitive.ObjectID, changesPerDays *[]models.ChangesPerDay) error {
+func CreateChangesPerDays(ctx context.Context, repositoryID primitive.ObjectID, pipelineID primitive.ObjectID, changesPerDays *[]models.ChangesPerDay) error {
 	service := mongodb.NewService()
 	database := os.Getenv("MONGODB_DATABASE")
 	err := service.Connect(ctx, database)
@@ -41,6 +42,7 @@ func CreateChangesPerDays(ctx context.Context, repositoryID primitive.ObjectID, 
 
 	for index, changesPerDay := range *changesPerDays {
 		changesPerDay.RepositoryID = repositoryID
+		changesPerDay.PipelineID = pipelineID
 
 		err = service.InsertOne(ctx, changesPerDayCollection, &changesPerDay)
 		if err != nil {
@@ -66,8 +68,8 @@ func GetChangesPerDay(ctx context.Context, changesPerDayID primitive.ObjectID, c
 }
 
 // ListChangesPerDays retrieves many ChangesPerDay.
-func ListChangesPerDays(ctx context.Context, repositoryID primitive.ObjectID, changesPerDay *[]models.ChangesPerDay) error {
-	filter := bson.M{"repository_id": repositoryID}
+func ListChangesPerDays(ctx context.Context, repositoryID primitive.ObjectID, pipelineID primitive.ObjectID, changesPerDay *[]models.ChangesPerDay) error {
+	filter := bson.M{"repository_id": repositoryID, "pipeline_id": pipelineID}
 	err := ListChangesPerDaysByFilter(ctx, filter, changesPerDay)
 	return err
 }
