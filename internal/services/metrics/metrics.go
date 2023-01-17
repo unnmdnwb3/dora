@@ -5,16 +5,14 @@ import (
 	"time"
 
 	"github.com/unnmdnwb3/dora/internal/models"
+	"github.com/unnmdnwb3/dora/internal/utils/numeric"
 	"github.com/unnmdnwb3/dora/internal/utils/times"
 )
 
-// CalculateMovingAverages calculates the moving averages for a given slice of totals.
-func CalculateMovingAverages(totals *[]int, window int) (*[]float64, error) {
+// MovingAverages calculates the moving averages for a given slice of totals.
+func MovingAverages(totals *[]int, window int) (*[]float64, error) {
 	if len(*totals) == 0 {
 		return nil, fmt.Errorf("no data provided to calculate moving averages")
-	}
-	if len(*totals) != (window*2)-1 {
-		return nil, fmt.Errorf("number of data provided to calculate moving averages does not match window")
 	}
 
 	offset := window - 1
@@ -26,20 +24,18 @@ func CalculateMovingAverages(totals *[]int, window int) (*[]float64, error) {
 	movingAverages := make([]float64, len(*totals)-offset)
 	for index := offset; index < len(*totals); index++ {
 		totalsInWindow += (*totals)[index]
-		movingAverages[index-offset] = float64(totalsInWindow) / float64(window)
+		val := float64(totalsInWindow) / float64(window)
+		movingAverages[index-offset] = numeric.Round(val, 2)
 		totalsInWindow -= (*totals)[index-offset]
 	}
 
 	return &movingAverages, nil
 }
 
-// CalculateMovingAveragesRatio calculates the moving averages for a given two slices of totals.
-func CalculateMovingAveragesRatio(numerators *[]int, denominators *[]int, window int) (*[]float64, error) {
+// MovingAveragesRatio calculates the moving averages for a given two slices of totals.
+func MovingAveragesRatio(numerators *[]int, denominators *[]int, window int) (*[]float64, error) {
 	if len(*numerators) == 0 || len(*denominators) == 0 {
 		return nil, fmt.Errorf("no data provided to calculate moving averages")
-	}
-	if len(*numerators) != (window*2)-1 || len(*denominators) != (window*2)-1 {
-		return nil, fmt.Errorf("number of data provided to calculate moving averages does not match window")
 	}
 
 	offset := window - 1
@@ -57,7 +53,8 @@ func CalculateMovingAveragesRatio(numerators *[]int, denominators *[]int, window
 		if denominatorsInWindow == 0 {
 			movingAverages[index-offset] = 0
 		} else {
-			movingAverages[index-offset] = (float64(numeratorsInWindow) / float64(denominatorsInWindow)) * 100
+			val := (float64(numeratorsInWindow) / float64(denominatorsInWindow)) * 100
+			movingAverages[index-offset] = numeric.Round(val, 2)
 		}
 
 		numeratorsInWindow -= (*numerators)[index-offset]

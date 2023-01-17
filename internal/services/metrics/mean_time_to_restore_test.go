@@ -112,13 +112,15 @@ var _ = Describe("services.metrics.mean_time_to_restore", func() {
 			Expect(err).To(BeNil())
 
 			// calculate mean time to restore
+			startDate := time.Date(2022, 12, 26, 0, 0, 0, 0, time.UTC)
 			endDate := time.Date(2022, 12, 29, 23, 59, 59, 0, time.UTC)
 			window := 3
-			meanTimeToRestore, err := metrics.CalculateMeanTimeToRestore(ctx, dataflow.ID, window, endDate)
+
+			meanTimeToRestore, err := metrics.MeanTimeToRestore(ctx, dataflow.ID, startDate, endDate, window)
 			Expect(err).To(BeNil())
-			Expect(meanTimeToRestore.DailyIncidents).To(Equal([]int{1, 0, 2}))
-			Expect(meanTimeToRestore.DailyDurations).To(Equal([]int{600, 0, 1200}))
-			Expect(meanTimeToRestore.MovingAverages).To(Equal([]float64{600, 600, 600}))
+			Expect(meanTimeToRestore.DailyIncidents).To(Equal([]int{2, 1, 0, 2}))
+			Expect(meanTimeToRestore.DailyDurations).To(Equal([]int{1200, 600, 0, 1200}))
+			Expect(meanTimeToRestore.MovingAverages).To(Equal([]float64{600, 600, 600, 600}))
 		})
 	})
 })

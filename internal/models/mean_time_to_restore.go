@@ -9,6 +9,9 @@ import (
 // MeanTimeToRestore represents the mean time to restore
 type MeanTimeToRestore struct {
 	DataflowID     primitive.ObjectID `bson:"dataflow_id" json:"dataflow_id"`
+	StartDate      time.Time          `bson:"start_date" json:"start_date"`
+	EndDate        time.Time          `bson:"end_date" json:"end_date"`
+	Window         int                `bson:"window" json:"window"`
 	Dates          []time.Time        `bson:"date" json:"date"`
 	DailyIncidents []int              `bson:"daily_incidents" json:"daily_incidents"`
 	DailyDurations []int              `bson:"daily_durations" json:"daily_durations"`
@@ -18,6 +21,7 @@ type MeanTimeToRestore struct {
 // MeanTimeToRestoreRequest represents the request to calculate the mean time to restore
 type MeanTimeToRestoreRequest struct {
 	DataflowID primitive.ObjectID `bson:"dataflow_id" json:"dataflow_id"`
+	StartDate  time.Time          `bson:"start_date" json:"start_date"`
 	EndDate    time.Time          `bson:"end_date" json:"end_date"`
 	Window     int                `bson:"window" json:"window"`
 }
