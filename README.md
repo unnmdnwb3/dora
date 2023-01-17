@@ -45,6 +45,23 @@ This builds and run the backend, alongside a MongoDB instance running in Docker 
 make compose
 ```
 
+## Development
+
+During development, we suggest you using the `docker-compose` configuration given in this repository.
+
+However, if you want to use `kind`, we suggest using the following configuration when creating a new cluster:
+
+```yaml
+apiVersion: kind.x-k8s.io/v1alpha4
+kind: Cluster
+nodes:
+- role: control-plane
+  extraPortMappings:
+  - containerPort: 32042
+    hostPort: 32042
+- role: worker
+```
+
 ### Test
 
 If you want to run seperate local test, you can use:
