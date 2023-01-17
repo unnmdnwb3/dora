@@ -25,15 +25,8 @@ func CreateDataflow(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
 
-	err = trigger.ImportData(ctx, &dataflow)
+	err = trigger.OnNewDataflow(ctx, &dataflow)
 	if err != nil {
-		_ = daos.DeleteDataflow(ctx, dataflow.ID)
-		c.AbortWithError(http.StatusBadRequest, err)
-	}
-
-	err = trigger.CreatePipelineRunsPerDays(ctx, dataflow.Pipeline.ID)
-	if err != nil {
-		_ = daos.DeleteDataflow(ctx, dataflow.ID)
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
 
