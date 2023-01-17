@@ -12,8 +12,15 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// CalculateMeanTimeToRestore calculates the mean time to restore for a given dataflow.
-func CalculateMeanTimeToRestore(ctx context.Context, dataflowID primitive.ObjectID, window int, endDate time.Time) (*models.MeanTimeToRestore, error) {
+// MeanTimeToRestore calculates the mean time to restore for a given dataflow.
+func MeanTimeToRestore(ctx context.Context, dataflowID primitive.ObjectID, startDate time.Time, endDate time.Time, window int) (*models.MeanTimeToRestore, error) {
+	if window < 1 {
+		return nil, fmt.Errorf("window must be greater than 0")
+	}
+	if startDate.After(endDate) {
+		return nil, fmt.Errorf("start date must be before end date")
+	}
+
 	var dataflow models.Dataflow
 	err := daos.GetDataflow(ctx, dataflowID, &dataflow)
 	if err != nil {
@@ -21,8 +28,7 @@ func CalculateMeanTimeToRestore(ctx context.Context, dataflowID primitive.Object
 	}
 
 	offset := window - 1
-	timeRange := offset * 2
-	startDate := times.Date(endDate.AddDate(0, 0, -timeRange))
+	startDate = times.Date(startDate.AddDate(0, 0, -offset))
 
 	var incidentsPerDays []models.IncidentsPerDay
 	filter := bson.M{"deployment_id": dataflow.Deployment.ID, "date": bson.M{"$gte": startDate, "$lte": endDate}}
@@ -44,7 +50,7 @@ func CalculateMeanTimeToRestore(ctx context.Context, dataflowID primitive.Object
 		return nil, err
 	}
 
-	movingAverages, err := CalculateMovingAverages(dailyDurations, window)
+	movingAverages, err := MovingAverages(dailyDurations, window)
 	if err != nil {
 		return nil, err
 	}

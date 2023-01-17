@@ -25,7 +25,7 @@ func DeploymentFrequency(c *gin.Context) {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
 
-	deploymentFrequency, err := metrics.CalculateDeploymentFrequency(ctx, dataflow.ID, request.Window, request.EndDate)
+	deploymentFrequency, err := metrics.DeploymentFrequency(ctx, dataflow.ID, request.StartDate, request.EndDate, request.Window)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}

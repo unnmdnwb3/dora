@@ -9,12 +9,12 @@ import (
 	"github.com/unnmdnwb3/dora/internal/utils/times"
 )
 
-func TestUtils(t *testing.T) {
+func TestTime(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "times Suite")
 }
 
-var _ = Describe("mongodb.Service", func() {
+var _ = Describe("utils.time", func() {
 	var _ = When("Date", func() {
 		It("returns true if the time are of the same date.", func() {
 			ts1 := "2019-10-09T09:11:20.861Z"

@@ -38,17 +38,16 @@ var _ = Describe("services.metrics.change_failure_rate", func() {
 	var _ = When("CalculateChangeFailureRate", func() {
 		It("calculates the ChangeFailureRate for a given window.", func() {
 			// create a new dataflow
-			externalID := 40649465
 			repository := models.Repository{
 				IntegrationID:  primitive.NewObjectID(),
-				ExternalID:     externalID,
+				ExternalID:     40649465,
 				NamespacedName: "foobar/foobar",
 				DefaultBranch:  "main",
 				URI:            "https://gitlab.com/foobar/foobar",
 			}
 			pipeline := models.Pipeline{
 				IntegrationID:  primitive.NewObjectID(),
-				ExternalID:     externalID,
+				ExternalID:     40649465,
 				NamespacedName: "foobar/foobar",
 				DefaultBranch:  "main",
 				URI:            "https://gitlab.com/foobar/foobar/-/pipelines",
@@ -160,13 +159,15 @@ var _ = Describe("services.metrics.change_failure_rate", func() {
 			Expect(err).To(BeNil())
 
 			// calculate change failure rate
+			startDate := time.Date(2022, 12, 26, 0, 0, 0, 0, time.UTC)
 			endDate := time.Date(2022, 12, 29, 23, 59, 59, 0, time.UTC)
 			window := 3
-			changeFailureRate, err := metrics.CalculateChangeFailureRate(ctx, dataflow.ID, window, endDate)
+
+			cfr, err := metrics.ChangeFailureRate(ctx, dataflow.ID, startDate, endDate, window)
 			Expect(err).To(BeNil())
-			Expect(changeFailureRate.DailyDeployments).To(Equal([]int{2, 8, 5}))
-			Expect(changeFailureRate.DailyIncidents).To(Equal([]int{1, 0, 2}))
-			Expect(changeFailureRate.MovingAverages).To(Equal([]float64{25, 18.75, 20}))
+			Expect(cfr.DailyDeployments).To(Equal([]int{6, 2, 8, 5}))
+			Expect(cfr.DailyIncidents).To(Equal([]int{2, 1, 0, 2}))
+			Expect(cfr.MovingAverages).To(Equal([]float64{20, 25, 18.75, 20}))
 		})
 	})
 })

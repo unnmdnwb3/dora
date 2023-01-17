@@ -12,8 +12,15 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// CalculateLeadTimeForChanges calculates the lead time for changes.
-func CalculateLeadTimeForChanges(ctx context.Context, dataflowID primitive.ObjectID, window int, endDate time.Time) (*models.LeadTimeForChanges, error) {
+// LeadTimeForChanges calculates the lead time for changes.
+func LeadTimeForChanges(ctx context.Context, dataflowID primitive.ObjectID, startDate time.Time, endDate time.Time, window int) (*models.LeadTimeForChanges, error) {
+	if window < 1 {
+		return nil, fmt.Errorf("window must be greater than 0")
+	}
+	if startDate.After(endDate) {
+		return nil, fmt.Errorf("start date must be before end date")
+	}
+
 	var dataflow models.Dataflow
 	err := daos.GetDataflow(ctx, dataflowID, &dataflow)
 	if err != nil {
@@ -21,8 +28,7 @@ func CalculateLeadTimeForChanges(ctx context.Context, dataflowID primitive.Objec
 	}
 
 	offset := window - 1
-	timeRange := offset * 2
-	startDate := times.Date(endDate.AddDate(0, 0, -timeRange))
+	startDate = times.Date(startDate.AddDate(0, 0, -offset))
 
 	var changesPerDay []models.ChangesPerDay
 	filter := bson.M{"repository_id": dataflow.Repository.ID, "date": bson.M{"$gte": startDate, "$lte": endDate}}
@@ -44,14 +50,14 @@ func CalculateLeadTimeForChanges(ctx context.Context, dataflowID primitive.Objec
 		return nil, err
 	}
 
-	movingAverages, err := CalculateMovingAverages(dailyLeadTimes, window)
+	movingAverages, err := MovingAverages(dailyLeadTimes, window)
 	if err != nil {
 		return nil, err
 	}
 
 	return &models.LeadTimeForChanges{
 		DataflowID:     dataflow.ID,
-		Dates:          *dates,
+		Dates:          (*dates)[offset:],
 		DailyChanges:   (*dailyChanges)[offset:],
 		DailyLeadTimes: (*dailyLeadTimes)[offset:],
 		MovingAverages: *movingAverages,

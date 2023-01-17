@@ -128,12 +128,14 @@ var _ = Describe("services.metrics.lead_time_for_changes", func() {
 			Expect(err).To(BeNil())
 
 			// calculate lead time for changes rate
+			startDate := time.Date(2022, 12, 26, 0, 0, 0, 0, time.UTC)
 			endDate := time.Date(2022, 12, 29, 23, 59, 59, 0, time.UTC)
 			window := 3
-			leadTimeForChanges, err := metrics.CalculateLeadTimeForChanges(ctx, dataflow.ID, window, endDate)
+
+			leadTimeForChanges, err := metrics.LeadTimeForChanges(ctx, dataflow.ID, startDate, endDate, window)
 			Expect(err).To(BeNil())
-			Expect(leadTimeForChanges.DailyChanges).To(Equal([]int{1, 0, 2}))
-			Expect(leadTimeForChanges.MovingAverages).To(Equal([]float64{2500, 2600, 3000}))
+			Expect(leadTimeForChanges.DailyChanges).To(Equal([]int{2, 1, 0, 2}))
+			Expect(leadTimeForChanges.MovingAverages).To(Equal([]float64{700, 2500, 2600, 3000}))
 		})
 	})
 })

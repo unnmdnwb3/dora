@@ -12,8 +12,15 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// CalculateDeploymentFrequency calculates the deployment frequency for a given dataflow.
-func CalculateDeploymentFrequency(ctx context.Context, dataflowID primitive.ObjectID, window int, endDate time.Time) (*models.DeploymentFrequency, error) {
+// DeploymentFrequency calculates the deployment frequency for a given dataflow.
+func DeploymentFrequency(ctx context.Context, dataflowID primitive.ObjectID, startDate time.Time, endDate time.Time, window int) (*models.DeploymentFrequency, error) {
+	if window < 1 {
+		return nil, fmt.Errorf("window must be greater than 0")
+	}
+	if startDate.After(endDate) {
+		return nil, fmt.Errorf("start date must be before end date")
+	}
+
 	var dataflow models.Dataflow
 	err := daos.GetDataflow(ctx, dataflowID, &dataflow)
 	if err != nil {
@@ -21,8 +28,7 @@ func CalculateDeploymentFrequency(ctx context.Context, dataflowID primitive.Obje
 	}
 
 	offset := window - 1
-	timeRange := offset * 2
-	startDate := times.Date(endDate.AddDate(0, 0, -timeRange))
+	startDate = times.Date(startDate.AddDate(0, 0, -offset))
 
 	var pipelineRunsPerDay []models.PipelineRunsPerDay
 	filter := bson.M{"pipeline_id": dataflow.Pipeline.ID, "date": bson.M{"$gte": startDate, "$lte": endDate}}
@@ -44,7 +50,7 @@ func CalculateDeploymentFrequency(ctx context.Context, dataflowID primitive.Obje
 		return nil, err
 	}
 
-	movingAverages, err := CalculateMovingAverages(dailyPipelineRuns, window)
+	movingAverages, err := MovingAverages(dailyPipelineRuns, window)
 	if err != nil {
 		return nil, err
 	}
@@ -53,6 +59,6 @@ func CalculateDeploymentFrequency(ctx context.Context, dataflowID primitive.Obje
 		DataflowID:        dataflow.ID,
 		Dates:             (*dates)[offset:],
 		DailyPipelineRuns: (*dailyPipelineRuns)[offset:],
-		MovingAverages:    *movingAverages,
+		MovingAverages:    (*movingAverages),
 	}, nil
 }
