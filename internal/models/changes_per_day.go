@@ -10,6 +10,7 @@ import (
 type ChangesPerDay struct {
 	ID            primitive.ObjectID `bson:"_id,omitempty"`
 	RepositoryID  primitive.ObjectID `bson:"repository_id" json:"repository_id"`
+	PipelineID    primitive.ObjectID `bson:"pipeline_id" json:"pipeline_id"`
 	Date          time.Time          `bson:"date" json:"date"`
 	TotalChanges  int                `bson:"total_changes" json:"total_changes"`
 	TotalLeadTime float64            `bson:"total_lead_time" json:"total_lead_time"`

@@ -14,7 +14,7 @@ type Dataflow struct {
 type Repository struct {
 	ID             primitive.ObjectID `bson:"_id,omitempty" json:"_id,omitempty"`
 	IntegrationID  primitive.ObjectID `bson:"integration_id,omitempty" json:"integration_id"`
-	ExternalID     int                `bson:"external_id" json:"id"`
+	ExternalID     int                `bson:"external_id" json:"external_id"`
 	NamespacedName string             `bson:"namespaced_name" json:"namespaced_name"`
 	DefaultBranch  string             `bson:"default_branch" json:"default_branch"`
 	URI            string             `bson:"uri" json:"uri"`
@@ -38,4 +38,5 @@ type Deployment struct {
 	Step          string             `bson:"step" json:"step"` // step is the time between each query according to the Prometheus API
 	Relation      string             `bson:"relation" json:"relation"`
 	Threshold     float64            `bson:"threshold" json:"threshold"`
+	URI           string             `bson:"uri" json:"uri"`
 }

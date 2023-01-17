@@ -12,7 +12,7 @@ import (
 	"github.com/unnmdnwb3/dora/internal/database/mongodb"
 	"github.com/unnmdnwb3/dora/internal/models"
 	"github.com/unnmdnwb3/dora/internal/services/metrics"
-	"github.com/unnmdnwb3/dora/internal/services/trigger"
+	"github.com/unnmdnwb3/dora/internal/services/trigger/aggregate"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -107,7 +107,7 @@ var _ = Describe("services.metrics.mean_time_to_restore", func() {
 			Expect(err).To(BeNil())
 
 			// create incidents per days
-			err = trigger.CreateIncidentsPerDays(ctx, dataflow.Deployment.ID)
+			err = aggregate.CreateIncidentsPerDays(ctx, dataflow.Deployment.ID)
 			Expect(err).To(BeNil())
 
 			// calculate mean time to restore

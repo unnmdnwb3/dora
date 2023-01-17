@@ -4,7 +4,7 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 
 // Integration represents an third-party integration
 type Integration struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	ID          primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`
 	Type        string             `bson:"type" json:"type"` // TODO change this to an enum
 	Provider    string             `bson:"provider" json:"provider"`
 	URI         string             `bson:"uri" json:"uri"`

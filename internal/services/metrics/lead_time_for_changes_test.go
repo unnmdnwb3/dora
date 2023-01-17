@@ -38,21 +38,22 @@ var _ = Describe("services.metrics.lead_time_for_changes", func() {
 	var _ = When("CalculateLeadTimeForChanges", func() {
 		It("calculates the CalculateLeadTime for a given window.", func() {
 			// create a new dataflow
-			externalID := 40649465
 			repository := models.Repository{
 				IntegrationID:  primitive.NewObjectID(),
-				ExternalID:     externalID,
+				ExternalID:     40649465,
 				NamespacedName: "foobar/foobar",
 				DefaultBranch:  "main",
 				URI:            "https://gitlab.com/foobar/foobar",
 			}
+
 			pipeline := models.Pipeline{
 				IntegrationID:  primitive.NewObjectID(),
-				ExternalID:     externalID,
+				ExternalID:     40649465,
 				NamespacedName: "foobar/foobar",
 				DefaultBranch:  "main",
 				URI:            "https://gitlab.com/foobar/foobar/-/pipelines",
 			}
+
 			deployment := models.Deployment{
 				IntegrationID: primitive.NewObjectID(),
 				Query:         "job:http_total_requests:internal_server_error_percentage",
@@ -60,11 +61,13 @@ var _ = Describe("services.metrics.lead_time_for_changes", func() {
 				Relation:      "gt",
 				Threshold:     0.2,
 			}
+
 			dataflow := models.Dataflow{
 				Repository: repository,
 				Pipeline:   pipeline,
 				Deployment: deployment,
 			}
+
 			err := daos.CreateDataflow(ctx, &dataflow)
 			Expect(err).To(BeNil())
 
@@ -72,49 +75,56 @@ var _ = Describe("services.metrics.lead_time_for_changes", func() {
 			changesPerDays := []models.ChangesPerDay{
 				{
 					RepositoryID:  dataflow.Repository.ID,
+					PipelineID:    dataflow.Pipeline.ID,
 					Date:          time.Date(2022, 12, 24, 0, 0, 0, 0, time.UTC),
 					TotalChanges:  1,
 					TotalLeadTime: 600,
 				},
 				{
 					RepositoryID:  dataflow.Repository.ID,
+					PipelineID:    dataflow.Pipeline.ID,
 					Date:          time.Date(2022, 12, 25, 0, 0, 0, 0, time.UTC),
 					TotalChanges:  0,
 					TotalLeadTime: 900,
 				},
 				{
 					RepositoryID:  dataflow.Repository.ID,
+					PipelineID:    dataflow.Pipeline.ID,
 					Date:          time.Date(2022, 12, 26, 0, 0, 0, 0, time.UTC),
 					TotalChanges:  2,
 					TotalLeadTime: 600,
 				},
 				{
 					RepositoryID:  dataflow.Repository.ID,
+					PipelineID:    dataflow.Pipeline.ID,
 					Date:          time.Date(2022, 12, 27, 0, 0, 0, 0, time.UTC),
 					TotalChanges:  1,
 					TotalLeadTime: 6000,
 				},
 				{
 					RepositoryID:  dataflow.Repository.ID,
+					PipelineID:    dataflow.Pipeline.ID,
 					Date:          time.Date(2022, 12, 28, 0, 0, 0, 0, time.UTC),
 					TotalChanges:  0,
 					TotalLeadTime: 1200,
 				},
 				{
 					RepositoryID:  dataflow.Repository.ID,
+					PipelineID:    dataflow.Pipeline.ID,
 					Date:          time.Date(2022, 12, 29, 0, 0, 0, 0, time.UTC),
 					TotalChanges:  2,
 					TotalLeadTime: 1800,
 				},
 				{
 					RepositoryID:  dataflow.Repository.ID,
+					PipelineID:    dataflow.Pipeline.ID,
 					Date:          time.Date(2022, 12, 30, 0, 0, 0, 0, time.UTC),
 					TotalChanges:  3,
 					TotalLeadTime: 600,
 				},
 			}
 
-			err = daos.CreateChangesPerDays(ctx, dataflow.Repository.ID, &changesPerDays)
+			err = daos.CreateChangesPerDays(ctx, dataflow.Repository.ID, dataflow.Pipeline.ID, &changesPerDays)
 			Expect(err).To(BeNil())
 
 			// calculate lead time for changes rate
