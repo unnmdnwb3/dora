@@ -6,8 +6,8 @@ import (
 	"github.com/unnmdnwb3/dora/internal/models"
 )
 
-// Aggregate aggregates the data per day.
-func Aggregate(ctx context.Context, dataflow *models.Dataflow) error {
+// All aggregates the data per day.
+func All(ctx context.Context, dataflow *models.Dataflow) error {
 	cpdChannel := make(chan error)
 	defer close(cpdChannel)
 	go CreateChangesPerDays(ctx, cpdChannel, dataflow.Repository.ID, dataflow.Pipeline.ID)

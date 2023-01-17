@@ -12,7 +12,6 @@ import (
 	"github.com/unnmdnwb3/dora/internal/database/mongodb"
 	"github.com/unnmdnwb3/dora/internal/models"
 	"github.com/unnmdnwb3/dora/internal/services/metrics"
-	"github.com/unnmdnwb3/dora/internal/services/trigger/aggregate"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -69,45 +68,47 @@ var _ = Describe("services.metrics.mean_time_to_restore", func() {
 			err := daos.CreateDataflow(ctx, &dataflow)
 			Expect(err).To(BeNil())
 
-			// create incidents
-			incidents := []models.Incident{
+			// create incidents per days
+			incidentsPerDays := []models.IncidentsPerDay{
 				{
-					DeploymentID: dataflow.Deployment.ID,
-					StartDate:    time.Date(2022, 12, 24, 13, 20, 56, 0, time.UTC),
-					EndDate:      time.Date(2022, 12, 24, 13, 30, 56, 0, time.UTC),
+					DeploymentID:   dataflow.Deployment.ID,
+					Date:           time.Date(2022, 12, 24, 0, 0, 0, 0, time.UTC),
+					TotalIncidents: 1,
+					TotalDuration:  600,
 				},
 				{
-					DeploymentID: dataflow.Deployment.ID,
-					StartDate:    time.Date(2022, 12, 26, 8, 20, 56, 0, time.UTC),
-					EndDate:      time.Date(2022, 12, 26, 8, 35, 56, 0, time.UTC),
+					DeploymentID:   dataflow.Deployment.ID,
+					Date:           time.Date(2022, 12, 25, 0, 0, 0, 0, time.UTC),
+					TotalIncidents: 0,
+					TotalDuration:  0,
 				},
 				{
-					DeploymentID: dataflow.Deployment.ID,
-					StartDate:    time.Date(2022, 12, 26, 10, 35, 56, 0, time.UTC),
-					EndDate:      time.Date(2022, 12, 26, 10, 40, 56, 0, time.UTC),
+					DeploymentID:   dataflow.Deployment.ID,
+					Date:           time.Date(2022, 12, 26, 0, 0, 0, 0, time.UTC),
+					TotalIncidents: 2,
+					TotalDuration:  1200,
 				},
 				{
-					DeploymentID: dataflow.Deployment.ID,
-					StartDate:    time.Date(2022, 12, 27, 9, 10, 56, 0, time.UTC),
-					EndDate:      time.Date(2022, 12, 27, 9, 20, 56, 0, time.UTC),
+					DeploymentID:   dataflow.Deployment.ID,
+					Date:           time.Date(2022, 12, 27, 0, 0, 0, 0, time.UTC),
+					TotalIncidents: 1,
+					TotalDuration:  600,
 				},
 				{
-					DeploymentID: dataflow.Deployment.ID,
-					StartDate:    time.Date(2022, 12, 29, 9, 10, 56, 0, time.UTC),
-					EndDate:      time.Date(2022, 12, 29, 9, 20, 56, 0, time.UTC),
+					DeploymentID:   dataflow.Deployment.ID,
+					Date:           time.Date(2022, 12, 28, 0, 0, 0, 0, time.UTC),
+					TotalIncidents: 0,
+					TotalDuration:  0,
 				},
 				{
-					DeploymentID: dataflow.Deployment.ID,
-					StartDate:    time.Date(2022, 12, 29, 9, 40, 56, 0, time.UTC),
-					EndDate:      time.Date(2022, 12, 29, 9, 50, 56, 0, time.UTC),
+					DeploymentID:   dataflow.Deployment.ID,
+					Date:           time.Date(2022, 12, 29, 0, 0, 0, 0, time.UTC),
+					TotalIncidents: 2,
+					TotalDuration:  1200,
 				},
 			}
 
-			err = daos.CreateIncidents(ctx, &incidents)
-			Expect(err).To(BeNil())
-
-			// create incidents per days
-			err = aggregate.CreateIncidentsPerDays(ctx, dataflow.Deployment.ID)
+			err = daos.CreateIncidentsPerDays(ctx, dataflow.Deployment.ID, &incidentsPerDays)
 			Expect(err).To(BeNil())
 
 			// calculate mean time to restore
