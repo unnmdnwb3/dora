@@ -19,6 +19,11 @@ func CreateChangesPerDays(ctx context.Context, channel chan error, repositoryID 
 		return
 	}
 
+	if len(changes) == 0 {
+		channel <- nil
+		return
+	}
+
 	changesPerDays, err := CalculateChangesPerDays(ctx, &changes)
 	if err != nil {
 		channel <- err
@@ -35,12 +40,12 @@ func CreateChangesPerDays(ctx context.Context, channel chan error, repositoryID 
 func CalculateChangesPerDays(ctx context.Context, changes *[]models.Change) (*[]models.ChangesPerDay, error) {
 	changesPerDays := []models.ChangesPerDay{}
 
-	date := (*changes)[0].FirstCommitDate
+	date := (*changes)[0].DeploymentDate
 	var countPerDay int
 	var durationPerDay time.Duration
 
 	for index := 0; index < len(*changes); index++ {
-		newDate := (*changes)[index].FirstCommitDate
+		newDate := (*changes)[index].DeploymentDate
 
 		if !times.SameDay(date, newDate) {
 			dayDate := times.Date(date)
@@ -53,7 +58,7 @@ func CalculateChangesPerDays(ctx context.Context, changes *[]models.Change) (*[]
 
 			changesPerDays = append(changesPerDays, changesPerDay)
 
-			date = (*changes)[index].FirstCommitDate
+			date = (*changes)[index].DeploymentDate
 			countPerDay = 0
 			durationPerDay = 0
 		}

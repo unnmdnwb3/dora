@@ -18,6 +18,11 @@ func CreatePipelineRunsPerDays(ctx context.Context, channel chan error, pipeline
 		return
 	}
 
+	if len(pipelineRuns) == 0 {
+		channel <- nil
+		return
+	}
+
 	pipelineRunsPerDays, err := CalculatePipelineRunsPerDays(ctx, &pipelineRuns)
 	if err != nil {
 		channel <- err
