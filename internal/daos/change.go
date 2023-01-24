@@ -8,6 +8,7 @@ import (
 	"github.com/unnmdnwb3/dora/internal/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // default changeCollection
@@ -81,7 +82,8 @@ func ListChangesByFilter(ctx context.Context, filter bson.M, changes *[]models.C
 	}
 	defer service.Disconnect(ctx)
 
-	err = service.Find(ctx, changeCollection, filter, changes)
+	ops := options.Find().SetSort(bson.M{"first_commit_date": 1})
+	err = service.Find(ctx, changeCollection, filter, changes, ops)
 	return err
 }
 

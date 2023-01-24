@@ -8,6 +8,7 @@ import (
 	"github.com/unnmdnwb3/dora/internal/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // default commitCollection
@@ -81,7 +82,8 @@ func ListCommitsByFilter(ctx context.Context, filter bson.M, commits *[]models.C
 	}
 	defer service.Disconnect(ctx)
 
-	err = service.Find(ctx, commitCollection, filter, commits)
+	ops := options.Find().SetSort(bson.M{"created_at": 1})
+	err = service.Find(ctx, commitCollection, filter, commits, ops)
 	return err
 }
 

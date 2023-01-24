@@ -8,6 +8,7 @@ import (
 	"github.com/unnmdnwb3/dora/internal/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // default pipelineRunCollection
@@ -82,7 +83,8 @@ func ListPipelineRunsByFilter(ctx context.Context, filter bson.M, pipelineRuns *
 	}
 	defer service.Disconnect(ctx)
 
-	err = service.Find(ctx, pipelineRunCollection, filter, pipelineRuns)
+	ops := options.Find().SetSort(bson.M{"created_at": 1})
+	err = service.Find(ctx, pipelineRunCollection, filter, pipelineRuns, ops)
 	return err
 }
 

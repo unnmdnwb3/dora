@@ -8,6 +8,7 @@ import (
 	"github.com/unnmdnwb3/dora/internal/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // default changesPerDayCollection
@@ -84,7 +85,8 @@ func ListChangesPerDaysByFilter(ctx context.Context, filter bson.M, changesPerDa
 	}
 	defer service.Disconnect(ctx)
 
-	err = service.Find(ctx, changesPerDayCollection, filter, changesPerDay)
+	ops := options.Find().SetSort(bson.M{"date": 1})
+	err = service.Find(ctx, changesPerDayCollection, filter, changesPerDay, ops)
 	return err
 }
 

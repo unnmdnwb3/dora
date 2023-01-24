@@ -8,6 +8,7 @@ import (
 	"github.com/unnmdnwb3/dora/internal/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // default integrationCollection
@@ -43,15 +44,7 @@ func GetIntegration(ctx context.Context, objectID primitive.ObjectID, integratio
 
 // ListIntegrations retrieves many Integrations.
 func ListIntegrations(ctx context.Context, integrations *[]models.Integration) error {
-	service := mongodb.NewService()
-	database := os.Getenv("MONGODB_DATABASE")
-	err := service.Connect(ctx, database)
-	if err != nil {
-		return err
-	}
-	defer service.Disconnect(ctx)
-
-	err = service.Find(ctx, integrationCollection, bson.M{}, integrations)
+	err := ListIntegrationsByFilter(ctx, bson.M{}, integrations)
 	return err
 }
 
@@ -66,7 +59,8 @@ func ListIntegrationsByFilter(ctx context.Context, filter bson.M, integrations *
 	}
 	defer service.Disconnect(ctx)
 
-	err = service.Find(ctx, integrationCollection, filter, integrations)
+	ops := options.Find().SetSort(bson.M{"_id": 1})
+	err = service.Find(ctx, integrationCollection, filter, integrations, ops)
 	return err
 }
 

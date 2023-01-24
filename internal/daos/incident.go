@@ -8,6 +8,7 @@ import (
 	"github.com/unnmdnwb3/dora/internal/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // default incidentCollection
@@ -78,7 +79,8 @@ func ListIncidentsByFilter(ctx context.Context, filter bson.M, incidents *[]mode
 	}
 	defer service.Disconnect(ctx)
 
-	err = service.Find(ctx, incidentCollection, filter, incidents)
+	ops := options.Find().SetSort(bson.M{"start_date": 1})
+	err = service.Find(ctx, incidentCollection, filter, incidents, ops)
 	return err
 }
 

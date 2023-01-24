@@ -8,6 +8,7 @@ import (
 	"github.com/unnmdnwb3/dora/internal/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // default dataflowCollection
@@ -47,15 +48,7 @@ func GetDataflow(ctx context.Context, objectID primitive.ObjectID, dataflow *mod
 
 // ListDataflows retrieves many Dataflows.
 func ListDataflows(ctx context.Context, dataflows *[]models.Dataflow) error {
-	service := mongodb.NewService()
-	database := os.Getenv("MONGODB_DATABASE")
-	err := service.Connect(ctx, database)
-	if err != nil {
-		return err
-	}
-	defer service.Disconnect(ctx)
-
-	err = service.Find(ctx, dataflowCollection, bson.M{}, dataflows)
+	err := ListDataflowsByFilter(ctx, bson.M{}, dataflows)
 	return err
 }
 
@@ -70,7 +63,8 @@ func ListDataflowsByFilter(ctx context.Context, filter bson.M, dataflows *[]mode
 	}
 	defer service.Disconnect(ctx)
 
-	err = service.Find(ctx, dataflowCollection, filter, dataflows)
+	ops := options.Find().SetSort(bson.M{"_id": 1})
+	err = service.Find(ctx, dataflowCollection, filter, dataflows, ops)
 	return err
 }
 
