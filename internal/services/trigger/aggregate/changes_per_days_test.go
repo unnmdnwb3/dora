@@ -118,7 +118,7 @@ var _ = Describe("services.trigger.aggregate.changes_per_days", func() {
 			Expect(changesPerDays[0].TotalChanges).To(Equal(2))
 			Expect(changesPerDays[0].TotalLeadTime).To(Equal(float64(4500)))
 			Expect(changesPerDays[1].TotalChanges).To(Equal(1))
-			Expect(changesPerDays[0].Date).To(Equal(time.Date(2022, 12, 29, 0, 0, 0, 0, time.UTC)))
+			Expect(changesPerDays[1].Date).To(Equal(time.Date(2022, 12, 29, 0, 0, 0, 0, time.UTC)))
 			Expect(changesPerDays[1].TotalLeadTime).To(Equal(float64(1200)))
 		})
 	})
