@@ -34,29 +34,29 @@ func MeanTimeToRestore(ctx context.Context, dataflowID primitive.ObjectID, start
 	filter := bson.M{"deployment_id": dataflow.Deployment.ID, "date": bson.M{"$gte": startDate, "$lte": endDate}}
 	err = daos.ListIncidentsPerDaysByFilter(ctx, filter, &incidentsPerDays)
 	if err != nil {
-		return nil, err
-	}
-	if len(incidentsPerDays) == 0 {
-		return nil, fmt.Errorf("no incidents per days found for deployment with id: %s", dataflow.Deployment.ID.Hex())
+		return nil, fmt.Errorf("error getting incidents per days: %w", err)
 	}
 
 	dates, err := DatesBetween(startDate, endDate)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error getting dates between %s and %s: %w", startDate, endDate, err)
 	}
 
 	dailyIncidents, dailyDurations, err := CompleteIncidentsPerDays(&incidentsPerDays, dates)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error completing incidents per days: %w", err)
 	}
 
 	movingAverages, err := MovingAverages(dailyDurations, window)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error calculating moving averages: %w", err)
 	}
 
 	return &models.MeanTimeToRestore{
 		DataflowID:     dataflow.ID,
+		StartDate:      startDate,
+		EndDate:        endDate,
+		Window:         window,
 		Dates:          (*dates)[offset:],
 		DailyIncidents: (*dailyIncidents)[offset:],
 		DailyDurations: (*dailyDurations)[offset:],

@@ -34,30 +34,30 @@ func LeadTimeForChanges(ctx context.Context, dataflowID primitive.ObjectID, star
 	filter := bson.M{"repository_id": dataflow.Repository.ID, "date": bson.M{"$gte": startDate, "$lte": endDate}}
 	err = daos.ListChangesPerDaysByFilter(ctx, filter, &changesPerDay)
 	if err != nil {
-		return nil, err
-	}
-	if len(changesPerDay) == 0 {
-		return nil, fmt.Errorf("no changes per days found for repository with id: %s", dataflow.Repository.ID.Hex())
+		return nil, fmt.Errorf("error listing changes per days: %w", err)
 	}
 
 	dates, err := DatesBetween(startDate, endDate)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error getting dates between %s and %s: %w", startDate, endDate, err)
 	}
 
 	dailyChanges, dailyLeadTimes, err := CompleteChangesPerDays(&changesPerDay, dates)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error completing changes per days: %w", err)
 	}
 
 	movingAverages, err := MovingAverages(dailyLeadTimes, window)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error calculating moving averages: %w", err)
 	}
 
 	return &models.LeadTimeForChanges{
 		DataflowID:     dataflow.ID,
 		Dates:          (*dates)[offset:],
+		StartDate:      startDate,
+		EndDate:        endDate,
+		Window:         window,
 		DailyChanges:   (*dailyChanges)[offset:],
 		DailyLeadTimes: (*dailyLeadTimes)[offset:],
 		MovingAverages: *movingAverages,

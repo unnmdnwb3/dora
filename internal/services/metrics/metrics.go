@@ -17,11 +17,13 @@ func MovingAverages(totals *[]int, window int) (*[]float64, error) {
 
 	offset := window - 1
 	totalsInWindow := 0
+
 	for index := 0; index < offset; index++ {
 		totalsInWindow += (*totals)[index]
 	}
 
 	movingAverages := make([]float64, len(*totals)-offset)
+
 	for index := offset; index < len(*totals); index++ {
 		totalsInWindow += (*totals)[index]
 		val := float64(totalsInWindow) / float64(window)
@@ -41,15 +43,18 @@ func MovingAveragesRatio(numerators *[]int, denominators *[]int, window int) (*[
 	offset := window - 1
 	numeratorsInWindow := 0
 	denominatorsInWindow := 0
+
 	for index := 0; index < offset; index++ {
 		numeratorsInWindow += (*numerators)[index]
 		denominatorsInWindow += (*denominators)[index]
 	}
 
 	movingAverages := make([]float64, len(*numerators)-offset)
+
 	for index := offset; index < len(*numerators); index++ {
 		numeratorsInWindow += (*numerators)[index]
 		denominatorsInWindow += (*denominators)[index]
+
 		if denominatorsInWindow == 0 {
 			movingAverages[index-offset] = 0
 		} else {
@@ -85,12 +90,10 @@ func DatesBetween(startDate time.Time, endDate time.Time) (*[]time.Time, error) 
 // CompleteIncidentsPerDays returns a slice of the number of incidents per day,
 // since provided IncidentsPerDays only account for the dates that any incidents were found.
 func CompleteIncidentsPerDays(incidentsPerDays *[]models.IncidentsPerDay, dates *[]time.Time) (*[]int, *[]int, error) {
-	if len(*incidentsPerDays) == 0 {
-		return nil, nil, fmt.Errorf("no incidents aggregates provided")
-	}
 	if len(*dates) == 0 {
 		return nil, nil, fmt.Errorf("no dates provided")
 	}
+
 	if len(*dates) < len(*incidentsPerDays) {
 		return nil, nil, fmt.Errorf("more incidents per day than dates provided")
 	}
@@ -98,6 +101,7 @@ func CompleteIncidentsPerDays(incidentsPerDays *[]models.IncidentsPerDay, dates 
 	dailyIncidents := make([]int, len(*dates))
 	dailyDurations := make([]int, len(*dates))
 	curr := 0
+
 	for index, date := range *dates {
 		if curr < len(*incidentsPerDays) && date == (*incidentsPerDays)[curr].Date {
 			dailyIncidents[index] = (*incidentsPerDays)[curr].TotalIncidents
@@ -115,18 +119,17 @@ func CompleteIncidentsPerDays(incidentsPerDays *[]models.IncidentsPerDay, dates 
 // CompletePipelineRunsPerDays returns a slice of the number of pipeline runs per day,
 // since provided PipelineRunsPerDays only account for the dates that any pipeline runs were found.
 func CompletePipelineRunsPerDays(pipelineRunsPerDays *[]models.PipelineRunsPerDay, dates *[]time.Time) (*[]int, error) {
-	if len(*pipelineRunsPerDays) == 0 {
-		return nil, fmt.Errorf("no pipeline runs aggregates provided")
-	}
 	if len(*dates) == 0 {
 		return nil, fmt.Errorf("no dates provided")
 	}
+
 	if len(*dates) < len(*pipelineRunsPerDays) {
 		return nil, fmt.Errorf("more pipeline runs per day than dates provided")
 	}
 
 	dailyPipelineRuns := make([]int, len(*dates))
 	curr := 0
+
 	for index, date := range *dates {
 		if curr < len(*pipelineRunsPerDays) && date == (*pipelineRunsPerDays)[curr].Date {
 			dailyPipelineRuns[index] = (*pipelineRunsPerDays)[curr].TotalPipelineRuns
@@ -142,12 +145,10 @@ func CompletePipelineRunsPerDays(pipelineRunsPerDays *[]models.PipelineRunsPerDa
 // CompleteChangesPerDays returns a slice of the number of changes per day,
 // since provided ChangesPerDays only account for the dates that any changes were found.
 func CompleteChangesPerDays(changesPerDays *[]models.ChangesPerDay, dates *[]time.Time) (*[]int, *[]int, error) {
-	if len(*changesPerDays) == 0 {
-		return nil, nil, fmt.Errorf("no change aggregates provided")
-	}
 	if len(*dates) == 0 {
 		return nil, nil, fmt.Errorf("no dates provided")
 	}
+
 	if len(*dates) < len(*changesPerDays) {
 		return nil, nil, fmt.Errorf("more changes per day than dates provided")
 	}
@@ -155,6 +156,7 @@ func CompleteChangesPerDays(changesPerDays *[]models.ChangesPerDay, dates *[]tim
 	dailyChanges := make([]int, len(*dates))
 	dailyLeadTimes := make([]int, len(*dates))
 	curr := 0
+
 	for index, date := range *dates {
 		if curr < len(*changesPerDays) && date == (*changesPerDays)[curr].Date {
 			dailyChanges[index] = (*changesPerDays)[curr].TotalChanges

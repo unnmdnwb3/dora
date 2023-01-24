@@ -19,11 +19,11 @@ type Client struct {
 	Query string
 	Start time.Time
 	End   time.Time
-	Step  string
+	Step  int
 }
 
 // NewClient creates a new Gitlab API client.
-func NewClient(URI string, auth string, query string, start time.Time, end time.Time, step string) *Client {
+func NewClient(URI string, auth string, query string, start time.Time, end time.Time, step int) *Client {
 	return &Client{
 		URI:   URI,
 		Auth:  auth,
@@ -32,6 +32,18 @@ func NewClient(URI string, auth string, query string, start time.Time, end time.
 		End:   end,
 		Step:  step,
 	}
+}
+
+// QueryRangeResponse represents a Prometheus query response.
+type QueryRangeResponse struct {
+	Data struct {
+		Result []struct {
+			Metric struct {
+				Name string `json:"__name__"`
+			} `json:"metric"`
+			Values [][]interface{} `json:"values"`
+		} `json:"result"`
+	} `json:"data"`
 }
 
 // GetMonitoringDataPoints gets all monitoring data points.
@@ -51,7 +63,7 @@ func (c *Client) GetMonitoringDataPoints() (*[]models.MonitoringDataPoint, error
 	q.Add("query", c.Query)
 	q.Add("start", strconv.FormatInt(c.Start.Unix(), 10))
 	q.Add("end", strconv.FormatInt(c.End.Unix(), 10))
-	q.Add("step", c.Step)
+	q.Add("step", strconv.Itoa(c.Step))
 	req.URL.RawQuery = q.Encode()
 
 	resp, err := client.Do(req)
@@ -71,19 +83,12 @@ func (c *Client) GetMonitoringDataPoints() (*[]models.MonitoringDataPoint, error
 		log.Fatalln(err)
 	}
 
-	return c.CreateMonitoringDataPoints(queryRange)
-}
+	monitoringDataPoints, err := c.CreateMonitoringDataPoints(queryRange)
+	if err != nil {
+		return nil, err
+	}
 
-// QueryRangeResponse represents a Prometheus query response.
-type QueryRangeResponse struct {
-	Data struct {
-		Result []struct {
-			Metric struct {
-				Name string `json:"__name__"`
-			} `json:"metric"`
-			Values [][]interface{} `json:"values"`
-		} `json:"result"`
-	} `json:"data"`
+	return monitoringDataPoints, nil
 }
 
 // CreateMonitoringDataPoints creates MonitoringDataPoints from a QueryRangeResponse.
@@ -92,7 +97,7 @@ func (c *Client) CreateMonitoringDataPoints(queryRangeResponse QueryRangeRespons
 	for _, result := range queryRangeResponse.Data.Result {
 		for _, dataPoint := range result.Values {
 			unix := int64(dataPoint[0].(float64))
-			createdAt := time.Unix(unix, 0).UTC()
+			createdAt := time.Unix(unix, 0)
 			value, err := strconv.ParseFloat(dataPoint[1].(string), 64)
 			if err != nil {
 				return nil, err

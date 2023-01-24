@@ -70,7 +70,6 @@ var _ = Describe("services.ingest.pipeline_runs", func() {
 				ExternalID:     15392086,
 				NamespacedName: "foobar/foobar",
 				DefaultBranch:  "main",
-				URI:            "https://gitlab.com/foobar/foobar/-/pipelines",
 			}
 
 			channel := make(chan error)

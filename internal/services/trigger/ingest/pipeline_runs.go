@@ -2,6 +2,7 @@ package ingest
 
 import (
 	"context"
+	"log"
 
 	"github.com/unnmdnwb3/dora/internal/connectors/gitlab"
 	"github.com/unnmdnwb3/dora/internal/daos"
@@ -34,6 +35,8 @@ func ImportPipelineRuns(ctx context.Context, channel chan error, pipeline *model
 		channel <- err
 		return
 	}
+
+	log.Printf("Created %d pipeline runs for pipeline %s", len(*pipelineRuns), pipeline.NamespacedName)
 
 	channel <- nil
 	return

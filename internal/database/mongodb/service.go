@@ -86,10 +86,10 @@ func (s *Service) InsertOne(ctx context.Context, collection string, v any) error
 }
 
 // Find finds many documents in a collection.
-func (s *Service) Find(ctx context.Context, collection string, filter bson.M, vs any) error {
+func (s *Service) Find(ctx context.Context, collection string, filter bson.M, vs any, ops *options.FindOptions) error {
 	coll := s.DB.Collection(collection)
 
-	cursor, err := coll.Find(ctx, filter)
+	cursor, err := coll.Find(ctx, filter, ops)
 	if err != nil {
 		return err
 	}

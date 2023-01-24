@@ -2,6 +2,7 @@ package ingest
 
 import (
 	"context"
+	"log"
 
 	"github.com/unnmdnwb3/dora/internal/connectors/gitlab"
 	"github.com/unnmdnwb3/dora/internal/daos"
@@ -34,6 +35,8 @@ func ImportCommits(ctx context.Context, channel chan error, repository *models.R
 		channel <- err
 		return
 	}
+
+	log.Printf("Created %d commits for repository %s", len(*commits), repository.NamespacedName)
 
 	channel <- nil
 }

@@ -44,19 +44,17 @@ var _ = Describe("services.metrics.mean_time_to_restore", func() {
 				ExternalID:     externalID,
 				NamespacedName: "foobar/foobar",
 				DefaultBranch:  "main",
-				URI:            "https://gitlab.com/foobar/foobar",
 			}
 			pipeline := models.Pipeline{
 				IntegrationID:  primitive.NewObjectID(),
 				ExternalID:     externalID,
 				NamespacedName: "foobar/foobar",
 				DefaultBranch:  "main",
-				URI:            "https://gitlab.com/foobar/foobar/-/pipelines",
 			}
 			deployment := models.Deployment{
 				IntegrationID: primitive.NewObjectID(),
 				Query:         "job:http_total_requests:internal_server_error_percentage",
-				Step:          "5m",
+				Step:          300,
 				Relation:      "gt",
 				Threshold:     0.2,
 			}

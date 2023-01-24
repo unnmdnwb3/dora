@@ -63,6 +63,9 @@ func SetupRouter() *gin.Engine {
 
 	// routes for metrics
 	router.POST("/api/v1/metrics/deployment-frequency", prometheusMiddleware(), handler.DeploymentFrequency)
+	router.POST("/api/v1/metrics/lead-time-for-changes", prometheusMiddleware(), handler.LeadTimeForChanges)
+	router.POST("/api/v1/metrics/mean-time-to-restore", prometheusMiddleware(), handler.MeanTimeToRestore)
+	router.POST("/api/v1/metrics/change-failure-rate", prometheusMiddleware(), handler.ChangeFailureRate)
 
 	return router
 }

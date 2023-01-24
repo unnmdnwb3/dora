@@ -3,6 +3,7 @@ package ingest
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/unnmdnwb3/dora/internal/daos"
 	"github.com/unnmdnwb3/dora/internal/models"
@@ -25,10 +26,14 @@ func CreateChanges(ctx context.Context, repositoryID primitive.ObjectID, pipelin
 		return err
 	}
 
+	log.Println(fmt.Sprintf("Found %d pipeline runs for pipelineID %s", len(pipelineRuns), pipelineID.Hex()))
+
 	firstCommits, err := GetFirstCommits(ctx, repositoryID, &pipelineRuns)
 	if err != nil {
 		return err
 	}
+
+	log.Println(fmt.Sprintf("Found %d first commits for repositoryID %s", len(*firstCommits), repositoryID.Hex()))
 
 	changes, err := CalculateChanges(ctx, firstCommits, &pipelineRuns)
 	if err != nil {
@@ -114,16 +119,17 @@ func GetFirstCommits(ctx context.Context, repositoryID primitive.ObjectID, pipel
 // CalculateChanges calculates the changes from commits and pipeline runs.
 func CalculateChanges(ctx context.Context, commits *[]models.Commit, pipelineRuns *[]models.PipelineRun) (*[]models.Change, error) {
 	if len(*commits) == 0 || len(*pipelineRuns) == 0 {
-		return nil, fmt.Errorf("no commits or pipeline runs found")
+		return nil, fmt.Errorf("no commits or pipeline runs provided")
 	}
 
 	if len(*commits) != len(*pipelineRuns) {
 		return nil, fmt.Errorf("number of commits and pipeline runs do not match")
 	}
 
-	var changes []models.Change
 	repositoryID := (*commits)[0].RepositoryID
 	pipelineID := (*pipelineRuns)[0].PipelineID
+
+	var changes []models.Change
 
 	for index := 0; index < len(*pipelineRuns); index++ {
 		start := (*commits)[index].CreatedAt

@@ -19,6 +19,11 @@ func CreateIncidentsPerDays(ctx context.Context, channel chan error, deploymentI
 		return
 	}
 
+	if len(incidents) == 0 {
+		channel <- nil
+		return
+	}
+
 	incidentsPerDays, err := CalculateIncidentsPerDays(ctx, &incidents)
 	if err != nil {
 		channel <- err

@@ -65,8 +65,10 @@ var _ = Describe("services.trigger.aggregate.changes_per_days", func() {
 			changesPerDays, err := aggregate.CalculateChangesPerDays(ctx, &changes)
 			Expect(err).To(BeNil())
 			Expect(len(*changesPerDays)).To(Equal(2))
+			Expect((*changesPerDays)[0].Date).To(Equal(time.Date(2022, 12, 27, 0, 0, 0, 0, time.UTC)))
 			Expect((*changesPerDays)[0].TotalChanges).To(Equal(2))
 			Expect((*changesPerDays)[0].TotalLeadTime).To(Equal(float64(4500)))
+			Expect((*changesPerDays)[1].Date).To(Equal(time.Date(2022, 12, 29, 0, 0, 0, 0, time.UTC)))
 			Expect((*changesPerDays)[1].TotalChanges).To(Equal(1))
 			Expect((*changesPerDays)[1].TotalLeadTime).To(Equal(float64(1200)))
 		})
@@ -93,8 +95,8 @@ var _ = Describe("services.trigger.aggregate.changes_per_days", func() {
 			change3 := models.Change{
 				RepositoryID:    repositoryID,
 				PipelineID:      pipelineID,
-				FirstCommitDate: time.Date(2022, 12, 29, 02, 21, 42, 0, time.UTC),
-				DeploymentDate:  time.Date(2022, 12, 29, 02, 41, 42, 0, time.UTC),
+				FirstCommitDate: time.Date(2022, 12, 29, 2, 21, 42, 0, time.UTC),
+				DeploymentDate:  time.Date(2022, 12, 29, 2, 41, 42, 0, time.UTC),
 			}
 
 			changes := []models.Change{change1, change2, change3}
@@ -112,9 +114,11 @@ var _ = Describe("services.trigger.aggregate.changes_per_days", func() {
 			err = daos.ListChangesPerDays(ctx, repositoryID, pipelineID, &changesPerDays)
 			Expect(err).To(BeNil())
 			Expect(len(changesPerDays)).To(Equal(2))
+			Expect(changesPerDays[0].Date).To(Equal(time.Date(2022, 12, 27, 0, 0, 0, 0, time.UTC)))
 			Expect(changesPerDays[0].TotalChanges).To(Equal(2))
 			Expect(changesPerDays[0].TotalLeadTime).To(Equal(float64(4500)))
 			Expect(changesPerDays[1].TotalChanges).To(Equal(1))
+			Expect(changesPerDays[1].Date).To(Equal(time.Date(2022, 12, 29, 0, 0, 0, 0, time.UTC)))
 			Expect(changesPerDays[1].TotalLeadTime).To(Equal(float64(1200)))
 		})
 	})

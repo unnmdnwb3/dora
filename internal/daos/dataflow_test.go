@@ -21,14 +21,12 @@ var _ = Describe("daos.Dataflow", func() {
 				ExternalID:     externalID,
 				NamespacedName: "foobar/foobar",
 				DefaultBranch:  "main",
-				URI:            "https://gitlab.com/foobar/foobar",
 			}
 			pipeline := models.Pipeline{
 				IntegrationID:  primitive.NewObjectID(),
 				ExternalID:     externalID,
 				NamespacedName: "foobar/foobar",
 				DefaultBranch:  "main",
-				URI:            "https://gitlab.com/foobar/foobar/-/pipelines",
 			}
 			deployment := models.Deployment{
 				IntegrationID: primitive.NewObjectID(),
@@ -54,14 +52,12 @@ var _ = Describe("daos.Dataflow", func() {
 				ExternalID:     externalID,
 				NamespacedName: "foobar/foobar",
 				DefaultBranch:  "main",
-				URI:            "https://gitlab.com/foobar/foobar",
 			}
 			pipeline := models.Pipeline{
 				IntegrationID:  primitive.NewObjectID(),
 				ExternalID:     externalID,
 				NamespacedName: "foobar/foobar",
 				DefaultBranch:  "main",
-				URI:            "https://gitlab.com/foobar/foobar/-/pipelines",
 			}
 			deployment := models.Deployment{
 				IntegrationID: primitive.NewObjectID(),
@@ -89,14 +85,12 @@ var _ = Describe("daos.Dataflow", func() {
 				ExternalID:     externalID,
 				NamespacedName: "foobar/foobar",
 				DefaultBranch:  "main",
-				URI:            "https://gitlab.com/foobar/foobar",
 			}
 			pipeline1 := models.Pipeline{
 				IntegrationID:  primitive.NewObjectID(),
 				ExternalID:     externalID,
 				NamespacedName: "foobar/foobar",
 				DefaultBranch:  "main",
-				URI:            "https://gitlab.com/foobar/foobar/-/pipelines",
 			}
 			deployment1 := models.Deployment{
 				IntegrationID: primitive.NewObjectID(),
@@ -114,14 +108,12 @@ var _ = Describe("daos.Dataflow", func() {
 				ExternalID:     externalID,
 				NamespacedName: "fizz/buzz",
 				DefaultBranch:  "main",
-				URI:            "https://gitlab.com/foobar/foobar",
 			}
 			pipeline2 := models.Pipeline{
 				IntegrationID:  primitive.NewObjectID(),
 				ExternalID:     externalID,
 				NamespacedName: "fizz/buzz",
 				DefaultBranch:  "main",
-				URI:            "https://gitlab.com/foobar/foobar/-/pipelines",
 			}
 			deployment2 := models.Deployment{
 				IntegrationID: primitive.NewObjectID(),
@@ -148,14 +140,12 @@ var _ = Describe("daos.Dataflow", func() {
 				ExternalID:     externalID,
 				NamespacedName: "foobar/foobar",
 				DefaultBranch:  "main",
-				URI:            "https://gitlab.com/foobar/foobar",
 			}
 			pipeline1 := models.Pipeline{
 				IntegrationID:  primitive.NewObjectID(),
 				ExternalID:     externalID,
 				NamespacedName: "foobar/foobar",
 				DefaultBranch:  "main",
-				URI:            "https://gitlab.com/foobar/foobar/-/pipelines",
 			}
 			deployment1 := models.Deployment{
 				IntegrationID: primitive.NewObjectID(),
@@ -173,14 +163,12 @@ var _ = Describe("daos.Dataflow", func() {
 				ExternalID:     externalID,
 				NamespacedName: "fizz/buzz",
 				DefaultBranch:  "main",
-				URI:            "https://gitlab.com/foobar/foobar",
 			}
 			pipeline2 := models.Pipeline{
 				IntegrationID:  primitive.NewObjectID(),
 				ExternalID:     externalID,
 				NamespacedName: "fizz/buzz",
 				DefaultBranch:  "main",
-				URI:            "https://gitlab.com/foobar/foobar/-/pipelines",
 			}
 			deployment2 := models.Deployment{
 				IntegrationID: primitive.NewObjectID(),
@@ -207,14 +195,12 @@ var _ = Describe("daos.Dataflow", func() {
 				ExternalID:     externalID,
 				NamespacedName: "foobar/foobar",
 				DefaultBranch:  "main",
-				URI:            "https://gitlab.com/foobar/foobar",
 			}
 			pipeline := models.Pipeline{
 				IntegrationID:  primitive.NewObjectID(),
 				ExternalID:     externalID,
 				NamespacedName: "foobar/foobar",
 				DefaultBranch:  "main",
-				URI:            "https://gitlab.com/foobar/foobar/-/pipelines",
 			}
 			deployment := models.Deployment{
 				IntegrationID: primitive.NewObjectID(),
@@ -250,14 +236,12 @@ var _ = Describe("daos.Dataflow", func() {
 				ExternalID:     externalID,
 				NamespacedName: "foobar/foobar",
 				DefaultBranch:  "main",
-				URI:            "https://gitlab.com/foobar/foobar",
 			}
 			pipeline := models.Pipeline{
 				IntegrationID:  primitive.NewObjectID(),
 				ExternalID:     externalID,
 				NamespacedName: "foobar/foobar",
 				DefaultBranch:  "main",
-				URI:            "https://gitlab.com/foobar/foobar/-/pipelines",
 			}
 			deployment := models.Deployment{
 				IntegrationID: primitive.NewObjectID(),

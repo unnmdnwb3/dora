@@ -66,6 +66,51 @@ var _ = Describe("services.trigger.ingest.changes", func() {
 			Expect(err).To(BeNil())
 
 			repositoryID := primitive.NewObjectID()
+			// commits := []models.Commit{
+			// 	{
+			// 		RepositoryID: repositoryID,
+			// 		CreatedAt:    time.Date(2022, 12, 28, 13, 01, 11, 0, time.UTC),
+			// 		Sha:          "1db209656ad1ab0e14aaa4e2fe79b6caf8b2a9e7",
+			// 		ParentShas: []string{
+			// 			"3d95fe3bf954501d3832e50fdd803c5f9eae3f94",
+			// 			"487d6aedb92ab76bdc03957aceece75db906796e",
+			// 		},
+			// 	},
+			// 	{
+			// 		RepositoryID: repositoryID,
+			// 		CreatedAt:    time.Date(2022, 12, 28, 12, 46, 21, 0, time.UTC),
+			// 		Sha:          "487d6aedb92ab76bdc03957aceece75db906796e",
+			// 		ParentShas: []string{
+			// 			"3d95fe3bf954501d3832e50fdd803c5f9eae3f94",
+			// 		},
+			// 	},
+			// 	{
+			// 		RepositoryID: repositoryID,
+			// 		CreatedAt:    time.Date(2022, 12, 28, 12, 21, 5, 0, time.UTC),
+			// 		Sha:          "3d95fe3bf954501d3832e50fdd803c5f9eae3f94",
+			// 		ParentShas: []string{
+			// 			"5da8e92e9f9243f7ee937170474531393a2cf48f",
+			// 			"b9b48bcf26ab79c77e4aa4dcf28ca466bdc3b9fa",
+			// 		},
+			// 	},
+			// 	{
+			// 		RepositoryID: repositoryID,
+			// 		CreatedAt:    time.Date(2022, 12, 27, 15, 55, 34, 0, time.UTC),
+			// 		Sha:          "b9b48bcf26ab79c77e4aa4dcf28ca466bdc3b9fa",
+			// 		ParentShas: []string{
+			// 			"5da8e92e9f9243f7ee937170474531393a2cf48f",
+			// 		},
+			// 	},
+			// 	{
+			// 		RepositoryID: repositoryID,
+			// 		CreatedAt:    time.Date(2022, 12, 27, 14, 00, 2, 0, time.UTC),
+			// 		Sha:          "5da8e92e9f9243f7ee937170474531393a2cf48f",
+			// 		ParentShas: []string{
+			// 			"0c9e7c4b194a4a5c7066301a8c4f0c6c061ce9bc",
+			// 		},
+			// 	},
+			// }
+
 			commits := []models.Commit{
 				{
 					RepositoryID: repositoryID,
@@ -133,8 +178,8 @@ var _ = Describe("services.trigger.ingest.changes", func() {
 					Ref:         "main",
 					Status:      "success",
 					EventSource: "push",
-					CreatedAt:   time.Date(2022, 12, 27, 13, 16, 42, 0, time.UTC),
-					UpdatedAt:   time.Date(2022, 12, 27, 13, 21, 42, 0, time.UTC),
+					CreatedAt:   time.Date(2022, 12, 27, 15, 57, 42, 0, time.UTC),
+					UpdatedAt:   time.Date(2022, 12, 27, 15, 59, 12, 0, time.UTC),
 					URI:         "https://gitlab.com/foobar/foobar/-/pipelines/713437228",
 				},
 				{
@@ -144,8 +189,8 @@ var _ = Describe("services.trigger.ingest.changes", func() {
 					Ref:         "main",
 					Status:      "success",
 					EventSource: "push",
-					CreatedAt:   time.Date(2022, 12, 28, 15, 37, 28, 0, time.UTC),
-					UpdatedAt:   time.Date(2022, 12, 28, 15, 43, 17, 0, time.UTC),
+					CreatedAt:   time.Date(2022, 12, 28, 12, 47, 16, 0, time.UTC),
+					UpdatedAt:   time.Date(2022, 12, 28, 12, 50, 2, 0, time.UTC),
 					URI:         "https://gitlab.com/foobar/foobar/-/pipelines/713437229",
 				},
 			}
@@ -154,7 +199,7 @@ var _ = Describe("services.trigger.ingest.changes", func() {
 			commits := []models.Commit{
 				{
 					RepositoryID: repositoryID,
-					CreatedAt:    time.Date(2022, 12, 27, 11, 0, 2, 0, time.UTC),
+					CreatedAt:    time.Date(2022, 12, 27, 14, 00, 2, 0, time.UTC),
 					Sha:          "5da8e92e9f9243f7ee937170474531393a2cf48f",
 					ParentShas: []string{
 						"0c9e7c4b194a4a5c7066301a8c4f0c6c061ce9bc",
@@ -162,7 +207,7 @@ var _ = Describe("services.trigger.ingest.changes", func() {
 				},
 				{
 					RepositoryID: repositoryID,
-					CreatedAt:    time.Date(2022, 12, 27, 12, 26, 34, 0, time.UTC),
+					CreatedAt:    time.Date(2022, 12, 27, 15, 55, 34, 0, time.UTC),
 					Sha:          "b9b48bcf26ab79c77e4aa4dcf28ca466bdc3b9fa",
 					ParentShas: []string{
 						"5da8e92e9f9243f7ee937170474531393a2cf48f",
@@ -170,7 +215,7 @@ var _ = Describe("services.trigger.ingest.changes", func() {
 				},
 				{
 					RepositoryID: repositoryID,
-					CreatedAt:    time.Date(2022, 12, 27, 13, 21, 41, 0, time.UTC),
+					CreatedAt:    time.Date(2022, 12, 28, 12, 21, 5, 0, time.UTC),
 					Sha:          "3d95fe3bf954501d3832e50fdd803c5f9eae3f94",
 					ParentShas: []string{
 						"5da8e92e9f9243f7ee937170474531393a2cf48f",
@@ -187,7 +232,7 @@ var _ = Describe("services.trigger.ingest.changes", func() {
 				},
 				{
 					RepositoryID: repositoryID,
-					CreatedAt:    time.Date(2022, 12, 28, 15, 37, 20, 0, time.UTC),
+					CreatedAt:    time.Date(2022, 12, 28, 13, 01, 11, 0, time.UTC),
 					Sha:          "1db209656ad1ab0e14aaa4e2fe79b6caf8b2a9e7",
 					ParentShas: []string{
 						"3d95fe3bf954501d3832e50fdd803c5f9eae3f94",
@@ -204,8 +249,8 @@ var _ = Describe("services.trigger.ingest.changes", func() {
 			changes, err := ingest.CalculateChanges(ctx, firstCommits, &pipelineRuns)
 			Expect(err).To(BeNil())
 			Expect(len(*changes)).To(Equal(2))
-			Expect((*changes)[0].LeadTime).To(Equal(float64(3308)))
-			Expect((*changes)[1].LeadTime).To(Equal(float64(10616)))
+			Expect((*changes)[0].LeadTime).To(Equal(float64(218)))
+			Expect((*changes)[1].LeadTime).To(Equal(float64(221)))
 		})
 	})
 
@@ -220,8 +265,8 @@ var _ = Describe("services.trigger.ingest.changes", func() {
 					Ref:         "main",
 					Status:      "success",
 					EventSource: "push",
-					CreatedAt:   time.Date(2022, 12, 27, 13, 16, 42, 0, time.UTC),
-					UpdatedAt:   time.Date(2022, 12, 27, 13, 21, 42, 0, time.UTC),
+					CreatedAt:   time.Date(2022, 12, 27, 15, 57, 42, 0, time.UTC),
+					UpdatedAt:   time.Date(2022, 12, 27, 15, 59, 12, 0, time.UTC),
 					URI:         "https://gitlab.com/foobar/foobar/-/pipelines/713437228",
 				},
 				{
@@ -231,8 +276,8 @@ var _ = Describe("services.trigger.ingest.changes", func() {
 					Ref:         "main",
 					Status:      "success",
 					EventSource: "push",
-					CreatedAt:   time.Date(2022, 12, 28, 15, 37, 28, 0, time.UTC),
-					UpdatedAt:   time.Date(2022, 12, 28, 15, 43, 17, 0, time.UTC),
+					CreatedAt:   time.Date(2022, 12, 28, 12, 47, 16, 0, time.UTC),
+					UpdatedAt:   time.Date(2022, 12, 28, 12, 50, 2, 0, time.UTC),
 					URI:         "https://gitlab.com/foobar/foobar/-/pipelines/713437229",
 				},
 			}
@@ -244,7 +289,7 @@ var _ = Describe("services.trigger.ingest.changes", func() {
 			commits := []models.Commit{
 				{
 					RepositoryID: repositoryID,
-					CreatedAt:    time.Date(2022, 12, 27, 11, 0, 2, 0, time.UTC),
+					CreatedAt:    time.Date(2022, 12, 27, 14, 00, 2, 0, time.UTC),
 					Sha:          "5da8e92e9f9243f7ee937170474531393a2cf48f",
 					ParentShas: []string{
 						"0c9e7c4b194a4a5c7066301a8c4f0c6c061ce9bc",
@@ -252,7 +297,7 @@ var _ = Describe("services.trigger.ingest.changes", func() {
 				},
 				{
 					RepositoryID: repositoryID,
-					CreatedAt:    time.Date(2022, 12, 27, 12, 26, 34, 0, time.UTC),
+					CreatedAt:    time.Date(2022, 12, 27, 15, 55, 34, 0, time.UTC),
 					Sha:          "b9b48bcf26ab79c77e4aa4dcf28ca466bdc3b9fa",
 					ParentShas: []string{
 						"5da8e92e9f9243f7ee937170474531393a2cf48f",
@@ -260,7 +305,7 @@ var _ = Describe("services.trigger.ingest.changes", func() {
 				},
 				{
 					RepositoryID: repositoryID,
-					CreatedAt:    time.Date(2022, 12, 27, 13, 21, 41, 0, time.UTC),
+					CreatedAt:    time.Date(2022, 12, 28, 12, 21, 5, 0, time.UTC),
 					Sha:          "3d95fe3bf954501d3832e50fdd803c5f9eae3f94",
 					ParentShas: []string{
 						"5da8e92e9f9243f7ee937170474531393a2cf48f",
@@ -277,7 +322,7 @@ var _ = Describe("services.trigger.ingest.changes", func() {
 				},
 				{
 					RepositoryID: repositoryID,
-					CreatedAt:    time.Date(2022, 12, 28, 15, 37, 20, 0, time.UTC),
+					CreatedAt:    time.Date(2022, 12, 28, 13, 01, 11, 0, time.UTC),
 					Sha:          "1db209656ad1ab0e14aaa4e2fe79b6caf8b2a9e7",
 					ParentShas: []string{
 						"3d95fe3bf954501d3832e50fdd803c5f9eae3f94",
@@ -296,8 +341,8 @@ var _ = Describe("services.trigger.ingest.changes", func() {
 			err = daos.ListChanges(ctx, repositoryID, &changes)
 
 			Expect(len(changes)).To(Equal(2))
-			Expect(changes[0].LeadTime).To(Equal(float64(3308)))
-			Expect(changes[1].LeadTime).To(Equal(float64(10616)))
+			Expect(changes[0].LeadTime).To(Equal(float64(218)))
+			Expect(changes[1].LeadTime).To(Equal(float64(221)))
 		})
 	})
 })
