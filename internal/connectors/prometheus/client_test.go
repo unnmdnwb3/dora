@@ -19,11 +19,11 @@ func TestClient(t *testing.T) {
 }
 
 var _ = Describe("prometheus.Client", func() {
-
 	var (
 		mock               *httptest.Server
 		queryRangeResponse prometheus.QueryRangeResponse
-		client             *prometheus.Client
+
+		client *prometheus.Client
 	)
 
 	var _ = BeforeEach(func() {
@@ -34,8 +34,11 @@ var _ = Describe("prometheus.Client", func() {
 			w.Write(json)
 		}))
 
-		query := "job:http_total_requests:internal_server_error_percentage"
-		client = prometheus.NewClient(mock.URL, "", query, time.Unix(1671556422, 0), time.Unix(1672161144, 0), "1m")
+		query := "up{app='dashboard-service'}"
+		start := time.Unix(1673186400, 0)
+		end := time.Unix(1674396000, 0)
+		step := 600
+		client = prometheus.NewClient(mock.URL, "", query, start, end, step)
 	})
 
 	var _ = AfterEach(func() {
@@ -46,9 +49,9 @@ var _ = Describe("prometheus.Client", func() {
 		It("creates monitoring data points from a query response", func() {
 			monitoringDataPoints, err := client.CreateMonitoringDataPoints(queryRangeResponse)
 			Expect(err).To(BeNil())
-			Expect(len(*monitoringDataPoints)).To(Equal(17))
-			Expect((*monitoringDataPoints)[16].Value).To(Equal(0.281))
-			Expect((*monitoringDataPoints)[16].CreatedAt).To(Equal(time.Date(2022, 12, 28, 14, 43, 12, 0, time.UTC)))
+			Expect(len(*monitoringDataPoints)).To(Equal(444))
+			Expect((*monitoringDataPoints)[0].Value).To(Equal(1.0))
+			Expect((*monitoringDataPoints)[0].CreatedAt).To(Equal(time.Unix(1674130200, 0)))
 		})
 	})
 
@@ -56,9 +59,9 @@ var _ = Describe("prometheus.Client", func() {
 		It("creates monitoring data points from a query response", func() {
 			monitoringDataPoints, err := client.GetMonitoringDataPoints()
 			Expect(err).To(BeNil())
-			Expect(len(*monitoringDataPoints)).To(Equal(17))
-			Expect((*monitoringDataPoints)[16].Value).To(Equal(0.281))
-			Expect((*monitoringDataPoints)[16].CreatedAt).To(Equal(time.Date(2022, 12, 28, 14, 43, 12, 0, time.UTC)))
+			Expect(len(*monitoringDataPoints)).To(Equal(444))
+			Expect((*monitoringDataPoints)[0].Value).To(Equal(1.0))
+			Expect((*monitoringDataPoints)[0].CreatedAt).To(Equal(time.Unix(1674130200, 0)))
 		})
 	})
 })

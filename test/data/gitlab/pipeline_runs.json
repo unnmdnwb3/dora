@@ -1,27 +1,15 @@
 [
     {
-        "id": 671507478,
-        "iid": 996,
+        "id": 672730294,
+        "iid": 999,
         "project_id": 15399086,
-        "sha": "398dc0ca313035ea4eb7ab3f29a5500631660fb7",
-        "ref": "main",
-        "status": "failed",
-        "source": "push",
-        "created_at": "2022-10-19T19:46:13.287Z",
-        "updated_at": "2022-10-19T19:51:10.126Z",
-        "web_url": "https://gitlab.com/foo/bar/-/pipelines/671507478"
-    },
-    {
-        "id": 671923590,
-        "iid": 997,
-        "project_id": 15399086,
-        "sha": "487d6aedb92ab76bdc03957aceece75db906796e",
+        "sha": "5e4016969a4d1e2c42d1c650a9e7f6328084798f",
         "ref": "main",
         "status": "success",
         "source": "push",
-        "created_at": "2022-10-20T08:26:25.953Z",
-        "updated_at": "2022-10-20T08:31:59.072Z",
-        "web_url": "https://gitlab.com/foo/bar/-/pipelines/671923590"
+        "created_at": "2022-10-20T21:13:01.734Z",
+        "updated_at": "2022-10-20T21:18:49.621Z",
+        "web_url": "https://gitlab.com/foo/bar/-/pipelines/672730294"
     },
     {
         "id": 672199634,
@@ -36,15 +24,27 @@
         "web_url": "https://gitlab.com/foo/bar/-/pipelines/672199634"
     },
     {
-        "id": 672730294,
-        "iid": 999,
+        "id": 671923590,
+        "iid": 997,
         "project_id": 15399086,
-        "sha": "5e4016969a4d1e2c42d1c650a9e7f6328084798f",
+        "sha": "487d6aedb92ab76bdc03957aceece75db906796e",
         "ref": "main",
         "status": "success",
         "source": "push",
-        "created_at": "2022-10-20T21:13:01.734Z",
-        "updated_at": "2022-10-20T21:18:49.621Z",
-        "web_url": "https://gitlab.com/foo/bar/-/pipelines/672730294"
+        "created_at": "2022-10-20T08:26:25.953Z",
+        "updated_at": "2022-10-20T08:31:59.072Z",
+        "web_url": "https://gitlab.com/foo/bar/-/pipelines/671923590"
+    },
+    {
+        "id": 671507478,
+        "iid": 996,
+        "project_id": 15399086,
+        "sha": "398dc0ca313035ea4eb7ab3f29a5500631660fb7",
+        "ref": "main",
+        "status": "failed",
+        "source": "push",
+        "created_at": "2022-10-19T19:46:13.287Z",
+        "updated_at": "2022-10-19T19:51:10.126Z",
+        "web_url": "https://gitlab.com/foo/bar/-/pipelines/671507478"
     }
 ]

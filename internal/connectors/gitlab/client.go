@@ -4,10 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/unnmdnwb3/dora/internal/models"
+	"github.com/unnmdnwb3/dora/internal/utils/times"
 )
 
 // Client represents a Gitlab API client
@@ -151,6 +154,7 @@ func (c *Client) GetCommits(projectID int, referenceBranch string) (*[]models.Co
 	q := req.URL.Query()
 	q.Add("order", "default") // asc
 	q.Add("ref_name", referenceBranch)
+	q.Add("since", times.Date(time.Now().AddDate(0, -1, 0)).String())
 	req.URL.RawQuery = q.Encode()
 
 	resp, err := client.Do(req)
@@ -169,6 +173,8 @@ func (c *Client) GetCommits(projectID int, referenceBranch string) (*[]models.Co
 	if err != nil {
 		return nil, err
 	}
+
+	log.Printf("Found %d commits", len(commits))
 
 	return &commits, nil
 }
@@ -191,6 +197,7 @@ func (c *Client) GetPipelineRuns(projectID int, referenceBranch string) (*[]mode
 	q.Add("sort", "asc")
 	q.Add("source", "push")
 	q.Add("status", "success")
+	q.Add("updated_after", times.Date(time.Now().AddDate(0, -1, 0)).String())
 	req.URL.RawQuery = q.Encode()
 
 	resp, err := client.Do(req)
@@ -209,6 +216,8 @@ func (c *Client) GetPipelineRuns(projectID int, referenceBranch string) (*[]mode
 	if err != nil {
 		return nil, err
 	}
+
+	log.Printf("Found %d pipeline runs", len(pipelineRuns))
 
 	return &pipelineRuns, nil
 }
