@@ -2,6 +2,8 @@ package ingest
 
 import (
 	"context"
+	"fmt"
+	"log"
 	"time"
 
 	"github.com/unnmdnwb3/dora/internal/connectors/prometheus"
@@ -36,13 +38,15 @@ func ImportMonitoringDataPoints(ctx context.Context, deployment *models.Deployme
 
 	// TODO standardize the time range for data imports
 	end := time.Now()
-	start := times.Date(end.AddDate(0, 0, -90))
+	start := times.Date(end.AddDate(0, -1, 0))
 
 	client := prometheus.NewClient(integration.URI, integration.BearerToken, deployment.Query, start, end, deployment.Step)
 	monitoringDataPoints, err := client.GetMonitoringDataPoints()
 	if err != nil {
 		return nil, err
 	}
+
+	log.Printf("Created %d monitoring data points", len(*monitoringDataPoints))
 
 	return monitoringDataPoints, nil
 }
@@ -55,75 +59,58 @@ func CreateIncidents(ctx context.Context, deployment *models.Deployment, monitor
 	}
 
 	err = daos.CreateIncidents(ctx, incidents)
-	return err
+	if err != nil {
+		return err
+	}
+
+	log.Printf("Created %d incidents", len(*incidents))
+
+	return nil
 }
 
 // CalculateIncidents calculates the incidents for a given deployment.
+// Ongoing incidents at the start and the end of the monitoring data points are used to create incidents with the information we got.
 func CalculateIncidents(ctx context.Context, deployment *models.Deployment, monitoringDataPoints *[]models.MonitoringDataPoint) (*[]models.Incident, error) {
-	var incidents []models.Incident
+	if len(*monitoringDataPoints) == 0 {
+		return &[]models.Incident{}, fmt.Errorf("no monitoring data points provided")
+	}
 
-	index := FirstNonIncident(deployment.Relation, deployment.Threshold, monitoringDataPoints)
-	if index == -1 {
-		return &[]models.Incident{
-			{
+	incidents := []models.Incident{}
+	prevIsIncident := IsIncident(deployment.Relation, deployment.Threshold, (*monitoringDataPoints)[0])
+
+	for slow, fast := 0, 1; fast < len(*monitoringDataPoints); fast++ {
+		curr := (*monitoringDataPoints)[fast]
+		currIsIncident := IsIncident(deployment.Relation, deployment.Threshold, curr)
+
+		// if the current data point is an incident and the previous was one as well, we do not need to do anything
+		// same applies if the current data point is not an incident and the previous was not one as well
+
+		if currIsIncident && !prevIsIncident {
+			slow = fast
+		}
+
+		if !currIsIncident && prevIsIncident {
+			incidents = append(incidents, models.Incident{
 				DeploymentID: deployment.ID,
-				StartDate:    (*monitoringDataPoints)[0].CreatedAt,
-				EndDate:      (*monitoringDataPoints)[len(*monitoringDataPoints)-1].CreatedAt,
-			},
-		}, nil
-	}
-
-	// cut slice to the first non-incident point
-	*monitoringDataPoints = (*monitoringDataPoints)[index:]
-	isIncidentPrev := false
-	slow := 0
-	for fast := 1; fast < len(*monitoringDataPoints); fast++ {
-		isIncident := IsIncident(deployment.Relation, deployment.Threshold, (*monitoringDataPoints)[fast])
-
-		if !isIncident {
-			if isIncidentPrev {
-				incident := models.Incident{
-					DeploymentID: deployment.ID,
-					StartDate:    (*monitoringDataPoints)[slow].CreatedAt,
-					EndDate:      (*monitoringDataPoints)[fast-1].CreatedAt,
-				}
-				incidents = append(incidents, incident)
-			}
+				StartDate:    (*monitoringDataPoints)[slow].CreatedAt,
+				EndDate:      (*monitoringDataPoints)[fast-1].CreatedAt,
+			})
 		}
 
-		if isIncident {
-			step, err := times.Duration(deployment.Step)
-			if err != nil {
-				return nil, err
-			}
-			isContinuation := IsContinuation((*monitoringDataPoints)[fast-1], (*monitoringDataPoints)[fast], step)
-
-			if !isIncidentPrev {
-				slow = fast
-			}
-
-			if isIncidentPrev && !isContinuation {
-				incident := models.Incident{
-					DeploymentID: deployment.ID,
-					StartDate:    (*monitoringDataPoints)[slow].CreatedAt,
-					EndDate:      (*monitoringDataPoints)[fast-1].CreatedAt,
-				}
-				incidents = append(incidents, incident)
-				slow = fast
-			}
-		}
-
-		isIncidentPrev = isIncident
+		prevIsIncident = currIsIncident
 	}
 
-	// add last incident if still open
-	if isIncidentPrev {
-		incident := models.Incident{
+	// if the last data point part of an incident, we need to create an incident for it
+	len := len(*monitoringDataPoints)
+	prevIsIncident = IsIncident(deployment.Relation, deployment.Threshold, (*monitoringDataPoints)[len-2])
+	currIsIncident := IsIncident(deployment.Relation, deployment.Threshold, (*monitoringDataPoints)[len-1])
+
+	if currIsIncident && prevIsIncident {
+		incidents = append(incidents, models.Incident{
 			DeploymentID: deployment.ID,
-			StartDate:    (*monitoringDataPoints)[slow].CreatedAt,
-			EndDate:      (*monitoringDataPoints)[len(*monitoringDataPoints)-1].CreatedAt,
-		}
-		incidents = append(incidents, incident)
+			StartDate:    (*monitoringDataPoints)[len-2].CreatedAt,
+			EndDate:      (*monitoringDataPoints)[len-1].CreatedAt,
+		})
 	}
 
 	return &incidents, nil
@@ -136,22 +123,4 @@ func IsIncident(relation string, threshold float64, monitoringDataPoint models.M
 	}
 
 	return monitoringDataPoint.Value < threshold
-}
-
-// FirstNonIncident finds the first non-incident data point.
-func FirstNonIncident(relation string, threshold float64, monitoringDataPoints *[]models.MonitoringDataPoint) int {
-	for index := 0; index < len(*monitoringDataPoints); index++ {
-		if !IsIncident(relation, threshold, (*monitoringDataPoints)[index]) {
-			return index
-		}
-	}
-	return -1
-}
-
-// IsContinuation checks if the given monitoring data points are part of the same incident.
-func IsContinuation(prev models.MonitoringDataPoint, curr models.MonitoringDataPoint, step time.Duration) bool {
-	elapsedTime := curr.CreatedAt.Sub(prev.CreatedAt)
-	// timesteps in Prometheus time series are not exact, thus, we need to implement some tolerance
-	tolerance := elapsedTime / 2
-	return step-tolerance <= elapsedTime && elapsedTime <= step+tolerance
 }
