@@ -11,6 +11,7 @@ import (
 	"github.com/unnmdnwb3/dora/internal/database/mongodb"
 	"github.com/unnmdnwb3/dora/internal/models"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
@@ -96,7 +97,8 @@ var _ = Describe("mongodb.Service", func() {
 
 			var findIntegrations []models.Integration
 			filter := bson.M{"type": "sc"}
-			err := service.Find(ctx, "integrations", filter, &findIntegrations)
+			ops := options.Find().SetSort(bson.M{"_id": 1})
+			err := service.Find(ctx, "integrations", filter, &findIntegrations, ops)
 			Expect(err).To(BeNil())
 			Expect(findIntegrations).To(HaveLen(3))
 		})
