@@ -18,19 +18,23 @@ func CreateDataflow(c *gin.Context) {
 	err := c.ShouldBind(&dataflow)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
 	err = daos.CreateDataflow(ctx, &dataflow)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
 	err = trigger.OnNewDataflow(ctx, &dataflow)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
 	c.JSON(http.StatusOK, dataflow)
+	return
 }
 
 // GetDataflow retrieves a Dataflow.

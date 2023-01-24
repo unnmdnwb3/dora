@@ -43,19 +43,17 @@ var _ = Describe("services.metrics.change_failure_rate", func() {
 				ExternalID:     40649465,
 				NamespacedName: "foobar/foobar",
 				DefaultBranch:  "main",
-				URI:            "https://gitlab.com/foobar/foobar",
 			}
 			pipeline := models.Pipeline{
 				IntegrationID:  primitive.NewObjectID(),
 				ExternalID:     40649465,
 				NamespacedName: "foobar/foobar",
 				DefaultBranch:  "main",
-				URI:            "https://gitlab.com/foobar/foobar/-/pipelines",
 			}
 			deployment := models.Deployment{
 				IntegrationID: primitive.NewObjectID(),
 				Query:         "job:http_total_requests:internal_server_error_percentage",
-				Step:          "5m",
+				Step:          300,
 				Relation:      "gt",
 				Threshold:     0.2,
 			}
