@@ -61,11 +61,17 @@ func SetupRouter() *gin.Engine {
 	router.PUT("/api/v1/dataflows/:id", prometheusMiddleware(), handler.UpdateDataflow)
 	router.DELETE("/api/v1/dataflows/:id", prometheusMiddleware(), handler.DeleteDataflow)
 
-	// routes for metrics
+	// routes for dataflow metrics
 	router.POST("/api/v1/metrics/deployment-frequency", prometheusMiddleware(), handler.DeploymentFrequency)
 	router.POST("/api/v1/metrics/lead-time-for-changes", prometheusMiddleware(), handler.LeadTimeForChanges)
 	router.POST("/api/v1/metrics/mean-time-to-restore", prometheusMiddleware(), handler.MeanTimeToRestore)
 	router.POST("/api/v1/metrics/change-failure-rate", prometheusMiddleware(), handler.ChangeFailureRate)
+
+	// routes for general dataflow metrics
+	router.POST("/api/v1/metrics/general/deployment-frequency", prometheusMiddleware(), handler.GeneralDeploymentFrequency)
+	router.POST("/api/v1/metrics/general/lead-time-for-changes", prometheusMiddleware(), handler.GeneralLeadTimeForChanges)
+	router.POST("/api/v1/metrics/general/mean-time-to-restore", prometheusMiddleware(), handler.GeneralMeanTimeToRestore)
+	router.POST("/api/v1/metrics/general/change-failure-rate", prometheusMiddleware(), handler.GeneralChangeFailureRate)
 
 	return router
 }

@@ -13,7 +13,7 @@ import (
 func ChangeFailureRate(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	var request models.ChangeFailureRateRequest
+	var request models.MetricsRequest
 	err := c.ShouldBind(&request)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
@@ -26,6 +26,24 @@ func ChangeFailureRate(c *gin.Context) {
 	}
 
 	changeFailureRate, err := metrics.ChangeFailureRate(ctx, dataflow.ID, request.StartDate, request.EndDate, request.Window)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+	}
+
+	c.JSON(http.StatusOK, changeFailureRate)
+}
+
+// GeneralChangeFailureRate retrieves the change failure rate of a Dataflow.
+func GeneralChangeFailureRate(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	var request models.GeneralMetricsRequest
+	err := c.ShouldBind(&request)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+	}
+
+	changeFailureRate, err := metrics.GeneralChangeFailureRate(ctx, request.StartDate, request.EndDate, request.Window)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}

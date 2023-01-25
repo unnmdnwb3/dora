@@ -12,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// ChangeFailureRate calculates the change failure rate for a given dataflow.
+// ChangeFailureRate calculates the change failure rate for a specific dataflow.
 func ChangeFailureRate(ctx context.Context, dataflowID primitive.ObjectID, startDate time.Time, endDate time.Time, window int) (*models.ChangeFailureRate, error) {
 	if window < 1 {
 		return nil, fmt.Errorf("window must be greater than 0")
@@ -67,6 +67,64 @@ func ChangeFailureRate(ctx context.Context, dataflowID primitive.ObjectID, start
 
 	return &models.ChangeFailureRate{
 		DataflowID:       dataflow.ID,
+		StartDate:        startDate,
+		EndDate:          endDate,
+		Window:           window,
+		Dates:            (*dates)[offset:],
+		DailyIncidents:   (*dailyIncidents)[offset:],
+		DailyDeployments: (*dailyDeployments)[offset:],
+		MovingAverages:   (*movingAverages),
+	}, err
+}
+
+// GeneralChangeFailureRate calculates the general change failure rate over all dataflows.
+func GeneralChangeFailureRate(ctx context.Context, startDate time.Time, endDate time.Time, window int) (*models.GeneralChangeFailureRate, error) {
+	if window < 1 {
+		return nil, fmt.Errorf("window must be greater than 0")
+	}
+
+	if startDate.After(endDate) {
+		return nil, fmt.Errorf("start date must be before end date")
+	}
+
+	offset := window - 1
+	startDate = times.Date(startDate.AddDate(0, 0, -offset))
+
+	var incidentsPerDays []models.IncidentsPerDay
+	filter := bson.M{"date": bson.M{"$gte": startDate, "$lte": endDate}}
+	err := daos.ListIncidentsPerDaysByFilter(ctx, filter, &incidentsPerDays)
+	if err != nil {
+		return nil, fmt.Errorf("error listing incidents per days: %w", err)
+	}
+
+	var pipelineRunsPerDays []models.PipelineRunsPerDay
+	filter = bson.M{"date": bson.M{"$gte": startDate, "$lte": endDate}}
+	err = daos.ListPipelineRunsPerDaysByFilter(ctx, filter, &pipelineRunsPerDays)
+	if err != nil {
+		return nil, fmt.Errorf("error listing pipeline runs per days: %w", err)
+	}
+
+	dates, err := DatesBetween(startDate, endDate)
+	if err != nil {
+		return nil, fmt.Errorf("error getting dates between %s and %s: %w", startDate, endDate, err)
+	}
+
+	dailyIncidents, _, err := CompleteIncidentsPerDays(&incidentsPerDays, dates)
+	if err != nil {
+		return nil, fmt.Errorf("error completing incidents per days: %w", err)
+	}
+
+	dailyDeployments, err := CompletePipelineRunsPerDays(&pipelineRunsPerDays, dates)
+	if err != nil {
+		return nil, fmt.Errorf("error completing pipeline runs per days: %w", err)
+	}
+
+	movingAverages, err := MovingAveragesRatio(dailyIncidents, dailyDeployments, window)
+	if err != nil {
+		return nil, fmt.Errorf("error calculating moving averages: %w", err)
+	}
+
+	return &models.GeneralChangeFailureRate{
 		StartDate:        startDate,
 		EndDate:          endDate,
 		Window:           window,
