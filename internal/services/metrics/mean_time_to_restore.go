@@ -12,11 +12,12 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// MeanTimeToRestore calculates the mean time to restore for a given dataflow.
+// MeanTimeToRestore calculates the mean time to restore for a specific dataflow.
 func MeanTimeToRestore(ctx context.Context, dataflowID primitive.ObjectID, startDate time.Time, endDate time.Time, window int) (*models.MeanTimeToRestore, error) {
 	if window < 1 {
 		return nil, fmt.Errorf("window must be greater than 0")
 	}
+
 	if startDate.After(endDate) {
 		return nil, fmt.Errorf("start date must be before end date")
 	}
@@ -54,6 +55,52 @@ func MeanTimeToRestore(ctx context.Context, dataflowID primitive.ObjectID, start
 
 	return &models.MeanTimeToRestore{
 		DataflowID:     dataflow.ID,
+		StartDate:      startDate,
+		EndDate:        endDate,
+		Window:         window,
+		Dates:          (*dates)[offset:],
+		DailyIncidents: (*dailyIncidents)[offset:],
+		DailyDurations: (*dailyDurations)[offset:],
+		MovingAverages: *movingAverages,
+	}, nil
+}
+
+// GeneralMeanTimeToRestore calculates the general mean time to restore over all dataflows.
+func GeneralMeanTimeToRestore(ctx context.Context, startDate time.Time, endDate time.Time, window int) (*models.GeneralMeanTimeToRestore, error) {
+	if window < 1 {
+		return nil, fmt.Errorf("window must be greater than 0")
+	}
+
+	if startDate.After(endDate) {
+		return nil, fmt.Errorf("start date must be before end date")
+	}
+
+	offset := window - 1
+	startDate = times.Date(startDate.AddDate(0, 0, -offset))
+
+	var incidentsPerDays []models.IncidentsPerDay
+	filter := bson.M{"date": bson.M{"$gte": startDate, "$lte": endDate}}
+	err := daos.ListIncidentsPerDaysByFilter(ctx, filter, &incidentsPerDays)
+	if err != nil {
+		return nil, fmt.Errorf("error getting incidents per days: %w", err)
+	}
+
+	dates, err := DatesBetween(startDate, endDate)
+	if err != nil {
+		return nil, fmt.Errorf("error getting dates between %s and %s: %w", startDate, endDate, err)
+	}
+
+	dailyIncidents, dailyDurations, err := CompleteIncidentsPerDays(&incidentsPerDays, dates)
+	if err != nil {
+		return nil, fmt.Errorf("error completing incidents per days: %w", err)
+	}
+
+	movingAverages, err := MovingAverages(dailyDurations, window)
+	if err != nil {
+		return nil, fmt.Errorf("error calculating moving averages: %w", err)
+	}
+
+	return &models.GeneralMeanTimeToRestore{
 		StartDate:      startDate,
 		EndDate:        endDate,
 		Window:         window,

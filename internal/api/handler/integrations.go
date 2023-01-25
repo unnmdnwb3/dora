@@ -17,14 +17,17 @@ func CreateIntegration(c *gin.Context) {
 	err := c.ShouldBind(&integration)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
 	err = daos.CreateIntegration(ctx, &integration)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
 	c.JSON(http.StatusOK, integration)
+	return
 }
 
 // GetIntegration retrieves a Integration.
@@ -35,20 +38,24 @@ func GetIntegration(c *gin.Context) {
 	err := c.BindUri(&params)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
 	var integration models.Integration
 	integrationID, err := types.StringToObjectID(params.ID)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
 	err = daos.GetIntegration(ctx, integrationID, &integration)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
 	c.JSON(http.StatusOK, integration)
+	return
 }
 
 // ListIntegrations retrieves many Integrations.
@@ -59,9 +66,11 @@ func ListIntegrations(c *gin.Context) {
 	err := daos.ListIntegrations(ctx, &integrations)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
 	c.JSON(http.StatusOK, integrations)
+	return
 }
 
 // UpdateIntegration update a Integration.
@@ -72,22 +81,26 @@ func UpdateIntegration(c *gin.Context) {
 	err := c.BindUri(&params)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
 	var integration models.Integration
 	err = c.ShouldBind(&integration)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
 	integrationID, err := types.StringToObjectID(params.ID)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
 	err = daos.UpdateIntegration(ctx, integrationID, &integration)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
 	integration.ID = integrationID
@@ -102,17 +115,21 @@ func DeleteIntegration(c *gin.Context) {
 	err := c.BindUri(&params)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
 	integrationID, err := types.StringToObjectID(params.ID)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
 	err = daos.DeleteIntegration(ctx, integrationID)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
 	c.JSON(http.StatusOK, params)
+	return
 }
