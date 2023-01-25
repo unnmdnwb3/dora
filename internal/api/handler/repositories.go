@@ -17,6 +17,7 @@ func GetRepositories(c *gin.Context) {
 	err := daos.ListIntegrations(ctx, &integrations)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
 	allRepositories := []models.Repository{}
@@ -27,10 +28,12 @@ func GetRepositories(c *gin.Context) {
 		repositories, err := client.GetRepositories()
 		if err != nil {
 			c.AbortWithError(http.StatusBadRequest, err)
+			return
 		}
 
 		allRepositories = append(allRepositories, *repositories...)
 	}
 
 	c.IndentedJSON(http.StatusOK, allRepositories)
+	return
 }

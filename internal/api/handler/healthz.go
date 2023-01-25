@@ -9,4 +9,5 @@ import (
 // Healthz returns the health status of the service.
 func Healthz(c *gin.Context) {
 	c.Status(http.StatusOK)
+	return
 }
