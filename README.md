@@ -24,7 +24,7 @@ If you're interested to use it for your team, but need us to support different D
 
 If you want to run `dora` locally, we assume you meet the following requirements installed:
 
-- Go >1.19
+- Go >1.20
 - Docker
 
 ## Overview

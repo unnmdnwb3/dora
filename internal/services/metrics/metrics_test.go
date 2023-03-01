@@ -30,7 +30,7 @@ var _ = Describe("services.metrics.metrics", func() {
 			movingAverages, err := metrics.MovingAveragesRatio(&numerators, &denominators, 3)
 			Expect(err).To(BeNil())
 			Expect(len(*movingAverages)).To(Equal(3))
-			Expect((*movingAverages)).To(Equal([]float64{25, 25, 25}))
+			Expect((*movingAverages)).To(Equal([]float64{0.25, 0.25, 0.25}))
 		})
 	})
 })
