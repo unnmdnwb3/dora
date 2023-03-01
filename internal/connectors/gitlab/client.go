@@ -154,7 +154,8 @@ func (c *Client) GetCommits(projectID int, referenceBranch string) (*[]models.Co
 	q := req.URL.Query()
 	q.Add("order", "default") // asc
 	q.Add("ref_name", referenceBranch)
-	q.Add("since", times.Date(time.Now().AddDate(0, -1, 0)).String())
+	q.Add("since", times.Date(time.Now().AddDate(0, -3, 0)).String())
+	q.Add("per_page", "100") // max
 	req.URL.RawQuery = q.Encode()
 
 	resp, err := client.Do(req)
@@ -194,10 +195,12 @@ func (c *Client) GetPipelineRuns(projectID int, referenceBranch string) (*[]mode
 
 	q := req.URL.Query()
 	q.Add("ref", referenceBranch)
-	q.Add("sort", "asc")
+	q.Add("sort", "asc") // asc
 	q.Add("source", "push")
 	q.Add("status", "success")
+	// shorter than commits, because a pipeline run could depend on commits older than a month or so
 	q.Add("updated_after", times.Date(time.Now().AddDate(0, -1, 0)).String())
+	q.Add("per_page", "100") // max
 	req.URL.RawQuery = q.Encode()
 
 	resp, err := client.Do(req)
