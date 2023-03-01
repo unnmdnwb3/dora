@@ -1,49 +1,41 @@
 # dora - fully automated DORA metrics
 
 > **Note**
-> This respository is work-in-progress. It's core functionality is not finished yet, but will be in **March 2023**.
+> This repository was created for the Master Thesis titled "Automated DORA Metrics: A Case Study" at FHNW, Switzerland.
+> Currently, we only provide the backend to calculate DORA metrics based on DevOps tooling data.
+> However, all metrics can be computed using our API.
 
-`dora` provides a backend to track the five DORA metrics in a completely automated manner. If you're interested to use it for your organization, but you need us to support additional DevOps technologies, please feel free to create a ticket and tell us!
+`dora` provides a backend to track the four DORA metrics in a completely automated manner. Thus, we provide the following metrics:
 
-## Overview
+- Deployment Frequency (DF)
+- Lead-Time for Changes (LTFC)
+- Change-Failure Rate (CFR)
+- Mean-Time to Restore (MTTR)
 
-The backend for `dora` visualized below.
+We currently support the following DevOps integrations:
 
-![Overview](./docs/images/overview.jpg)
+- Version Control: **Gitlab**
+- CICD: **Gitlab CICD**
+- Telemetry: **Prometheus**
 
-> **Note**
-> It currently supports only Gitlab, Gitlab CI. Prometheus, Bitbucket, Tekton, Argo and Jenkins will follow.
+If you're interested to use it for your team, but need us to support different DevOps technologies, please feel free to create a ticket and tell us!
 
 ## Requirements
 
 If you want to run `dora` locally, we assume you meet the following requirements installed:
 
-* Go >1.19
-* Docker
+- Go >1.19
+- Docker
 
-## Setup
+## Overview
 
-> **Note**
-> `dora` can only be run locally - a Kubernetes integration and Helm charts will be added before **March 2023**.
+A typical workflow using `dora` to calculate the DORA metrics is visualized below.
 
-### Run
+![Overview](./docs/images/dora-architecture.jpg)
 
-If you want to run `dora` locally, you can do so using:
+The implemented concepts to compute the DORA metrics are also visualized below.
 
-```bash
-make copy-empty-env
-```
-
-Inside the `.env` you only need to add a bearer-token for Gitlab to `GITLAB_BEARER`.
-
-> **Warning**
-> For production purposes, please ennsure that you use different credentials as the once proposed for a local test environment!
-
-This builds and run the backend, alongside a MongoDB instance running in Docker using:
-
-```bash
-make compose
-```
+![Concepts](./docs/images/dora_concepts.jpg)
 
 ## Development
 
@@ -62,23 +54,57 @@ nodes:
 - role: worker
 ```
 
-### Test
+## Run it
 
-If you want to run seperate local test, you can use:
+You can run `dora` using just a few commands!
+
+To run `dora` locally, first populate the `.env`:
+
+```bash
+make copy-empty-env
+```
+
+Inside the `.env` you only need to add a bearer-token for Gitlab to `GITLAB_BEARER`.
+
+> **Warning**
+> For production purposes, please ennsure that you use different credentials as the once proposed for a local test environment!
+
+Next, build and run the backend alongside a MongoDB instance:
+
+```bash
+make compose
+```
+
+Inspect the data in MongoDB:
+
+```bash
+make mongo-sh
+```
+
+If you need to start and stop the MongoDB manually:
+
+```bash
+make mongo-run
+make mongo-stop
+```
+
+### Test it
+
+If you want to run the tests one by one, you can use:
 
 ```bash
 make mongo-run
 ```
 
-This creates a new MongoDB instance within a Docker container.
+This creates a new MongoDB instance within a Docker container, so that you can run the integration tests against a database.
 
-To run all test, including integration, you can use:
+However, if you want to run all test, just use:
 
 ```bash
 make tests
 ```
 
-This command creates a temporary MongoDB instance, runs all test and destroys the MongoDB instance afterwards.
+This command creates a temporary MongoDB instance, runs all test and destroys the instance afterwards.
 
 ## License
 
@@ -88,6 +114,6 @@ This command creates a temporary MongoDB instance, runs all test and destroys th
 
 You can find more information on the DORA metrics here:
 
-* [DORA Accelerate State of DevOps Report - 2022](https://cloud.google.com/blog/products/devops-sre/dora-2022-accelerate-state-of-devops-report-now-out)
-* [Google Cloud Platform - Four Key Metrics](https://github.com/GoogleCloudPlatform/fourkeys)
-* [Accelerate: The Science Behind DevOps](https://books.google.ch/books/about/Accelerate.html?id=85XHAQAACAAJ)
+- [DORA Accelerate State of DevOps Report - 2022](https://cloud.google.com/blog/products/devops-sre/dora-2022-accelerate-state-of-devops-report-now-out)
+- [Google Cloud Platform - Four Key Metrics](https://github.com/GoogleCloudPlatform/fourkeys)
+- [Accelerate: The Science Behind DevOps](https://books.google.ch/books/about/Accelerate.html?id=85XHAQAACAAJ)
