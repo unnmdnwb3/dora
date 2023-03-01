@@ -27,6 +27,9 @@ func CreateChanges(ctx context.Context, repositoryID primitive.ObjectID, pipelin
 	}
 
 	log.Println(fmt.Sprintf("Found %d pipeline runs for pipelineID %s", len(pipelineRuns), pipelineID.Hex()))
+	if len(pipelineRuns) == 0 {
+		return nil
+	}
 
 	firstCommits, err := GetFirstCommits(ctx, repositoryID, &pipelineRuns)
 	if err != nil {

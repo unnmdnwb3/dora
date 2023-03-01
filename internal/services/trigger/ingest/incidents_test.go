@@ -30,8 +30,9 @@ var _ = Describe("services.trigger.import.incidents", func() {
 	var _ = BeforeEach(func() {
 		_ = godotenv.Load("./../../../../test/.env")
 
-		var queryRangeResponse prometheus.QueryRangeResponse
-		_ = test.UnmarshalFixture("./../../../../test/data/prometheus/query_range.json", &queryRangeResponse)
+		var queryRangeResponse prometheus.QueryResponse
+
+		_ = test.UnmarshalFixture("./../../../../test/data/prometheus/query.json", &queryRangeResponse)
 		prometheusMock = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 			json, _ := json.Marshal(queryRangeResponse)
@@ -53,8 +54,8 @@ var _ = Describe("services.trigger.import.incidents", func() {
 		os.Remove("MONGODB_PASSWORD")
 	})
 
-	var _ = When("ImportMonitoringDataPoints", func() {
-		It("gets all MonitoringDataPoints of a Deployment.", func() {
+	var _ = When("ImportAlerts", func() {
+		It("gets all Alerts of a Deployment.", func() {
 			integration := models.Integration{
 				ID:          primitive.NewObjectID(),
 				Provider:    "prometheus",
@@ -67,145 +68,87 @@ var _ = Describe("services.trigger.import.incidents", func() {
 
 			deployment := models.Deployment{
 				IntegrationID: integration.ID,
-				Query:         "up{app='dashboard-service'}",
-				Step:          600,
-				Relation:      "st",
-				Threshold:     1.0,
+				Query:         "ALERTS{alertname='TargetDown', job='ak-core/log-processor-service'}[6w]",
 			}
 
-			monitoringDataPoints, err := ingest.ImportMonitoringDataPoints(ctx, &deployment)
+			alerts, err := ingest.ImportAlerts(ctx, &deployment)
 			Expect(err).To(BeNil())
-			Expect(len(*monitoringDataPoints)).To(Equal(444))
+			Expect(len(*alerts)).To(Equal(62))
 		})
 	})
 
 	var _ = When("CalculateIncidents", func() {
-		It("calculates Incidents based on MonitoringDataPoints.", func() {
+		It("calculates Incidents based on Alerts.", func() {
 			deployment := models.Deployment{
 				IntegrationID: primitive.NewObjectID(),
-				Query:         "up{app='dashboard-service'}",
-				Step:          600,
-				Relation:      "st",
-				Threshold:     1.0,
+				Query:         "ALERTS{alertname='TargetDown', job='ak-core/log-processor-service'}[6w]",
 			}
 
-			dataPoints := []models.MonitoringDataPoint{
+			alerts := []models.Alert{
 				{
-					Value:     1.0,
-					CreatedAt: time.Unix(1674130200, 0),
+					CreatedAt: time.Unix(1674486526, 0),
 				},
 				{
-					Value:     1.0,
-					CreatedAt: time.Unix(1674130800, 0),
+					CreatedAt: time.Unix(1674486586, 0),
 				},
 				{
-					Value:     1.0,
-					CreatedAt: time.Unix(1674131400, 0),
+					CreatedAt: time.Unix(1674551806, 0),
 				},
 				{
-					Value:     0.0,
-					CreatedAt: time.Unix(1674132000, 0),
+					CreatedAt: time.Unix(1674551866, 0),
 				},
 				{
-					Value:     0.0,
-					CreatedAt: time.Unix(1674132600, 0),
+					CreatedAt: time.Unix(1674551926, 0),
 				},
 				{
-					Value:     1.0,
-					CreatedAt: time.Unix(1674133200, 0),
-				},
-				{
-					Value:     0.0,
-					CreatedAt: time.Unix(1674133800, 0),
-				},
-				{
-					Value:     0.0,
-					CreatedAt: time.Unix(1674134400, 0),
-				},
-				{
-					Value:     0.0,
-					CreatedAt: time.Unix(1674135000, 0),
-				},
-				{
-					Value:     1.0,
-					CreatedAt: time.Unix(1674135600, 0),
+					CreatedAt: time.Unix(1674728206, 0),
 				},
 			}
 
-			incidents, err := ingest.CalculateIncidents(ctx, &deployment, &dataPoints)
+			incidents, err := ingest.CalculateIncidents(ctx, &deployment, &alerts)
 			Expect(err).To(BeNil())
-			Expect(len(*incidents)).To(Equal(2))
-			Expect((*incidents)[0].StartDate).To(Equal(time.Unix(1674132000, 0)))
-			Expect((*incidents)[0].EndDate).To(Equal(time.Unix(1674132600, 0)))
-			Expect((*incidents)[1].StartDate).To(Equal(time.Unix(1674133800, 0)))
-			Expect((*incidents)[1].EndDate).To(Equal(time.Unix(1674135000, 0)))
-
+			Expect(len(*incidents)).To(Equal(3))
+			Expect((*incidents)[1].StartDate).To(Equal(time.Unix(1674551806, 0)))
+			Expect((*incidents)[1].EndDate).To(Equal(time.Unix(1674551956, 0)))
 		})
 	})
 
 	var _ = When("CreateIncidents", func() {
-		It("creates Incidents based on MonitoringDataPoints.", func() {
+		It("creates Incidents based on Alerts.", func() {
 			deployment := models.Deployment{
 				IntegrationID: primitive.NewObjectID(),
-				Query:         "up{app='dashboard-service'}",
-				Step:          600,
-				Relation:      "st",
-				Threshold:     1.0,
+				Query:         "ALERTS{alertname='TargetDown', job='ak-core/log-processor-service'}[6w]",
 			}
 
-			dataPoints := []models.MonitoringDataPoint{
+			alerts := []models.Alert{
 				{
-					Value:     1.0,
-					CreatedAt: time.Unix(1674130200, 0),
+					CreatedAt: time.Unix(1674486526, 0),
 				},
 				{
-					Value:     1.0,
-					CreatedAt: time.Unix(1674130800, 0),
+					CreatedAt: time.Unix(1674486586, 0),
 				},
 				{
-					Value:     1.0,
-					CreatedAt: time.Unix(1674131400, 0),
+					CreatedAt: time.Unix(1674551806, 0),
 				},
 				{
-					Value:     0.0,
-					CreatedAt: time.Unix(1674132000, 0),
+					CreatedAt: time.Unix(1674551866, 0),
 				},
 				{
-					Value:     0.0,
-					CreatedAt: time.Unix(1674132600, 0),
+					CreatedAt: time.Unix(1674551926, 0),
 				},
 				{
-					Value:     1.0,
-					CreatedAt: time.Unix(1674133200, 0),
-				},
-				{
-					Value:     0.0,
-					CreatedAt: time.Unix(1674133800, 0),
-				},
-				{
-					Value:     0.0,
-					CreatedAt: time.Unix(1674134400, 0),
-				},
-				{
-					Value:     0.0,
-					CreatedAt: time.Unix(1674135000, 0),
-				},
-				{
-					Value:     1.0,
-					CreatedAt: time.Unix(1674135600, 0),
+					CreatedAt: time.Unix(1674728206, 0),
 				},
 			}
 
-			err := ingest.CreateIncidents(ctx, &deployment, &dataPoints)
+			err := ingest.CreateIncidents(ctx, &deployment, &alerts)
 			Expect(err).To(BeNil())
 
 			var incidents []models.Incident
 			err = daos.ListIncidentsByFilter(ctx, bson.M{"deployment_id": deployment.ID}, &incidents)
-			Expect(incidents).To(HaveLen(2))
-			Expect(incidents[0].StartDate).To(Equal(time.Unix(1674132000, 0).UTC()))
-			Expect(incidents[0].EndDate).To(Equal(time.Unix(1674132600, 0).UTC()))
-			Expect(incidents[1].StartDate).To(Equal(time.Unix(1674133800, 0).UTC()))
-			Expect(incidents[1].EndDate).To(Equal(time.Unix(1674135000, 0).UTC()))
+			Expect(incidents).To(HaveLen(3))
+			Expect(incidents[1].StartDate).To(Equal(time.Unix(1674551806, 0).UTC()))
+			Expect(incidents[1].EndDate).To(Equal(time.Unix(1674551956, 0).UTC()))
 		})
 	})
 
@@ -223,10 +166,7 @@ var _ = Describe("services.trigger.import.incidents", func() {
 
 			deployment := models.Deployment{
 				IntegrationID: integration.ID,
-				Query:         "up{app='dashboard-service'}",
-				Step:          600,
-				Relation:      "st",
-				Threshold:     1.0,
+				Query:         "ALERTS{alertname='TargetDown', job='ak-core/log-processor-service'}[6w]",
 			}
 
 			channel := make(chan error)
@@ -239,9 +179,7 @@ var _ = Describe("services.trigger.import.incidents", func() {
 			var incidents []models.Incident
 			err = daos.ListIncidents(ctx, deployment.ID, &incidents)
 			Expect(err).To(BeNil())
-			Expect(len(incidents)).To(Equal(5))
-			Expect(incidents[0].StartDate).To(Equal(time.Unix(1674131400, 0).UTC()))
-			Expect(incidents[0].EndDate).To(Equal(time.Unix(1674132600, 0).UTC()))
+			Expect(len(incidents)).To(Equal(23))
 		})
 	})
 })

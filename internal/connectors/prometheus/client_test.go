@@ -21,47 +21,34 @@ func TestClient(t *testing.T) {
 var _ = Describe("prometheus.Client", func() {
 	var (
 		mock               *httptest.Server
-		queryRangeResponse prometheus.QueryRangeResponse
+		queryResponse prometheus.QueryResponse
 
 		client *prometheus.Client
 	)
 
 	var _ = BeforeEach(func() {
-		_ = test.UnmarshalFixture("./../../../test/data/prometheus/query_range.json", &queryRangeResponse)
+		_ = test.UnmarshalFixture("./../../../test/data/prometheus/query.json", &queryResponse)
 		mock = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
-			json, _ := json.Marshal(queryRangeResponse)
+			json, _ := json.Marshal(queryResponse)
 			w.Write(json)
 		}))
 
-		query := "up{app='dashboard-service'}"
-		start := time.Unix(1673186400, 0)
-		end := time.Unix(1674396000, 0)
-		step := 600
-		client = prometheus.NewClient(mock.URL, "", query, start, end, step)
+		query := "ALERTS{alertname='TargetDown', job='ak-core/log-processor-service'}[6w]"
+
+		client = prometheus.NewClient(mock.URL, "", query)
 	})
 
 	var _ = AfterEach(func() {
 		defer mock.Close()
 	})
 
-	var _ = When("CreateMonitoringDataPoints", func() {
-		It("creates monitoring data points from a query response", func() {
-			monitoringDataPoints, err := client.CreateMonitoringDataPoints(queryRangeResponse)
+	var _ = When("CreateAlerts", func() {
+		It("creates alerts from a query response", func() {
+			alerts, err := client.CreateAlerts(queryResponse)
 			Expect(err).To(BeNil())
-			Expect(len(*monitoringDataPoints)).To(Equal(444))
-			Expect((*monitoringDataPoints)[0].Value).To(Equal(1.0))
-			Expect((*monitoringDataPoints)[0].CreatedAt).To(Equal(time.Unix(1674130200, 0)))
-		})
-	})
-
-	var _ = When("GetMonitoringDataPoints", func() {
-		It("creates monitoring data points from a query response", func() {
-			monitoringDataPoints, err := client.GetMonitoringDataPoints()
-			Expect(err).To(BeNil())
-			Expect(len(*monitoringDataPoints)).To(Equal(444))
-			Expect((*monitoringDataPoints)[0].Value).To(Equal(1.0))
-			Expect((*monitoringDataPoints)[0].CreatedAt).To(Equal(time.Unix(1674130200, 0)))
+			Expect(len(*alerts)).To(Equal(62))
+			Expect((*alerts)[0].CreatedAt).To(Equal(time.Unix(1674486526, 0)))
 		})
 	})
 })
