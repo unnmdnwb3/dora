@@ -2,60 +2,57 @@ package ingest
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
 	"github.com/unnmdnwb3/dora/internal/connectors/prometheus"
 	"github.com/unnmdnwb3/dora/internal/daos"
 	"github.com/unnmdnwb3/dora/internal/models"
-	"github.com/unnmdnwb3/dora/internal/utils/times"
 )
 
 // ImportIncidents gets and persists historical data for each incident of a deployment.
-// However, this functions does not persist the raw monitoring data points, but rather aggregates them already to incidents.
-// This is because the raw data points are not relevant for the user, but the incidents are.
-// Additionally, persisting the raw data points would be too expensive, especially considering a small step size.
+// However, this functions does not persist the raw alerts, but rather aggregates them already to incidents.
+// This is because the raw alerts are not relevant for the user, but the incidents are.
 func ImportIncidents(ctx context.Context, channel chan error, deployment *models.Deployment) {
-	monitoringDataPoints, err := ImportMonitoringDataPoints(ctx, deployment)
+	alerts, err := ImportAlerts(ctx, deployment)
 	if err != nil {
 		channel <- err
 		return
 	}
 
-	err = CreateIncidents(ctx, deployment, monitoringDataPoints)
+	err = CreateIncidents(ctx, deployment, alerts)
 	channel <- err
 	return
 }
 
-// ImportMonitoringDataPoints gets historical monitoring data.
-func ImportMonitoringDataPoints(ctx context.Context, deployment *models.Deployment) (*[]models.MonitoringDataPoint, error) {
+// ImportAlerts gets the historical raw alert data.
+func ImportAlerts(ctx context.Context, deployment *models.Deployment) (*[]models.Alert, error) {
 	var integration models.Integration
 	err := daos.GetIntegration(ctx, deployment.IntegrationID, &integration)
 	if err != nil {
 		return nil, err
 	}
 
-	// TODO standardize the time range for data imports
-	end := time.Now()
-	start := times.Date(end.AddDate(0, -1, 0))
-
-	client := prometheus.NewClient(integration.URI, integration.BearerToken, deployment.Query, start, end, deployment.Step)
-	monitoringDataPoints, err := client.GetMonitoringDataPoints()
+	client := prometheus.NewClient(integration.URI, integration.BearerToken, deployment.Query)
+	alerts, err := client.GetAlerts()
 	if err != nil {
 		return nil, err
 	}
 
-	log.Printf("Created %d monitoring data points", len(*monitoringDataPoints))
+	log.Printf("Imported %d alerts", len(*alerts))
 
-	return monitoringDataPoints, nil
+	return alerts, nil
 }
 
 // CreateIncidents calculates and creates the incidents for a given deployment.
-func CreateIncidents(ctx context.Context, deployment *models.Deployment, monitoringDataPoints *[]models.MonitoringDataPoint) error {
-	incidents, err := CalculateIncidents(ctx, deployment, monitoringDataPoints)
+func CreateIncidents(ctx context.Context, deployment *models.Deployment, alerts *[]models.Alert) error {
+	incidents, err := CalculateIncidents(ctx, deployment, alerts)
 	if err != nil {
 		return err
+	}
+
+	if incidents == nil {
+		return nil
 	}
 
 	err = daos.CreateIncidents(ctx, incidents)
@@ -69,58 +66,39 @@ func CreateIncidents(ctx context.Context, deployment *models.Deployment, monitor
 }
 
 // CalculateIncidents calculates the incidents for a given deployment.
-// Ongoing incidents at the start and the end of the monitoring data points are used to create incidents with the information we got.
-func CalculateIncidents(ctx context.Context, deployment *models.Deployment, monitoringDataPoints *[]models.MonitoringDataPoint) (*[]models.Incident, error) {
-	if len(*monitoringDataPoints) == 0 {
-		return &[]models.Incident{}, fmt.Errorf("no monitoring data points provided")
+func CalculateIncidents(ctx context.Context, deployment *models.Deployment, alerts *[]models.Alert) (*[]models.Incident, error) {
+	if len(*alerts) == 0 {
+		return nil, nil
 	}
 
 	incidents := []models.Incident{}
-	prevIsIncident := IsIncident(deployment.Relation, deployment.Threshold, (*monitoringDataPoints)[0])
 
-	for slow, fast := 0, 1; fast < len(*monitoringDataPoints); fast++ {
-		curr := (*monitoringDataPoints)[fast]
-		currIsIncident := IsIncident(deployment.Relation, deployment.Threshold, curr)
+	// we assume each incidents to have at least one alert
+	// if the next alert is more than 120 seconds away, we assume a new incident
 
-		// if the current data point is an incident and the previous was one as well, we do not need to do anything
-		// same applies if the current data point is not an incident and the previous was not one as well
+	start := (*alerts)[0]
+	for i := 1; i < len(*alerts); i++ {
+		prev := (*alerts)[i-1]
+		curr := (*alerts)[i]
 
-		if currIsIncident && !prevIsIncident {
-			slow = fast
-		}
-
-		if !currIsIncident && prevIsIncident {
+		diff := curr.CreatedAt.Sub(prev.CreatedAt).Seconds()
+		if diff > 120 {
 			incidents = append(incidents, models.Incident{
 				DeploymentID: deployment.ID,
-				StartDate:    (*monitoringDataPoints)[slow].CreatedAt,
-				EndDate:      (*monitoringDataPoints)[fast-1].CreatedAt,
+				StartDate:    start.CreatedAt,
+				EndDate:      prev.CreatedAt.Add(30 * time.Second), // add 30 seconds
 			})
+
+			start = curr
 		}
-
-		prevIsIncident = currIsIncident
 	}
 
-	// if the last data point part of an incident, we need to create an incident for it
-	len := len(*monitoringDataPoints)
-	prevIsIncident = IsIncident(deployment.Relation, deployment.Threshold, (*monitoringDataPoints)[len-2])
-	currIsIncident := IsIncident(deployment.Relation, deployment.Threshold, (*monitoringDataPoints)[len-1])
-
-	if currIsIncident && prevIsIncident {
-		incidents = append(incidents, models.Incident{
-			DeploymentID: deployment.ID,
-			StartDate:    (*monitoringDataPoints)[len-2].CreatedAt,
-			EndDate:      (*monitoringDataPoints)[len-1].CreatedAt,
-		})
-	}
+	// add the last incident
+	incidents = append(incidents, models.Incident{
+		DeploymentID: deployment.ID,
+		StartDate:    start.CreatedAt,
+		EndDate:      (*alerts)[len(*alerts)-1].CreatedAt.Add(60 * time.Second), // add 30 seconds
+	})
 
 	return &incidents, nil
-}
-
-// IsIncident checks if a given monitoring data point is part of an incident.
-func IsIncident(relation string, threshold float64, monitoringDataPoint models.MonitoringDataPoint) bool {
-	if relation == "gt" {
-		return monitoringDataPoint.Value > threshold
-	}
-
-	return monitoringDataPoint.Value < threshold
 }

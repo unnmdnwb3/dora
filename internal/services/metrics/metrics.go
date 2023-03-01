@@ -58,7 +58,7 @@ func MovingAveragesRatio(numerators *[]int, denominators *[]int, window int) (*[
 		if denominatorsInWindow == 0 {
 			movingAverages[index-offset] = 0
 		} else {
-			val := (float64(numeratorsInWindow) / float64(denominatorsInWindow)) * 100
+			val := (float64(numeratorsInWindow) / float64(denominatorsInWindow))
 			movingAverages[index-offset] = numeric.Round(val, 2)
 		}
 
@@ -94,23 +94,26 @@ func CompleteIncidentsPerDays(incidentsPerDays *[]models.IncidentsPerDay, dates 
 		return nil, nil, fmt.Errorf("no dates provided")
 	}
 
-	if len(*dates) < len(*incidentsPerDays) {
-		return nil, nil, fmt.Errorf("more incidents per day than dates provided")
-	}
-
 	dailyIncidents := make([]int, len(*dates))
 	dailyDurations := make([]int, len(*dates))
+
 	curr := 0
 
 	for index, date := range *dates {
-		if curr < len(*incidentsPerDays) && date == (*incidentsPerDays)[curr].Date {
-			dailyIncidents[index] = (*incidentsPerDays)[curr].TotalIncidents
-			dailyDurations[index] = int((*incidentsPerDays)[curr].TotalDuration)
-			curr++
-		} else {
-			dailyIncidents[index] = 0
-			dailyDurations[index] = 0
+		sumIncidents := 0
+		sumDuration := 0
+		for j := curr; j < len(*incidentsPerDays); j++ {
+			if (*incidentsPerDays)[j].Date == date {
+				sumIncidents += (*incidentsPerDays)[j].TotalIncidents
+				sumDuration += int((*incidentsPerDays)[j].TotalDuration)
+				curr++
+			} else {
+				break
+			}
 		}
+
+		dailyIncidents[index] = sumIncidents
+		dailyDurations[index] = sumDuration
 	}
 
 	return &dailyIncidents, &dailyDurations, nil
@@ -123,20 +126,21 @@ func CompletePipelineRunsPerDays(pipelineRunsPerDays *[]models.PipelineRunsPerDa
 		return nil, fmt.Errorf("no dates provided")
 	}
 
-	if len(*dates) < len(*pipelineRunsPerDays) {
-		return nil, fmt.Errorf("more pipeline runs per day than dates provided")
-	}
-
 	dailyPipelineRuns := make([]int, len(*dates))
-	curr := 0
 
-	for index, date := range *dates {
-		if curr < len(*pipelineRunsPerDays) && date == (*pipelineRunsPerDays)[curr].Date {
-			dailyPipelineRuns[index] = (*pipelineRunsPerDays)[curr].TotalPipelineRuns
-			curr++
-		} else {
-			dailyPipelineRuns[index] = 0
+	curr := 0
+	for i, date := range *dates {
+		sum := 0
+		for j := curr; j < len(*pipelineRunsPerDays); j++ {
+			if (*pipelineRunsPerDays)[j].Date == date {
+				sum += (*pipelineRunsPerDays)[j].TotalPipelineRuns
+				curr++
+			} else {
+				break
+			}
 		}
+
+		dailyPipelineRuns[i] = sum
 	}
 
 	return &dailyPipelineRuns, nil
@@ -149,23 +153,26 @@ func CompleteChangesPerDays(changesPerDays *[]models.ChangesPerDay, dates *[]tim
 		return nil, nil, fmt.Errorf("no dates provided")
 	}
 
-	if len(*dates) < len(*changesPerDays) {
-		return nil, nil, fmt.Errorf("more changes per day than dates provided")
-	}
-
 	dailyChanges := make([]int, len(*dates))
 	dailyLeadTimes := make([]int, len(*dates))
+
 	curr := 0
 
-	for index, date := range *dates {
-		if curr < len(*changesPerDays) && date == (*changesPerDays)[curr].Date {
-			dailyChanges[index] = (*changesPerDays)[curr].TotalChanges
-			dailyLeadTimes[index] = int((*changesPerDays)[curr].TotalLeadTime)
-			curr++
-		} else {
-			dailyChanges[index] = 0
-			dailyLeadTimes[index] = 0
+	for i, date := range *dates {
+		sumChanges := 0
+		sumLeadTimes := 0.0
+		for j := curr; j < len(*changesPerDays); j++ {
+			if (*changesPerDays)[j].Date == date {
+				sumChanges += (*changesPerDays)[j].TotalChanges
+				sumLeadTimes += (*changesPerDays)[j].TotalLeadTime
+				curr++
+			} else {
+				break
+			}
 		}
+
+		dailyChanges[i] = sumChanges
+		dailyLeadTimes[i] = int(sumLeadTimes)
 	}
 
 	return &dailyChanges, &dailyLeadTimes, nil
