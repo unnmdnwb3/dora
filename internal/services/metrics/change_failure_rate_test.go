@@ -165,7 +165,7 @@ var _ = Describe("services.metrics.change_failure_rate", func() {
 			Expect(err).To(BeNil())
 			Expect(cfr.DailyDeployments).To(Equal([]int{6, 2, 8, 5}))
 			Expect(cfr.DailyIncidents).To(Equal([]int{2, 1, 0, 2}))
-			Expect(cfr.MovingAverages).To(Equal([]float64{20, 25, 18.75, 20}))
+			Expect(cfr.MovingAverages).To(Equal([]float64{0.2, 0.25, 0.19, 0.2}))
 		})
 	})
 })
