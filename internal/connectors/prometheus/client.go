@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/unnmdnwb3/dora/internal/models"
@@ -17,25 +16,19 @@ type Client struct {
 	URI   string
 	Auth  string
 	Query string
-	Start time.Time
-	End   time.Time
-	Step  int
 }
 
 // NewClient creates a new Gitlab API client.
-func NewClient(URI string, auth string, query string, start time.Time, end time.Time, step int) *Client {
+func NewClient(URI string, auth string, query string) *Client {
 	return &Client{
 		URI:   URI,
 		Auth:  auth,
 		Query: query,
-		Start: start,
-		End:   end,
-		Step:  step,
 	}
 }
 
-// QueryRangeResponse represents a Prometheus query response.
-type QueryRangeResponse struct {
+// QueryResponse represents a Prometheus query response.
+type QueryResponse struct {
 	Data struct {
 		Result []struct {
 			Metric struct {
@@ -46,11 +39,11 @@ type QueryRangeResponse struct {
 	} `json:"data"`
 }
 
-// GetMonitoringDataPoints gets all monitoring data points.
-func (c *Client) GetMonitoringDataPoints() (*[]models.MonitoringDataPoint, error) {
+// GetAlerts gets all alerts.
+func (c *Client) GetAlerts() (*[]models.Alert, error) {
 	client := &http.Client{}
 
-	uri := fmt.Sprintf("%s/api/v1/query_range", c.URI)
+	uri := fmt.Sprintf("%s/api/v1/query", c.URI)
 	req, err := http.NewRequest(http.MethodGet, uri, nil)
 	if err != nil {
 		log.Fatalln(err)
@@ -61,9 +54,6 @@ func (c *Client) GetMonitoringDataPoints() (*[]models.MonitoringDataPoint, error
 
 	q := req.URL.Query()
 	q.Add("query", c.Query)
-	q.Add("start", strconv.FormatInt(c.Start.Unix(), 10))
-	q.Add("end", strconv.FormatInt(c.End.Unix(), 10))
-	q.Add("step", strconv.Itoa(c.Step))
 	req.URL.RawQuery = q.Encode()
 
 	resp, err := client.Do(req)
@@ -77,37 +67,28 @@ func (c *Client) GetMonitoringDataPoints() (*[]models.MonitoringDataPoint, error
 		log.Fatalln(err)
 	}
 
-	var queryRange QueryRangeResponse
-	err = json.Unmarshal(body, &queryRange)
+	var queryResponse QueryResponse
+	err = json.Unmarshal(body, &queryResponse)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	monitoringDataPoints, err := c.CreateMonitoringDataPoints(queryRange)
+	alerts, err := c.CreateAlerts(queryResponse)
 	if err != nil {
 		return nil, err
 	}
 
-	return monitoringDataPoints, nil
+	return alerts, nil
 }
 
-// CreateMonitoringDataPoints creates MonitoringDataPoints from a QueryRangeResponse.
-func (c *Client) CreateMonitoringDataPoints(queryRangeResponse QueryRangeResponse) (*[]models.MonitoringDataPoint, error) {
-	monitoringDataPoints := []models.MonitoringDataPoint{}
-	for _, result := range queryRangeResponse.Data.Result {
+// CreateAlerts creates Alerts from a QueryResponse.
+func (c *Client) CreateAlerts(queryResponse QueryResponse) (*[]models.Alert, error) {
+	alerts := []models.Alert{}
+	for _, result := range queryResponse.Data.Result {
 		for _, dataPoint := range result.Values {
-			unix := int64(dataPoint[0].(float64))
-			createdAt := time.Unix(unix, 0)
-			value, err := strconv.ParseFloat(dataPoint[1].(string), 64)
-			if err != nil {
-				return nil, err
-			}
-			monitoringDataPoints = append(monitoringDataPoints, models.MonitoringDataPoint{
-				CreatedAt: createdAt,
-				Value:     value,
-			})
+			alerts = append(alerts, models.Alert{CreatedAt: time.Unix(int64(dataPoint[0].(float64)), 0)})
 		}
 	}
 
-	return &monitoringDataPoints, nil
+	return &alerts, nil
 }
